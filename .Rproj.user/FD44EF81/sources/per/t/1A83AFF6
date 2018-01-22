@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1516133012529.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1493282594",
+    "id" : "1A83AFF6",
+    "lastKnownWriteTime" : 1516133758,
+    "last_content_update" : 1516133758506,
+    "path" : "~/Dropbox/research/rpackages/GpGp/src/vecchia_functions.cpp",
+    "project_path" : "src/vecchia_functions.cpp",
+    "properties" : {
+        "cursorPosition" : "116,45",
+        "scrollLine" : "102"
+    },
+    "relative_order" : 7,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "cpp"
+}

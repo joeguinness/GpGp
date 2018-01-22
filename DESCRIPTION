@@ -1,0 +1,20 @@
+Package: GpGp
+Type: Package
+Title: Fast Gaussian Process Computation Using Vecchia's Approximation
+Version: 0.0.0
+Date: 2018-01-13
+Author: Joseph Guinness
+Maintainer: Joseph Guinness <joeguinness@gmail.com>
+Description: The package includes functions for reordering
+    input locations, finding ordered nearest neighbors
+    (with help from FNN package), grouping operations, 
+    approximate likelihood evaluations, profile likelihoods,
+    Gaussian process predictions, and conditional simulations.
+License: MIT + file LICENSE
+Imports: 
+    Rcpp (>= 0.12.13),
+    FNN
+Suggests:
+    fields
+LinkingTo: Rcpp
+RoxygenNote: 6.0.1

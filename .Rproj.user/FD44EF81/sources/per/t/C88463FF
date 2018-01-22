@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1516132290617.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1654026274",
+    "id" : "C88463FF",
+    "lastKnownWriteTime" : 1516133805,
+    "last_content_update" : 1516133805636,
+    "path" : "~/Dropbox/research/rpackages/GpGp/R/ordering_functions.R",
+    "project_path" : "R/ordering_functions.R",
+    "properties" : {
+        "cursorPosition" : "95,31",
+        "scrollLine" : "79"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

@@ -1,0 +1,23 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1516132475460.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "889255699",
+    "id" : "4D92CEF4",
+    "lastKnownWriteTime" : 1516133681,
+    "last_content_update" : 1516133681892,
+    "path" : "~/Dropbox/research/rpackages/GpGp/R/simulation_functions.R",
+    "project_path" : "R/simulation_functions.R",
+    "properties" : {
+        "cursorPosition" : "55,44",
+        "scrollLine" : "48",
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

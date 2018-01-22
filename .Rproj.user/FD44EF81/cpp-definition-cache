@@ -1,0 +1,116 @@
+[
+    {
+        "definitions" : [
+            {
+                "column" : 15,
+                "file" : "/Users/guinness/Dropbox/research/rpackages/GpGp/src/covfuns.cpp",
+                "kind" : 6,
+                "line" : 31,
+                "name" : "matern_isotropic(NumericMatrix, NumericVector)",
+                "parent_name" : "",
+                "usr" : "c:@F@matern_isotropic#$@N@Rcpp@C@Matrix>#VI14#@N@Rcpp@CT>1#T@PreserveStorage#$@N@Rcpp@C@Vector>#VI14#@N@Rcpp@CT>1#T@PreserveStorage#"
+            },
+            {
+                "column" : 15,
+                "file" : "/Users/guinness/Dropbox/research/rpackages/GpGp/src/covfuns.cpp",
+                "kind" : 6,
+                "line" : 88,
+                "name" : "matern_sphere(NumericMatrix, NumericVector)",
+                "parent_name" : "",
+                "usr" : "c:@F@matern_sphere#$@N@Rcpp@C@Matrix>#VI14#@N@Rcpp@CT>1#T@PreserveStorage#$@N@Rcpp@C@Vector>#VI14#@N@Rcpp@CT>1#T@PreserveStorage#"
+            },
+            {
+                "column" : 15,
+                "file" : "/Users/guinness/Dropbox/research/rpackages/GpGp/src/covfuns.cpp",
+                "kind" : 6,
+                "line" : 136,
+                "name" : "matern_sphere_time(NumericMatrix, NumericVector)",
+                "parent_name" : "",
+                "usr" : "c:@F@matern_sphere_time#$@N@Rcpp@C@Matrix>#VI14#@N@Rcpp@CT>1#T@PreserveStorage#$@N@Rcpp@C@Vector>#VI14#@N@Rcpp@CT>1#T@PreserveStorage#"
+            }
+        ],
+        "file" : "/Users/guinness/Dropbox/research/rpackages/GpGp/src/covfuns.cpp",
+        "file_last_write" : 1516132894
+    },
+    {
+        "definitions" : [
+            {
+                "column" : 15,
+                "file" : "/Users/guinness/Dropbox/research/rpackages/GpGp/src/covfuns.h",
+                "kind" : 6,
+                "line" : 6,
+                "name" : "matern_function(double, double *)",
+                "parent_name" : "",
+                "usr" : "c:@F@matern_function#d#*d#"
+            },
+            {
+                "column" : 15,
+                "file" : "/Users/guinness/Dropbox/research/rpackages/GpGp/src/covfuns.h",
+                "kind" : 6,
+                "line" : 25,
+                "name" : "matern_isotropic_internal(const std::vector<double> *, const std::vector<double> *, double *)",
+                "parent_name" : "",
+                "usr" : "c:@F@matern_isotropic_internal#*1$@N@std@N@__1@C@vector>#d#$@N@std@N@__1@C@allocator>#d#S0_#*d#"
+            }
+        ],
+        "file" : "/Users/guinness/Dropbox/research/rpackages/GpGp/src/covfuns.h",
+        "file_last_write" : 1516132833
+    },
+    {
+        "definitions" : [
+            {
+                "column" : 15,
+                "file" : "/Users/guinness/Dropbox/research/rpackages/GpGp/src/vecchia_functions.cpp",
+                "kind" : 6,
+                "line" : 46,
+                "name" : "vecchia_loglik(NumericVector, StringVector, NumericVector, NumericMatrix, IntegerMatrix)",
+                "parent_name" : "",
+                "usr" : "c:@F@vecchia_loglik#$@N@Rcpp@C@Vector>#VI14#@N@Rcpp@CT>1#T@PreserveStorage#$@N@Rcpp@C@Vector>#VI16#@N@Rcpp@CT>1#T@PreserveStorage#S0_#$@N@Rcpp@C@Matrix>#VI14#@N@Rcpp@CT>1#T@PreserveStorage#$@N@Rcpp@C@Matrix>#VI13#@N@Rcpp@CT>1#T@PreserveStorage#"
+            },
+            {
+                "column" : 15,
+                "file" : "/Users/guinness/Dropbox/research/rpackages/GpGp/src/vecchia_functions.cpp",
+                "kind" : 6,
+                "line" : 88,
+                "name" : "vecchia_Linv(NumericVector, StringVector, NumericMatrix, IntegerMatrix)",
+                "parent_name" : "",
+                "usr" : "c:@F@vecchia_Linv#$@N@Rcpp@C@Vector>#VI14#@N@Rcpp@CT>1#T@PreserveStorage#$@N@Rcpp@C@Vector>#VI16#@N@Rcpp@CT>1#T@PreserveStorage#$@N@Rcpp@C@Matrix>#VI14#@N@Rcpp@CT>1#T@PreserveStorage#$@N@Rcpp@C@Matrix>#VI13#@N@Rcpp@CT>1#T@PreserveStorage#"
+            },
+            {
+                "column" : 15,
+                "file" : "/Users/guinness/Dropbox/research/rpackages/GpGp/src/vecchia_functions.cpp",
+                "kind" : 6,
+                "line" : 124,
+                "name" : "Linv_mult(NumericMatrix, NumericVector, IntegerMatrix)",
+                "parent_name" : "",
+                "usr" : "c:@F@Linv_mult#$@N@Rcpp@C@Matrix>#VI14#@N@Rcpp@CT>1#T@PreserveStorage#$@N@Rcpp@C@Vector>#VI14#@N@Rcpp@CT>1#T@PreserveStorage#$@N@Rcpp@C@Matrix>#VI13#@N@Rcpp@CT>1#T@PreserveStorage#"
+            },
+            {
+                "column" : 15,
+                "file" : "/Users/guinness/Dropbox/research/rpackages/GpGp/src/vecchia_functions.cpp",
+                "kind" : 6,
+                "line" : 176,
+                "name" : "L_mult(NumericMatrix, NumericVector, IntegerMatrix)",
+                "parent_name" : "",
+                "usr" : "c:@F@L_mult#$@N@Rcpp@C@Matrix>#VI14#@N@Rcpp@CT>1#T@PreserveStorage#$@N@Rcpp@C@Vector>#VI14#@N@Rcpp@CT>1#T@PreserveStorage#$@N@Rcpp@C@Matrix>#VI13#@N@Rcpp@CT>1#T@PreserveStorage#"
+            }
+        ],
+        "file" : "/Users/guinness/Dropbox/research/rpackages/GpGp/src/vecchia_functions.cpp",
+        "file_last_write" : 1516133758
+    },
+    {
+        "definitions" : [
+            {
+                "column" : 6,
+                "file" : "/Users/guinness/Dropbox/research/rpackages/GpGp/src/vecchiafun.h",
+                "kind" : 6,
+                "line" : 10,
+                "name" : "vecchia(NumericVector, StringVector, NumericMatrix, IntegerMatrix, NumericVector &, NumericMatrix *, NumericVector *, int)",
+                "parent_name" : "",
+                "usr" : "c:@F@vecchia#$@N@Rcpp@C@Vector>#VI14#@N@Rcpp@CT>1#T@PreserveStorage#$@N@Rcpp@C@Vector>#VI16#@N@Rcpp@CT>1#T@PreserveStorage#$@N@Rcpp@C@Matrix>#VI14#@N@Rcpp@CT>1#T@PreserveStorage#$@N@Rcpp@C@Matrix>#VI13#@N@Rcpp@CT>1#T@PreserveStorage#&S0_#*S2_#*S0_#I#"
+            }
+        ],
+        "file" : "/Users/guinness/Dropbox/research/rpackages/GpGp/src/vecchiafun.h",
+        "file_last_write" : 1516132995
+    }
+]
