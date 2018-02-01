@@ -4,10 +4,12 @@
 \alias{order_maxmin}
 \title{Maximum minimum distance ordering}
 \usage{
-order_maxmin(locs)
+order_maxmin(locs, lonlat = FALSE)
 }
 \arguments{
 \item{locs}{A matrix of locations in R^d. Each row of \code{locs} contains a location.}
+
+\item{lonlat}{Flag indicating whether the \code{locs} are longitudes and latitudes.}
 }
 \value{
 A vector of indices giving the ordering,
@@ -18,6 +20,7 @@ A point in the center is chosen first, and then each successive point
 is chosen to maximize the minimum distance to previously selected points
 }
 \examples{
+# planar coordinates
 nvec <- c(50,50)
 locs <- as.matrix( expand.grid( 1:nvec[1]/nvec[1], 1:nvec[2]/nvec[2] ) )
 ord <- order_maxmin(locs)
@@ -25,5 +28,15 @@ par(mfrow=c(1,3))
 plot( locs[ord[1:100],1], locs[ord[1:100],2], xlim = c(0,1), ylim = c(0,1) )
 plot( locs[ord[1:300],1], locs[ord[1:300],2], xlim = c(0,1), ylim = c(0,1) )
 plot( locs[ord[1:900],1], locs[ord[1:900],2], xlim = c(0,1), ylim = c(0,1) )
+
+# longitude/latitude coordinates (sphere)
+latvals <- seq(-80, 80, length.out = 40 )
+lonvals <- seq( 0, 360, length.out = 81 )[1:80]
+lonlat <- as.matrix( expand.grid( lonvals, latvals ) )
+ord <- order_maxmin_sphere(lonlat)
+par(mfrow=c(1,3))
+plot( lonlat[ord[1:100],1], lonlat[ord[1:100],2], xlim = c(0,360), ylim = c(-90,90) )
+plot( lonlat[ord[1:300],1], lonlat[ord[1:300],2], xlim = c(0,360), ylim = c(-90,90) )
+plot( lonlat[ord[1:900],1], lonlat[ord[1:900],2], xlim = c(0,360), ylim = c(-90,90) )
 
 }

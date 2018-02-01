@@ -4,10 +4,10 @@
 \alias{fast_Gp_sim}
 \title{Approximate GP simulation}
 \usage{
-fast_Gp_sim(covfun_name = "matern_isotropic", covparms, locs, m = 30)
+fast_Gp_sim(covparms, covfun_name = "matern_isotropic", locs, m = 30)
 }
 \arguments{
-\item{covparms}{Vector of covariance function parameters. For "maternIsotropic" and 
+\item{covparms}{Vector of covariance function parameters. For "maternIsotropic" and
 "maternSphere", these are (variance, range, smoothness, nugget). For "maternSphereTime",
 these are (variance, spatial range, temporal range, smoothness, nugget). See documentation
 of the covariance functions for more details.}
@@ -18,7 +18,7 @@ locations are (lon,lat,time).}
 
 \item{m}{Number of nearest neighbors to use in approximation}
 
-\item{covfunNames}{string name of covariance functions. Currently supported 
+\item{covfunNames}{string name of covariance functions. Currently supported
 covariance functions are "maternIsotropic", "maternSphere", and "maternSphereTime"}
 }
 \value{
@@ -32,6 +32,6 @@ with a vector of uncorrelated standard normals
 }
 \examples{
 locs <- as.matrix( expand.grid( (1:100)/100, (1:100)/100 ) )
-y <- fast_Gp_sim("matern_isotropic", c(4,0.2,0.5,0), locs, 30 )
+y <- fast_Gp_sim(c(4,0.2,0.5,0), "matern_isotropic",  locs, 30 )
 fields::image.plot( matrix(y,100,100) )
 }

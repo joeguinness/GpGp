@@ -4,7 +4,7 @@
 #include <vector>
 #include <cassert>
 #include "covfuns.h"
-#include "vecchiafun.h"
+#include "vecchia_fun_grouped.h"
 
 using namespace std;
 using namespace Rcpp;
@@ -40,18 +40,21 @@ using namespace Rcpp;
 //' y <- fast_Gp_sim( "matern_isotropic", covparms, locs, 60 ) 
 //' ord <- order_maxmin(locs)
 //' NNarray <- find_ordered_nn(locs,20)
-//' loglik <- vecchia_loglik( covparms, "matern_isotropic", y, locs, NNarray )
+//' NNlist <- group_obs(NNarray)
+//' loglik <- vecchia_loglik_grouped( covparms, "matern_isotropic", y, locs, NNlist )
 //' @export
 // [[Rcpp::export]]
-NumericVector vecchia_loglik(NumericVector covparms, StringVector covfun_name,
+NumericVector vecchia_loglik_grouped(NumericVector covparms, StringVector covfun_name,
                                   NumericVector y,
-                                  NumericMatrix locs, IntegerMatrix NNarray) {
+                                  NumericMatrix locs, List NNlist) {
 
     NumericVector ll(1);        // loglikelihood to be returned
-    NumericMatrix Linv(1,1);    // Linv not to be returned
-    vecchia(covparms, covfun_name, locs, NNarray, y, &Linv, &ll, 1);
+    NumericVector Linv(1);    // Linv not to be returned
+    vecchia_grouped(covparms, covfun_name, locs, NNlist, y, &Linv, &ll, 1);
     return ll;
 }
+
+
 
 //' Inverse Cholesky factor implied by Vecchia's approximation
 //' 
@@ -85,15 +88,21 @@ NumericVector vecchia_loglik(NumericVector covparms, StringVector covfun_name,
 //' Linv <- vecchia_Linv( covparms, "matern_isotropic", locs, NNarray )
 //' @export
 // [[Rcpp::export]]
-NumericMatrix vecchia_Linv(NumericVector covparms, StringVector covfun_name,
-                            NumericMatrix locs, IntegerMatrix NNarray) {
+NumericVector vecchia_Linv_grouped(NumericVector covparms, StringVector covfun_name,
+                            NumericMatrix locs, List NNlist) {
 
-    NumericVector y(NNarray.nrow());
+    NumericVector y(locs.nrow());
     NumericVector ll(1);        // loglikelihood to be returned
-    NumericMatrix Linv(NNarray.nrow() , NNarray.ncol());    // Linv not to be returned
-    vecchia(covparms, covfun_name, locs, NNarray, y, &Linv, &ll, 2);
+    NumericVector local_resp_inds = NNlist["local_resp_inds"];
+    int nentries = 0;
+    for(int j=0; j<local_resp_inds.length(); j++){
+        nentries += local_resp_inds[j];
+    }
+    NumericVector Linv(nentries);    // Linv not to be returned
+    vecchia_grouped(covparms, covfun_name, locs, NNlist, y, &Linv, &ll, 2);
     return Linv;
 }
+
 
 
 //' Multiply approximate inverse Cholesky by a vector
@@ -121,88 +130,51 @@ NumericMatrix vecchia_Linv(NumericVector covparms, StringVector covfun_name,
 //' print( sum( (z1-z2)^2 ) )
 //' @export
 // [[Rcpp::export]]
-NumericVector Linv_mult(NumericMatrix Linv_entries, NumericVector z,
-                                  IntegerMatrix NNarray) {
+NumericVector Linv_mult_grouped(NumericVector Linv, NumericVector z,
+                                  List NNlist) {
 
     // return x = Linv * z
-    int i;
-    int j;
+    int i, j, k, nresp;
 
     int n = z.length();
     NumericVector x(n);
-    for(j=0;j<n;j++){ x[j] = 0.0; }
 
-    // number of neighbors + 1
-    int m = NNarray.ncol();
+    // vector of all indices
+    std::vector<int> all_inds = Rcpp::as<std::vector<int> >(NNlist["all_inds"]);
+    // vector of local response indices
+    std::vector<int> local_resp_inds = Rcpp::as<std::vector<int> >(NNlist["local_resp_inds"]);
+    // vector of global response indices
+    std::vector<int> global_resp_inds = Rcpp::as<std::vector<int> >(NNlist["global_resp_inds"]);
+    // last index of each block in all_inds
+    std::vector<int> last_ind_of_block = Rcpp::as<std::vector<int> >(NNlist["last_ind_of_block"]);
+    // last response index of each block in local_resp_inds and global_resp_inds
+    std::vector<int> last_resp_of_block = Rcpp::as<std::vector<int> >(NNlist["last_resp_of_block"]);
 
+    int nb = last_ind_of_block.size();    
+    int first_ind_block = 0;
+    int first_L_ind = 0;
+    int first_resp = 0;
+    int cur_resp = 0;
+    Rcout << nb << endl;
     // rows 1 though n
-    for(i=0; i<n; i++){
-        int bsize = min(i+1,m);
-        for(j=0; j<bsize; j++){
-            x( i ) += z( NNarray(i,j) - 1 )*Linv_entries(i,j);
-        }
-    }
+    for(i=0; i<nb; i++){
+        
+        if(i==0){ first_resp = 0; } else { first_resp = last_resp_of_block[i-1]; }
+        nresp = last_resp_of_block[i] - first_resp;
+        
+        for(j=0; j<nresp; j++){
+            
+            for(k=0; k<local_resp_inds[cur_resp]; k++){
+                x( global_resp_inds[cur_resp] - 1 ) += 
+                    Linv( first_L_ind + k )*z( all_inds[ first_ind_block + k ] - 1 );
+            }
 
+            // update first_L_ind
+            first_L_ind += local_resp_inds[cur_resp];
+            cur_resp++;
+        }
+        // update first ind block
+        first_ind_block = last_ind_of_block[i];
+    }
     return x;
 }
-
-
-//' Multiply approximate Cholesky by a vector
-//' 
-//' Vecchia's approximation implies a sparse approximation to the 
-//' inverse Cholesky factor of the covariance matrix. This function
-//' returns the result of multiplying the inverse of that matrix by a vector 
-//' (i.e. an approximation to the Cholesky factor).
-//' @param LinvEntries Entries of the sparse inverse Cholesky factor,
-//' usually the output from \code{vecchiaLinv}.
-//' @param z the vector to be multiplied
-//' @param NNarray A matrix of indicies, usually the output from \code{findOrderedNN}. Row \code{i} contains the indices
-//' of the observations that observation \code{i} conditions on. By convention,
-//' the first element of row \code{i} is \code{i}.
-//' @return the product of the sprase inverse Cholesky factor with a vector
-//' @examples
-//' n <- 8000
-//' locs <- matrix( runif(2*n), n, 2 )
-//' covparms <- c(2, 0.2, 0.75, 0.1)
-//' ord <- order_maxmin(locs)
-//' NNarray <- find_ordered_nn(locs,20)
-//' Linv <- vecchia_Linv( covparms, "matern_isotropic", locs, NNarray )
-//' z <- rnorm(n)
-//' y1 <- fast_Gp_sim_Linv(Linv,NNarray,z)
-//' y2 <- L_mult(Linv, z, NNarray)
-//' print( sum( (y1-y2)^2 ) )
-//' @export
-// [[Rcpp::export]]
-NumericVector L_mult(NumericMatrix Linv_entries, NumericVector z,
-                               IntegerMatrix NNarray) {
-
-    // return x = L z
-    // by solving (L^{-1})x = z
-    int i;
-    int j;
-    int B;
-
-    int n = z.length();
-    NumericVector x(n);
-
-    // number of neighbors + 1
-    int m = NNarray.ncol();
-
-    // get entry 0
-    x(0) = z(0)/Linv_entries(0,0);
-
-    // get entries 1 through n
-    for(i=1; i<n; i++){
-        B = min(i+1,m);
-        x(i) = z(i);
-        for(j=1; j<B; j++){
-            x(i) -= Linv_entries(i,j)*x( NNarray(i,j) - 1 );
-        }
-        x(i) = x(i)/Linv_entries(i,0);
-    }
-
-    return x;
-}
-
-
-

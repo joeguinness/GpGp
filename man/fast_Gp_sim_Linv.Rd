@@ -7,12 +7,12 @@
 fast_Gp_sim_Linv(Linv, NNarray, z = NULL)
 }
 \arguments{
-\item{Linv}{Matrix containing the entries of Linverse, usually the output from 
+\item{Linv}{Matrix containing the entries of Linverse, usually the output from
 \code{vecchiaLinv}.}
 
 \item{NNarray}{Matrix of nearest neighbor indices, usually the output from findOrderedNN}
 
-\item{z}{Optional vector of standard normals. If not specified, 
+\item{z}{Optional vector of standard normals. If not specified,
 these are computed within the function.}
 }
 \value{

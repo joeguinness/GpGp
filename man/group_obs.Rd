@@ -7,10 +7,10 @@
 group_obs(NNarray, exponent = 2)
 }
 \arguments{
-\item{NNarray}{Matrix of nearest neighbor indices, usually the result of findOrderedNN}
+\item{NNarray}{Matrix of nearest neighbor indices, usually the result of \code{find_ordered_nn}.}
 
 \item{exponent}{Within the algorithm, two groups are merged if the number of unique
-neighbors raised to the \code{exponent} power is less than the sum of the unique numbers 
+neighbors raised to the \code{exponent} power is less than the sum of the unique numbers
 raised to the \code{exponent} power from the two groups.}
 }
 \value{
@@ -22,17 +22,21 @@ is exhaustive, meaning that the entirety of NNarray can be reconstructed from th
 Take in an array of nearest neighbors, and automatically partition
 the array into groups that share neighbors.
 This is helpful to speed the computations and improve their accuracy.
-The function returns a list, with each list element containing one or 
+The function returns a list, with each list element containing one or
 several rows of NNarray. The algorithm attempts to find groupings such that
 observations within a group share many common neighbors.
 }
 \examples{
-locs <- matrix( runif(200), 100, 2 )                         # generate random locations
-ord <- order_maxmin(locs)                                     # calculate an ordering
-locsord <- locs[ord,]                                        # reorder locations
-m <- 10                               
-NNarray <- find_ordered_nn(locsord,m)  
-NNlist2 <- group_obs(NNarray)
-NNlist3 <- group_obs(NNarray,3)
-NNlist2[1:10]
+locs <- matrix( runif(200), 100, 2 )   # generate random locations
+ord <- order_maxmin(locs)              # calculate an ordering
+locsord <- locs[ord,]                  # reorder locations
+m <- 10
+NNarray <- find_ordered_nn(locsord,m)  # m nearest neighbor indices
+NNlist2 <- group_obs(NNarray)          # join blocks if joining reduces squares
+NNlist3 <- group_obs(NNarray,3)        # join blocks if joining reduces cubes
+object.size(NNarray)
+object.size(NNlist2)
+object.size(NNlist3)
+mean( NNlist2[["local_resp_inds"]] - 1 )   # average number of neighbors (exponent 2)
+mean( NNlist3[["local_resp_inds"]] - 1 )   # average number of neighbors (exponent 3)
 }

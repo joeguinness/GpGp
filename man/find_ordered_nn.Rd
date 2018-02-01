@@ -2,28 +2,28 @@
 % Please edit documentation in R/nearest_neighbor_functions.R
 \name{find_ordered_nn}
 \alias{find_ordered_nn}
-\title{Find ordered nearest neighhbors}
+\title{Find ordered nearest neighbors}
 \usage{
-find_ordered_nn(locs, m)
+find_ordered_nn(locs, m, lonlat = FALSE)
 }
 \arguments{
-\item{locs}{Matrix containing ordered locations. 
+\item{locs}{Matrix containing ordered locations.
 Each row is contains a single location}
 
 \item{m}{Nuber of neighbors to return}
 }
 \value{
 An matrix containing the indices of the neighbors. Row \code{i} of the
-returned matrix contains the indices of the nearest \code{m} 
-locations to the \code{i}'th location. Indices are ordered within a 
+returned matrix contains the indices of the nearest \code{m}
+locations to the \code{i}'th location. Indices are ordered within a
 row to be increasing in distance. By convention, consider a location
-to neighbor itself, so the first entry of row \code{i} is \code{i}, the 
+to neighbor itself, so the first entry of row \code{i} is \code{i}, the
 second neighbor is the nearest other location, and so on. Because each
 location neighbors itself, the returned matrix has \code{m+1} columns.
 }
 \description{
 Given a matrix of reordered locations, find the \code{m} nearest neighbors
-to each location, subject to the neighbors coming 
+to each location, subject to the neighbors coming
 previously in the ordering. The algorithm uses the kdtree
 algorithm in the FNN package, adapted to the setting
 where the nearest neighbors must come from previous
@@ -33,7 +33,7 @@ in the ordering.
 locs <- as.matrix( expand.grid( (1:40)/40, (1:40)/40 ) )     # grid of locations
 ord <- order_maxmin(locs)                                     # calculate an ordering
 locsord <- locs[ord,]                                        # reorder locations
-m <- 20                               
+m <- 20
 NNarray <- find_ordered_nn(locsord,20)             # find ordered nearest 20 neighbors
 ind <- 100
 # plot all locations in gray, first ind locations in black,

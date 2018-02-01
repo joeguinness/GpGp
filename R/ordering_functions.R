@@ -82,8 +82,10 @@ order_coordinate <- function( locs, coordinate ){
 #' is chosen to maximize the minimum distance to previously selected points
 #'  
 #' @param locs A matrix of locations in R^d. Each row of \code{locs} contains a location.
+#' @param lonlat Flag indicating whether the \code{locs} are longitudes and latitudes.
 #' @return A vector of indices giving the ordering, 
 #' @examples
+#' # planar coordinates
 #' nvec <- c(50,50)
 #' locs <- as.matrix( expand.grid( 1:nvec[1]/nvec[1], 1:nvec[2]/nvec[2] ) )
 #' ord <- order_maxmin(locs)
@@ -92,9 +94,31 @@ order_coordinate <- function( locs, coordinate ){
 #' plot( locs[ord[1:300],1], locs[ord[1:300],2], xlim = c(0,1), ylim = c(0,1) )
 #' plot( locs[ord[1:900],1], locs[ord[1:900],2], xlim = c(0,1), ylim = c(0,1) )
 #' 
+#' # longitude/latitude coordinates (sphere)
+#' latvals <- seq(-80, 80, length.out = 40 )
+#' lonvals <- seq( 0, 360, length.out = 81 )[1:80]
+#' lonlat <- as.matrix( expand.grid( lonvals, latvals ) )
+#' ord <- order_maxmin_sphere(lonlat)
+#' par(mfrow=c(1,3))
+#' plot( lonlat[ord[1:100],1], lonlat[ord[1:100],2], xlim = c(0,360), ylim = c(-90,90) )
+#' plot( lonlat[ord[1:300],1], lonlat[ord[1:300],2], xlim = c(0,360), ylim = c(-90,90) )
+#' plot( lonlat[ord[1:900],1], lonlat[ord[1:900],2], xlim = c(0,360), ylim = c(-90,90) )
+#' 
 #' @export
-order_maxmin <- function(locs){
+order_maxmin <- function(locs, lonlat = FALSE){
 
+    if(lonlat){
+        lon <- locs[,1]
+        lat <- locs[,2]
+        lonrad <- lon*2*pi/360
+        latrad <- (lat+90)*2*pi/360
+        x <- sin(latrad)*cos(lonrad)
+        y <- sin(latrad)*sin(lonrad)
+        z <- cos(latrad)
+        locs <- cbind(x,y,z)
+    }
+
+    
     # get number of locs
     n <- nrow(locs)
     m <- round(sqrt(n))
@@ -125,5 +149,3 @@ order_maxmin <- function(locs){
 
     return(ord)
 }
-
-

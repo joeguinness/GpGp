@@ -2,82 +2,182 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 #' Isotropic Matern covariance function
-#' 
+#'
 #' From a matrix of locations and covariance parameters of the form
 #' (variance, range, smoothness, nugget), return the square matrix of
 #' all pairwise covariances.
-#' @param locs A matrix with \code{n} rows and \code{d} columns. 
+#' @param locs A matrix with \code{n} rows and \code{d} columns.
 #' Each row of locs gives a point in R^d.
-#' @param covparms A vector giving positive-valued covariance parameters 
+#' @param covparms A vector giving positive-valued covariance parameters
 #' in the form (variance, range, smoothness, nugget)
 #' @return A matrix with \code{n} rows and \code{n} columns, with the i,j entry
-#' containing the covariance between observations at \code{locs[i,]} and 
+#' containing the covariance between observations at \code{locs[i,]} and
 #' \code{locs[j,]}.
 #' @section Parameterization:
-#' The covariance parameter vector is (variange, range, smoothness, nugget) 
+#' The covariance parameter vector is (variange, range, smoothness, nugget)
 #' = \eqn{(\sigma^2,\alpha,\nu,\tau^2)}, and the covariance function is parameterized
 #' as
 #' \deqn{ M(x,y) = \sigma^2 2^{1-\nu}/\Gamma(\nu) ( || x - y || / \alpha )^\nu K_\nu( || x - y || / \alpha )  }
-#' The nugget value \eqn{ \sigma^2 \tau^2 } is added to the diagonal of the covariance matrix. 
+#' The nugget value \eqn{ \sigma^2 \tau^2 } is added to the diagonal of the covariance matrix.
 #' NOTE: the nugget is \eqn{ \sigma^2 \tau^2 }, not \eqn{ \tau^2 }. The reason for this choice
 #' is for simpler profiling of \eqn{ \sigma^2 }.
-matern_isotropic <- function(locs, covparms) {
-    .Call('_GpGp_matern_isotropic', PACKAGE = 'GpGp', locs, covparms)
+matern_isotropic <- function(covparms, locs) {
+    .Call('_GpGp_matern_isotropic', PACKAGE = 'GpGp', covparms, locs)
 }
 
 #' Isotropic Matern covariance function on sphere
-#' 
+#'
 #' From a matrix of longitudes and latitudes and a vector covariance parameters of the form
 #' (variance, range, smoothness, nugget), return the square matrix of
 #' all pairwise covariances.
 #' @param lonlat A matrix with \code{n} rows and one column with longitudes in (-180,180)
-#' and one column of latitudes in (-90,90). 
+#' and one column of latitudes in (-90,90).
 #' Each row of locs describes a point on the sphere.
-#' @param covparms A vector giving positive-valued covariance parameters 
+#' @param covparms A vector giving positive-valued covariance parameters
 #' in the form (variance, range, smoothness, nugget)
 #' @return A matrix with \code{n} rows and \code{n} columns, with the i,j entry
-#' containing the covariance between observations at \code{lonlat[i,]} and 
+#' containing the covariance between observations at \code{lonlat[i,]} and
 #' \code{lonlat[j,]}.
 #' @section Matern on Sphere Domain:
 #' The function first calculates the (x,y,z) 3D coordinates, and then inputs
 #' the resulting locations into \code{maternIsotropic}. This means that we construct
 #' covariances on the sphere by embedding the sphere in a 3D space. There has been some
-#' concern expressed in the literature that such embeddings may produce distortions. 
-#' The source and nature of such distortions has never been articulated, 
+#' concern expressed in the literature that such embeddings may produce distortions.
+#' The source and nature of such distortions has never been articulated,
 #' and to date, no such distortions have been documented. Guinness and
 #' Fuentes (2016) argue that 3D embeddings produce reasonable models for data on spheres.
-matern_sphere <- function(lonlat, covparms) {
-    .Call('_GpGp_matern_sphere', PACKAGE = 'GpGp', lonlat, covparms)
+matern_sphere <- function(covparms, lonlat) {
+    .Call('_GpGp_matern_sphere', PACKAGE = 'GpGp', covparms, lonlat)
 }
 
 #' Isotropic Matern covariance function on sphere-time
-#' 
+#'
 #' From a matrix of longitudes, latitudes, and times and a vector covariance parameters of the form
 #' (variance, spatial range, temporal range, smoothness, nugget), return the square matrix of
 #' all pairwise covariances.
 #' @param lonlattime A matrix with \code{n} rows and one column with longitudes in (-180,180),
 #' one column of latitudes in (-90,90), and one column of times.
 #' Each row of locs describes a point on the sphere-time domain.
-#' @param covparms A vector giving positive-valued covariance parameters 
+#' @param covparms A vector giving positive-valued covariance parameters
 #' in the form (variance, spatial range, temporal range, smoothness, nugget)
 #' @return A matrix with \code{n} rows and \code{n} columns, with the i,j entry
-#' containing the covariance between observations at \code{lonlattime[i,]} and 
+#' containing the covariance between observations at \code{lonlattime[i,]} and
 #' \code{lonlattime[j,]}.
 #' @section Matern on Sphere-Time Domain:
-#' The function first calculates the (x,y,z) 3D spatial coordinates, and scales the 
-#' spatial coordinates by the spatial range and the temporal coordinates by 
+#' The function first calculates the (x,y,z) 3D spatial coordinates, and scales the
+#' spatial coordinates by the spatial range and the temporal coordinates by
 #' the temporal range. Then the scaled coordinates are input into
 #' \code{maternIsotropic}. This means that we construct
-#' covariances on the sphere-time by embedding the sphere-time domain in a 4D space, with a 
-#' different range parameter for the three spatial dimensions versus the one 
+#' covariances on the sphere-time by embedding the sphere-time domain in a 4D space, with a
+#' different range parameter for the three spatial dimensions versus the one
 #' temporal dimension. There has been some
 #' concern expressed in the literature that embedding points on the sphere into
-#' a 3D domain may cause distortions. 
-#' The source and nature of such distortions has never been articulated, 
+#' a 3D domain may cause distortions.
+#' The source and nature of such distortions has never been articulated,
 #' and to date, no such distortions have been documented. Guinness and
 #' Fuentes (2016) argue that 3D embeddings produce reasonable models for data on spheres.
-matern_sphere_time <- function(lonlattime, covparms) {
-    .Call('_GpGp_matern_sphere_time', PACKAGE = 'GpGp', lonlattime, covparms)
+matern_sphere_time <- function(covparms, lonlattime) {
+    .Call('_GpGp_matern_sphere_time', PACKAGE = 'GpGp', covparms, lonlattime)
+}
+
+#' Vecchia's approximation to the Gaussian loglikelihood
+#' 
+#' This function returns Vecchia's (1988) approximation to the Gaussian
+#' loglikelihood. The approximation modifies the ordered conditional
+#' specification of the joint density; rather than each term in the product
+#' conditioning on all previous observations, each term conditions on
+#' a small subset of previous observations.
+#' @param covparms A vector of covariance parameters appropriate
+#' for the specified covariance function
+#' @param covfunName One of "maternIsotropic", "maternSphere", or "maternSphereTime".
+#' "maternIsotropic" and "maternSphere" have four covariance parameters, 
+#' (variange, range, smoothness, nugget), and "maternSphereTime" has five,
+#' (variance, spatial range, temporal range, smoothness, nugget).
+#' @param y vector of response values
+#' @param locs matrix of locations. Row \code{i} of locs specifies the location
+#' of element \code{i} of \code{y}, and so the length of \code{y} should equal
+#' the number of rows of \code{locs}.
+#' @param NNarray A matrix of indicies, usually the output from \code{findOrderedNN}. Row \code{i} contains the indices
+#' of the observations that observation \code{i} conditions on. By convention,
+#' the first element of row \code{i} is \code{i}.
+#' @return the Gaussian loglikelihood
+#' @examples
+#' n1 <- 60
+#' n2 <- 60
+#' n <- n1*n2
+#' locs <- as.matrix( expand.grid( (1:n1)/n1, (1:n2)/n2 ) )
+#' covparms <- c(2, 0.2, 0.75, 0)
+#' y <- fast_Gp_sim( "matern_isotropic", covparms, locs, 60 ) 
+#' ord <- order_maxmin(locs)
+#' NNarray <- find_ordered_nn(locs,20)
+#' NNlist <- group_obs(NNarray)
+#' loglik <- vecchia_loglik_grouped( covparms, "matern_isotropic", y, locs, NNlist )
+#' @export
+vecchia_loglik_grouped <- function(covparms, covfun_name, y, locs, NNlist) {
+    .Call('_GpGp_vecchia_loglik_grouped', PACKAGE = 'GpGp', covparms, covfun_name, y, locs, NNlist)
+}
+
+#' Inverse Cholesky factor implied by Vecchia's approximation
+#' 
+#' This function returns the entries of the sparse approximation to 
+#' the Cholesky factor implied by Vecchia's (1988) approximation to the Gaussian
+#' loglikelihood. The approximation modifies the ordered conditional
+#' specification of the joint density; rather than each term in the product
+#' conditioning on all previous observations, each term conditions on
+#' a small subset of previous observations.
+#' @param covparms A vector of covariance parameters appropriate
+#' for the specified covariance function
+#' @param covfunName One of "maternIsotropic", "maternSphere", or "maternSphereTime".
+#' "maternIsotropic" and "maternSphere" have four covariance parameters, 
+#' (variange, range, smoothness, nugget), and "maternSphereTime" has five,
+#' (variance, spatial range, temporal range, smoothness, nugget).
+#' @param locs matrix of locations. Row \code{i} of locs specifies the location
+#' of element \code{i} of \code{y}, and so the length of \code{y} should equal
+#' the number of rows of \code{locs}.
+#' @param NNarray A matrix of indicies, usually the output from \code{findOrderedNN}. Row \code{i} contains the indices
+#' of the observations that observation \code{i} conditions on. By convention,
+#' the first element of row \code{i} is \code{i}.
+#' @return the Gaussian loglikelihood
+#' @examples
+#' n1 <- 60
+#' n2 <- 60
+#' n <- n1*n2
+#' locs <- as.matrix( expand.grid( (1:n1)/n1, (1:n2)/n2 ) )
+#' covparms <- c(2, 0.2, 0.75, 0)
+#' ord <- order_maxmin(locs)
+#' NNarray <- find_ordered_nn(locs,20)
+#' Linv <- vecchia_Linv( covparms, "matern_isotropic", locs, NNarray )
+#' @export
+vecchia_Linv_grouped <- function(covparms, covfun_name, locs, NNlist) {
+    .Call('_GpGp_vecchia_Linv_grouped', PACKAGE = 'GpGp', covparms, covfun_name, locs, NNlist)
+}
+
+#' Multiply approximate inverse Cholesky by a vector
+#' 
+#' Vecchia's approximation implies a sparse approximation to the 
+#' inverse Cholesky factor of the covariance matrix. This function
+#' returns the result of multiplying that matrix by a vector.
+#' @param LinvEntries Entries of the sparse inverse Cholesky factor,
+#' usually the output from \code{vecchiaLinv}.
+#' @param z the vector to be multiplied
+#' @param NNarray A matrix of indicies, usually the output from \code{findOrderedNN}. Row \code{i} contains the indices
+#' of the observations that observation \code{i} conditions on. By convention,
+#' the first element of row \code{i} is \code{i}.
+#' @return the product of the sprase inverse Cholesky factor with a vector
+#' @examples
+#' n <- 8000
+#' locs <- matrix( runif(2*n), n, 2 )
+#' covparms <- c(2, 0.2, 0.75, 0.1)
+#' ord <- order_maxmin(locs)
+#' NNarray <- find_ordered_nn(locs,20)
+#' Linv <- vecchia_Linv( covparms, "matern_isotropic", locs, NNarray )
+#' z1 <- rnorm(n)
+#' y <- fast_Gp_sim_Linv(Linv,NNarray,z1)
+#' z2 <- Linv_mult(Linv, y, NNarray)
+#' print( sum( (z1-z2)^2 ) )
+#' @export
+Linv_mult_grouped <- function(Linv, z, NNlist) {
+    .Call('_GpGp_Linv_mult_grouped', PACKAGE = 'GpGp', Linv, z, NNlist)
 }
 
 #' Vecchia's approximation to the Gaussian loglikelihood

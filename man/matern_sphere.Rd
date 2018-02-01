@@ -4,19 +4,19 @@
 \alias{matern_sphere}
 \title{Isotropic Matern covariance function on sphere}
 \usage{
-matern_sphere(lonlat, covparms)
+matern_sphere(covparms, lonlat)
 }
 \arguments{
-\item{lonlat}{A matrix with \code{n} rows and one column with longitudes in (-180,180)
-and one column of latitudes in (-90,90). 
-Each row of locs describes a point on the sphere.}
-
-\item{covparms}{A vector giving positive-valued covariance parameters 
+\item{covparms}{A vector giving positive-valued covariance parameters
 in the form (variance, range, smoothness, nugget)}
+
+\item{lonlat}{A matrix with \code{n} rows and one column with longitudes in (-180,180)
+and one column of latitudes in (-90,90).
+Each row of locs describes a point on the sphere.}
 }
 \value{
 A matrix with \code{n} rows and \code{n} columns, with the i,j entry
-containing the covariance between observations at \code{lonlat[i,]} and 
+containing the covariance between observations at \code{lonlat[i,]} and
 \code{lonlat[j,]}.
 }
 \description{
@@ -29,8 +29,8 @@ all pairwise covariances.
 The function first calculates the (x,y,z) 3D coordinates, and then inputs
 the resulting locations into \code{maternIsotropic}. This means that we construct
 covariances on the sphere by embedding the sphere in a 3D space. There has been some
-concern expressed in the literature that such embeddings may produce distortions. 
-The source and nature of such distortions has never been articulated, 
+concern expressed in the literature that such embeddings may produce distortions.
+The source and nature of such distortions has never been articulated,
 and to date, no such distortions have been documented. Guinness and
 Fuentes (2016) argue that 3D embeddings produce reasonable models for data on spheres.
 }
