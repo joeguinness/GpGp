@@ -7,7 +7,7 @@
 group_obs(NNarray, exponent = 2)
 }
 \arguments{
-\item{NNarray}{Matrix of nearest neighbor indices, usually the result of \code{find_ordered_nn}.}
+\item{NNarray}{Matrix of nearest neighbor indices, usually the result of \code{\link{find_ordered_nn}}.}
 
 \item{exponent}{Within the algorithm, two groups are merged if the number of unique
 neighbors raised to the \code{exponent} power is less than the sum of the unique numbers

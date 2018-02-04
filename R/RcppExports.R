@@ -107,7 +107,7 @@ matern_sphere_time <- function(covparms, lonlattime) {
 #' n <- n1*n2
 #' locs <- as.matrix( expand.grid( (1:n1)/n1, (1:n2)/n2 ) )
 #' covparms <- c(2, 0.2, 0.75, 0)
-#' y <- fast_Gp_sim( "matern_isotropic", covparms, locs, 60 ) 
+#' y <- fast_Gp_sim(covparms, "matern_isotropic", locs, 60 ) 
 #' ord <- order_maxmin(locs)
 #' NNarray <- find_ordered_nn(locs,20)
 #' NNlist <- group_obs(NNarray)
@@ -207,7 +207,7 @@ Linv_mult_grouped <- function(Linv, z, NNlist) {
 #' n <- n1*n2
 #' locs <- as.matrix( expand.grid( (1:n1)/n1, (1:n2)/n2 ) )
 #' covparms <- c(2, 0.2, 0.75, 0)
-#' y <- fast_Gp_sim( "matern_isotropic", covparms, locs, 60 ) 
+#' y <- fast_Gp_sim(covparms, "matern_isotropic", locs, 60 ) 
 #' ord <- order_maxmin(locs)
 #' NNarray <- find_ordered_nn(locs,20)
 #' loglik <- vecchia_loglik( covparms, "matern_isotropic", y, locs, NNarray )

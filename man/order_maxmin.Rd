@@ -32,11 +32,11 @@ plot( locs[ord[1:900],1], locs[ord[1:900],2], xlim = c(0,1), ylim = c(0,1) )
 # longitude/latitude coordinates (sphere)
 latvals <- seq(-80, 80, length.out = 40 )
 lonvals <- seq( 0, 360, length.out = 81 )[1:80]
-lonlat <- as.matrix( expand.grid( lonvals, latvals ) )
-ord <- order_maxmin_sphere(lonlat)
+locs <- as.matrix( expand.grid( lonvals, latvals ) )
+ord <- order_maxmin(locs, lonlat = TRUE)
 par(mfrow=c(1,3))
-plot( lonlat[ord[1:100],1], lonlat[ord[1:100],2], xlim = c(0,360), ylim = c(-90,90) )
-plot( lonlat[ord[1:300],1], lonlat[ord[1:300],2], xlim = c(0,360), ylim = c(-90,90) )
-plot( lonlat[ord[1:900],1], lonlat[ord[1:900],2], xlim = c(0,360), ylim = c(-90,90) )
+plot( locs[ord[1:100],1], locs[ord[1:100],2], xlim = c(0,360), ylim = c(-90,90) )
+plot( locs[ord[1:300],1], locs[ord[1:300],2], xlim = c(0,360), ylim = c(-90,90) )
+plot( locs[ord[1:900],1], locs[ord[1:900],2], xlim = c(0,360), ylim = c(-90,90) )
 
 }

@@ -26,7 +26,7 @@
 #' X = as.matrix( rep(1,n) )  # design matrix
 #'
 #' # simulated response
-#' y <- 2*X[,1] + fast_Gp_sim("matern_isotropic", covparms, locs, m = 30)
+#' y <- 2*X[,1] + fast_Gp_sim(covparms, "matern_isotropic", locs, m = 30)
 #'
 #' ord <- order_maxmin(locs)         # ordering of locations
 #' yord <- y[ord]                    # reordered response
@@ -103,7 +103,7 @@ proflik_mean_variance <- function(subparms,covfun_name = "matern_isotropic",
 #' X = as.matrix( rep(1,n) )  # design matrix
 #'
 #' # simulated response
-#' y <- 2*X[,1] + fast_Gp_sim("matern_isotropic", covparms, locs, m = 30)
+#' y <- 2*X[,1] + fast_Gp_sim(covparms, "matern_isotropic", locs, m = 30)
 #'
 #' ord <- order_maxmin(locs)         # ordering of locations
 #' yord <- y[ord]                    # reordered response
@@ -172,7 +172,7 @@ proflik_variance <- function(subparms,covfun_name = "matern_isotropic",
 #' X = as.matrix( rep(1,n) )  # design matrix
 #'
 #' # simulated response
-#' y <- 2*X[,1] + fast_Gp_sim("matern_isotropic", covparms, locs, m = 30)
+#' y <- 2*X[,1] + fast_Gp_sim(covparms, "matern_isotropic", locs, m = 30)
 #'
 #' ord <- order_maxmin(locs)         # ordering of locations
 #' yord <- y[ord]                    # reordered response
@@ -252,7 +252,7 @@ proflik_mean <- function(parms,covfun_name = "matern_isotropic",
 #' X = as.matrix( rep(1,n) )  # design matrix
 #'
 #' # simulated response
-#' y <- 2*X[,1] + fast_Gp_sim("matern_isotropic", covparms, locs, m = 30)
+#' y <- 2*X[,1] + fast_Gp_sim(covparms, "matern_isotropic", locs, m = 30)
 #'
 #' ord <- order_maxmin(locs)         # ordering of locations
 #' yord <- y[ord]                    # reordered response
@@ -331,7 +331,7 @@ proflik_mean_variance_grouped <- function(subparms,covfun_name = "matern_isotrop
 #' X = as.matrix( rep(1,n) )  # design matrix
 #'
 #' # simulated response
-#' y <- 2*X[,1] + fast_Gp_sim("matern_isotropic", covparms, locs, m = 30)
+#' y <- 2*X[,1] + fast_Gp_sim(covparms, "matern_isotropic", locs, m = 30)
 #'
 #' ord <- order_maxmin(locs)         # ordering of locations
 #' yord <- y[ord]                    # reordered response
@@ -402,7 +402,7 @@ proflik_variance_grouped <- function(subparms,covfun_name = "matern_isotropic",
 #' X = as.matrix( rep(1,n) )  # design matrix
 #'
 #' # simulated response
-#' y <- 2*X[,1] + fast_Gp_sim("matern_isotropic", covparms, locs, m = 30)
+#' y <- 2*X[,1] + fast_Gp_sim(covparms, "matern_isotropic", locs, m = 30)
 #'
 #' ord <- order_maxmin(locs)         # ordering of locations
 #' yord <- y[ord]                    # reordered response

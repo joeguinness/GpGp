@@ -41,7 +41,7 @@ covparms = c(3,0.1,1,0)    # variance, range, smoothness, nugget
 X = as.matrix( rep(1,n) )  # design matrix
 
 # simulated response
-y <- 2*X[,1] + fast_Gp_sim("matern_isotropic", covparms, locs, m = 30)
+y <- 2*X[,1] + fast_Gp_sim(covparms, "matern_isotropic", locs, m = 30)
 
 ord <- order_maxmin(locs)         # ordering of locations
 yord <- y[ord]                    # reordered response

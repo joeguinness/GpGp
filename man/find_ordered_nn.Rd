@@ -2,7 +2,7 @@
 % Please edit documentation in R/nearest_neighbor_functions.R
 \name{find_ordered_nn}
 \alias{find_ordered_nn}
-\title{Find ordered nearest neighbors}
+\title{Find ordered nearest neighbors.}
 \usage{
 find_ordered_nn(locs, m, lonlat = FALSE)
 }

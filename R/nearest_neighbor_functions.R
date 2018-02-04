@@ -24,7 +24,7 @@ find_ordered_nn_brute <- function( locs, m ){
 
 
 
-#' Find ordered nearest neighbors
+#' Find ordered nearest neighbors.
 #'
 #' Given a matrix of reordered locations, find the \code{m} nearest neighbors
 #' to each location, subject to the neighbors coming
@@ -94,7 +94,7 @@ find_ordered_nn <- function(locs,m, lonlat = FALSE){
         less_than_k <- t(sapply( 1:nrow(NN), function(k) NN[k,] <= query_inds[k]  ))
         sum_less_than_k <- apply(less_than_k,1,sum)
         ind_less_than_k <- which(sum_less_than_k >= m+1)
-        NN_less_than_k <- NN[ind_less_than_k,]
+        #NN_less_than_k <- NN[ind_less_than_k,]
 
         NN_m <- t(sapply(ind_less_than_k,function(k) NN[k,][less_than_k[k,]][1:(m+1)] ))
 
@@ -124,7 +124,7 @@ find_ordered_nn <- function(locs,m, lonlat = FALSE){
 #' The function returns a list, with each list element containing one or
 #' several rows of NNarray. The algorithm attempts to find groupings such that
 #' observations within a group share many common neighbors.
-#' @param NNarray Matrix of nearest neighbor indices, usually the result of \code{find_ordered_nn}.
+#' @param NNarray Matrix of nearest neighbor indices, usually the result of \code{\link{find_ordered_nn}}.
 #' @param exponent Within the algorithm, two groups are merged if the number of unique
 #' neighbors raised to the \code{exponent} power is less than the sum of the unique numbers
 #' raised to the \code{exponent} power from the two groups.

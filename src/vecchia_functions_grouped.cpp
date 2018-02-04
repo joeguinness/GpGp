@@ -37,7 +37,7 @@ using namespace Rcpp;
 //' n <- n1*n2
 //' locs <- as.matrix( expand.grid( (1:n1)/n1, (1:n2)/n2 ) )
 //' covparms <- c(2, 0.2, 0.75, 0)
-//' y <- fast_Gp_sim( "matern_isotropic", covparms, locs, 60 ) 
+//' y <- fast_Gp_sim(covparms, "matern_isotropic", locs, 60 ) 
 //' ord <- order_maxmin(locs)
 //' NNarray <- find_ordered_nn(locs,20)
 //' NNlist <- group_obs(NNarray)
@@ -155,7 +155,6 @@ NumericVector Linv_mult_grouped(NumericVector Linv, NumericVector z,
     int first_L_ind = 0;
     int first_resp = 0;
     int cur_resp = 0;
-    Rcout << nb << endl;
     // rows 1 though n
     for(i=0; i<nb; i++){
         
