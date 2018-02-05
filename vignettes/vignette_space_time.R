@@ -1,26 +1,32 @@
 
 
-
-
 # a short vignette demonstrating how to use the functions
 library("GpGp")
 
 # grid size for data locations
-gsize <- 80
-nvec <- c(gsize,gsize)
+gsize <- 50
+times <- 10
+nvec <- c(gsize,gsize,times)
 n <- prod(nvec)
 
 # generate data locations and plot them
 x1 <- (1:nvec[1])/nvec[1]
 x2 <- (1:nvec[2])/nvec[2]
-locs <- as.matrix(expand.grid(x1,x2))
+locstime <- as.matrix(expand.grid(x1,x2,1:times))
 
 # covariance function and parameters
 # covfun <- maternIsotropic
-covparms <- c(variance = 4, range = 0.1, smoothness = 1/2, nugget = 0)
+covparms <- c(variance = 4, sp_range = 0.5, t_range = 3, smoothness = 1/2, nugget = 0)
 
 # simulate some data
-y <- fast_Gp_sim(covparms, "matern_isotropic",locs,50)
+y <- fast_Gp_sim(covparms, "matern_space_time",locs = locstime,m = 100)
+y <- fast_Gp_sim(covparms[c(1,2,4,5)], "matern_isotropic",locs = locstime,m = 100)
+y_array <- array( y, nvec )
+par(mfrow=c(1,3))
+image(y_array[,,1], col = viridis::viridis(64))
+image(y_array[,,2], col = viridis::viridis(64))
+image(y_array[,,3], col = viridis::viridis(64))
+
 
 # generate an ordering
 ord <- order_maxmin(locs)
@@ -60,8 +66,3 @@ if( n < 8000 ){ # only do this if we can store the covariance matrix
     print( sd(z3-z1) )
     print( sd(z3-z2) )
 }
-
-
-
-
-

@@ -14,9 +14,23 @@ neighbors raised to the \code{exponent} power is less than the sum of the unique
 raised to the \code{exponent} power from the two groups.}
 }
 \value{
-A list defining the partition of NNarray. Each list element contains the rows
-of NNarray corresponding to the grouping, and the collection of all of the elements
-is exhaustive, meaning that the entirety of NNarray can be reconstructed from the list.
+A list with elements defining the grouping. The list entries are:
+\itemize{
+  \item \code{all_inds}: vector of all indices of all blocks.
+  \item \code{last_ind_of_block}: The \code{i}th entry tells us the
+      location in \code{all_inds} of the last index of the \code{i}th block. Thus the length
+      of \code{last_ind_of_block} is the number of blocks, and \code{last_ind_of_block} can
+      be used to chop \code{all_inds} up into blocks.
+  \item \code{global_resp_inds}: The \code{i}th entry tells us the
+      index of the \code{i}th response, as ordered in \code{all_inds}.
+  \item \code{local_resp_inds}: The \code{i}th entry tells us the location within 
+      the block of the response index.
+  \item \code{last_resp_of_block}: The \code{i}th entry tells us the
+      location within \code{local_resp_inds} and \code{global_resp_inds} of the last
+      index of the \code{i}th block. \code{last_resp_of_block} is to 
+      \code{global_resp_inds} and \code{local_resp_inds}
+      as \code{last_ind_of_block} is to \code{all_inds}.
+}
 }
 \description{
 Take in an array of nearest neighbors, and automatically partition
@@ -39,4 +53,18 @@ object.size(NNlist2)
 object.size(NNlist3)
 mean( NNlist2[["local_resp_inds"]] - 1 )   # average number of neighbors (exponent 2)
 mean( NNlist3[["local_resp_inds"]] - 1 )   # average number of neighbors (exponent 3)
+
+all_inds <- NNlist2$all_inds
+last_ind_of_block <- NNlist2$last_ind_of_block
+inds_of_block_2 <- all_inds[ (last_ind_of_block[1] + 1):last_ind_of_block[2] ]
+
+local_resp_inds <- NNlist2$local_resp_inds
+global_resp_inds <- NNlist2$global_resp_inds
+last_resp_of_block <- NNlist2$last_resp_of_block
+local_resp_of_block_2 <- local_resp_inds[(last_resp_of_block[1]+1):last_resp_of_block[2]]
+
+global_resp_of_block_2 <- global_resp_inds[(last_resp_of_block[1]+1):last_resp_of_block[2]]
+inds_of_block_2[local_resp_of_block_2]
+# these last two should be the same
+
 }

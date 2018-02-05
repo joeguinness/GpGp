@@ -1,11 +1,64 @@
 
+
+
+#' Estimate mean and covariance parameters
+#' 
+#' Given a response, set of locations, (optionally) a design matrix, 
+#' and a specified covariance function, return the maximum
+#' approximate likelihood estimates, using Vecchia's 
+#' likelihood approximation.
+#' 
+#' @param y response vector
+#' @param locs matrix of locations. Each row is a single spatial or spatial-temporal
+#' location. If using one of the "matern_sphere" covariance functions,
+#' the locations should be longitudes and latitudes (in that order) in degrees.
+#' @param X design matrix. Each row contains covariates for the corresponding
+#' observation in \code{y}. If not specified, the function sets \code{X} to be a 
+#' matrix with a single column of ones, that is, a constant mean function.
+#' @param covfun_name string name of a covariance function. Currrently supported
+#' are "matern_isotropic", "matern_sphere", and "matern_sphere_time".
+#' @param silent TRUE/FALSE for whether to print some information during fitting.
+#' @param group TRUE/FALSE for whether to use the grouped version of 
+#' the approximation (Guinness, 2018) or not.  The grouped version 
+#' is used by default.
+#' @param reorder TRUE/FALSE indicating whether maxmin ordering should be used
+#' (TRUE) or whether no reordering should be done before fitting (FALSE).
+#' @return A list object containing covariance parameter estimates,
+#' mean parameter estimates, and covariance matrix for mean parameter estimates.
+#' @details The \code{fit_model} is a user-friendly model fitting function
+#' that automatically performs many of the auxiliary tasks needed for 
+#' using Vecchia's approximation, including reordering, computing
+#' nearest neighbors, grouping, and optimization. Optimization proceeds
+#' in several steps, using increasingly accurate versions of the approximation. 
+#' The first step usings 5 neighbors, then 15 neighbors, and the last step
+#' uses 30 neighbors. The actual number of neighbors in the grouped
+#' version is guaranteed to be larger, though depends on the ordering and
+#' the configuration of the locations. We recommend always using
+#' \code{group = TRUE} since the grouping is guaranteed to improve
+#' the approximation.
+#'
+#' The Jason-3 windspeed vignette is a useful source for a 
+#' use-case of the \code{fit_model} function for data on sphere. The example below
+#' shows a very small example with a simulated dataset in 2d.
+#' 
+#' @examples
+#' n1 <- 10
+#' n2 <- 10
+#' n <- n1*n2
+#' locs <- as.matrix( expand.grid( (1:n1)/n1, (1:n2)/n2 ) )
+#' covparms <- c(2,0.1,1/2,0)
+#' y <- 7 + fast_Gp_sim(covparms, "matern_isotropic", locs)
+#' X <- as.matrix( rep(1,n) )
+#' fit <- fit_model(y, locs, X, "matern_isotropic")
+#' fit
+#' 
+#' 
 #' @export
 fit_model <- function(y, locs, X = NULL, covfun_name = "matern_isotropic",
-    silent = FALSE, group = TRUE){
+    silent = FALSE, group = TRUE, reorder = TRUE){
     
     n <- length(y)
-    
-    
+
     # check that length of observation vector same as
     # number of locations
     if( nrow(locs) != n ){
@@ -23,15 +76,16 @@ fit_model <- function(y, locs, X = NULL, covfun_name = "matern_isotropic",
     X <- as.matrix(X)
     
     # check if one of the allowed covariance functions is chosen
-    if( ! covfun_name %in% c("matern_isotropic","matern_sphere","matern_sphere_time") ){
+    if( ! covfun_name %in% c("matern_isotropic","matern_sphere",
+                            "matern_sphere_time","matern_space_time") ) {
         stop("unrecognized covariance function name `covfun_name'. Choose from
-             'matern_isotropic', 'matern_sphere', or 'matern_sphere_time' " )
+             'matern_isotropic', 'matern_sphere', 'matern_sphere_time', or 'matern_space_time' " )
     }
     
     # missing values???
     
     # starting values and covariance-specific settings
-    start_var <- var(y)
+    start_var <- stats::var(y)
     start_smooth <- 1
     start_nug <- 0.1
     
@@ -41,6 +95,16 @@ fit_model <- function(y, locs, X = NULL, covfun_name = "matern_isotropic",
         dmat <- fields::rdist(locs[randinds,])
         start_range <- mean( dmat )/4
         start_parms <- c(start_var, start_range, start_smooth, start_nug)
+    }
+
+    if(covfun_name == "matern_space_time"){
+        lonlat <- FALSE
+        d <- ncol(locs)-1
+        dmat1 <- fields::rdist(locs[randinds,1:d])
+        dmat2 <- fields::rdist(locs[randinds,d+1,drop=FALSE])
+        start_range1 <- mean( dmat1 )/4
+        start_range2 <- mean( dmat2 )/4
+        start_parms <- c(start_var, start_range1, start_range2, start_smooth, start_nug)
     }
 
     if( covfun_name == "matern_sphere" ){
@@ -65,16 +129,20 @@ fit_model <- function(y, locs, X = NULL, covfun_name = "matern_isotropic",
     nparms <- length(start_parms)
     
     # get an ordering and reorder everything
-    if(!silent) cat("Reordering...")
-    ord <- order_maxmin(locs, lonlat = lonlat)
+    if(reorder){
+        if(!silent) cat("Reordering...")
+        ord <- order_maxmin(locs, lonlat = lonlat)
+        if(!silent) cat("Done \n")
+    } else {
+        ord <- 1:n
+    }
     yord <- y[ord]
     locsord <- locs[ord,]
     Xord <- as.matrix( X[ord,] )
-    if(!silent) cat("Done \n")
     
     # get nearest neighbors    
     if(!silent) cat("Finding nearest neighbors...")
-    NNarray <- find_ordered_nn(locsord, m=45, lonlat = lonlat)
+    NNarray <- find_ordered_nn(locsord, m=30, lonlat = lonlat)
     if(!silent) cat("Done \n")
     
     fit <- list(par=log(start_parms[2:nparms]))
@@ -91,7 +159,7 @@ fit_model <- function(y, locs, X = NULL, covfun_name = "matern_isotropic",
             return(-loglik)
         }
         if(!silent) cat("Refining estimates...")
-        fit <- optim(fit$par,funtomax,
+        fit <- stats::optim(fit$par,funtomax,
             control=list(trace=0,maxit=25), method = "BFGS") 
         if(!silent) cat("Done          ")
         if(!silent) cat(paste(  paste( round(exp(fit$par),3), collapse = " " ), "\n" ) )

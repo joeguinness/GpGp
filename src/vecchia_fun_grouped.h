@@ -49,55 +49,10 @@ void vecchia_grouped(NumericVector covparms, StringVector covfun_name,
     std::string covfun_name_string;
     covfun_name_string = covfun_name[0];
 
-    // set p_covfun, cparms, and locations based on covfun_name_string
-    if( covfun_name_string.compare("matern_isotropic") == 0 )
-    {
-        for(k=0; k<3; k++){ cparms[k] = covparms[k]; }  // re-assign non-nugget parameters
-        nugget = covparms[0]*covparms[3];               // separate variable for nugget
-        p_covfun = &matern_isotropic_internal;                    // pointer to covariance fun
-    }
-    else if( covfun_name_string.compare("matern_sphere") == 0 )
-    {
-        for(k=0; k<3; k++){ cparms[k] = covparms[k]; }  // re-assign non-nugget parameters
-        nugget = covparms[0]*covparms[3];               // separate variable for nugget
-        double lonrad;                                  // longitude
-        double latrad;                                  // latitude
-        Rcpp::NumericMatrix xyz(n, 3);
-        for(i = 0; i < n; i++){
-            lonrad = 2*M_PI*locs(i,0)/360;
-            latrad = 2*M_PI*(locs(i,1)+90)/360;
-            xyz(i,0) = sin(latrad)*cos(lonrad);         // convert lon,lat to x,y,z
-            xyz(i,1) = sin(latrad)*sin(lonrad);
-            xyz(i,2) = cos(latrad);
-        }
-        locs = xyz;
-        p_covfun = &matern_isotropic_internal; 
-    }
-    else if( covfun_name_string.compare("matern_sphere_time") == 0 )
-    {
-        cparms[0] = covparms[0];                    // variance
-        cparms[1] = 1;                              // locations scaled below, so set range = 1
-        cparms[2] = covparms[3];                    // smoothness
-        nugget = covparms[0]*covparms[4];           // nugget
-        double lonrad;
-        double latrad;
-        Rcpp::NumericMatrix xyzt(n, 4);
-        for(i = 0; i < n; i++){
-            lonrad = 2*M_PI*locs(i,0)/360;
-            latrad = 2*M_PI*(locs(i,1)+90)/360;
-            xyzt(i,0) = sin(latrad)*cos(lonrad)/covparms[1];   // convert lon,lat,time to
-            xyzt(i,1) = sin(latrad)*sin(lonrad)/covparms[1];   // scaled x,y,z, and scaled time
-            xyzt(i,2) = cos(latrad)/covparms[1];
-            xyzt(i,3) = locs(i,2)/covparms[2];
-        }
-        locs = xyzt;
-        p_covfun = &matern_isotropic_internal; 
-    }
-    else   // stop the program
-    {
-        std::cout << "Unrecognized Covariance Function Name \n";
-        assert(0);
-    }
+    // update everything based on the covariance functin name
+    update_vars_based_on_covfun(covfun_name_string, cparms, &nugget, &locs, covparms); 
+    p_covfun = &matern_isotropic_internal; // pointer to covariance fun
+    // only matern functions implemented so far
 
     int dim = locs.ncol();            // dimension of newly defined locations
     

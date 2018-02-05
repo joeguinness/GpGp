@@ -4,17 +4,18 @@
 \alias{L_mult}
 \title{Multiply approximate Cholesky by a vector}
 \usage{
-L_mult(Linv_entries, z, NNarray)
+L_mult(Linv, z, NNarray)
 }
 \arguments{
+\item{Linv}{Entries of the sparse inverse Cholesky factor,
+usually the output from \code{\link{vecchia_Linv}}.}
+
 \item{z}{the vector to be multiplied}
 
-\item{NNarray}{A matrix of indicies, usually the output from \code{findOrderedNN}. Row \code{i} contains the indices
+\item{NNarray}{A matrix of indicies, usually the output from \code{\link{find_ordered_nn}}. 
+Row \code{i} contains the indices
 of the observations that observation \code{i} conditions on. By convention,
 the first element of row \code{i} is \code{i}.}
-
-\item{LinvEntries}{Entries of the sparse inverse Cholesky factor,
-usually the output from \code{vecchiaLinv}.}
 }
 \value{
 the product of the sprase inverse Cholesky factor with a vector

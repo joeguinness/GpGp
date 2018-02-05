@@ -19,15 +19,21 @@ using namespace Rcpp;
 //' a small subset of previous observations.
 //' @param covparms A vector of covariance parameters appropriate
 //' for the specified covariance function
-//' @param covfunName One of "maternIsotropic", "maternSphere", or "maternSphereTime".
-//' "maternIsotropic" and "maternSphere" have four covariance parameters, 
-//' (variange, range, smoothness, nugget), and "maternSphereTime" has five,
-//' (variance, spatial range, temporal range, smoothness, nugget).
+//' @param covfun_name One of "matern_isotropic", "matern_space_time", "matern_sphere", 
+//' or "matern_sphere_time".
+//' "matern_isotropic" and "matern_sphere" have four covariance parameters, 
+//' (variange, range, smoothness, nugget), while "matern_space_time" and 
+//' "matern_sphere_time" have five,
+//' (variance, spatial range, temporal range, smoothness, nugget). 
+//' For more details, see the documentation 
+//' for each of the covariance functions by typing, for example, ?matern_isotropic
+//' or ?matern_sphere_time.
 //' @param y vector of response values
 //' @param locs matrix of locations. Row \code{i} of locs specifies the location
 //' of element \code{i} of \code{y}, and so the length of \code{y} should equal
 //' the number of rows of \code{locs}.
-//' @param NNarray A matrix of indicies, usually the output from \code{findOrderedNN}. Row \code{i} contains the indices
+//' @param NNarray A matrix of indicies, usually the output from \code{\link{find_ordered_nn}}. 
+//' Row \code{i} contains the indices
 //' of the observations that observation \code{i} conditions on. By convention,
 //' the first element of row \code{i} is \code{i}.
 //' @return the Gaussian loglikelihood
@@ -61,18 +67,7 @@ NumericVector vecchia_loglik(NumericVector covparms, StringVector covfun_name,
 //' specification of the joint density; rather than each term in the product
 //' conditioning on all previous observations, each term conditions on
 //' a small subset of previous observations.
-//' @param covparms A vector of covariance parameters appropriate
-//' for the specified covariance function
-//' @param covfunName One of "maternIsotropic", "maternSphere", or "maternSphereTime".
-//' "maternIsotropic" and "maternSphere" have four covariance parameters, 
-//' (variange, range, smoothness, nugget), and "maternSphereTime" has five,
-//' (variance, spatial range, temporal range, smoothness, nugget).
-//' @param locs matrix of locations. Row \code{i} of locs specifies the location
-//' of element \code{i} of \code{y}, and so the length of \code{y} should equal
-//' the number of rows of \code{locs}.
-//' @param NNarray A matrix of indicies, usually the output from \code{findOrderedNN}. Row \code{i} contains the indices
-//' of the observations that observation \code{i} conditions on. By convention,
-//' the first element of row \code{i} is \code{i}.
+//' @inheritParams vecchia_loglik
 //' @return the Gaussian loglikelihood
 //' @examples
 //' n1 <- 60
@@ -101,12 +96,10 @@ NumericMatrix vecchia_Linv(NumericVector covparms, StringVector covfun_name,
 //' Vecchia's approximation implies a sparse approximation to the 
 //' inverse Cholesky factor of the covariance matrix. This function
 //' returns the result of multiplying that matrix by a vector.
-//' @param LinvEntries Entries of the sparse inverse Cholesky factor,
-//' usually the output from \code{vecchiaLinv}.
+//' @param Linv Entries of the sparse inverse Cholesky factor,
+//' usually the output from \code{\link{vecchia_Linv}}.
 //' @param z the vector to be multiplied
-//' @param NNarray A matrix of indicies, usually the output from \code{findOrderedNN}. Row \code{i} contains the indices
-//' of the observations that observation \code{i} conditions on. By convention,
-//' the first element of row \code{i} is \code{i}.
+//' @inheritParams vecchia_loglik
 //' @return the product of the sprase inverse Cholesky factor with a vector
 //' @examples
 //' n <- 8000
@@ -121,7 +114,7 @@ NumericMatrix vecchia_Linv(NumericVector covparms, StringVector covfun_name,
 //' print( sum( (z1-z2)^2 ) )
 //' @export
 // [[Rcpp::export]]
-NumericVector Linv_mult(NumericMatrix Linv_entries, NumericVector z,
+NumericVector Linv_mult(NumericMatrix Linv, NumericVector z,
                                   IntegerMatrix NNarray) {
 
     // return x = Linv * z
@@ -139,7 +132,7 @@ NumericVector Linv_mult(NumericMatrix Linv_entries, NumericVector z,
     for(i=0; i<n; i++){
         int bsize = min(i+1,m);
         for(j=0; j<bsize; j++){
-            x( i ) += z( NNarray(i,j) - 1 )*Linv_entries(i,j);
+            x( i ) += z( NNarray(i,j) - 1 )*Linv(i,j);
         }
     }
 
@@ -153,12 +146,10 @@ NumericVector Linv_mult(NumericMatrix Linv_entries, NumericVector z,
 //' inverse Cholesky factor of the covariance matrix. This function
 //' returns the result of multiplying the inverse of that matrix by a vector 
 //' (i.e. an approximation to the Cholesky factor).
-//' @param LinvEntries Entries of the sparse inverse Cholesky factor,
-//' usually the output from \code{vecchiaLinv}.
+//' @param Linv Entries of the sparse inverse Cholesky factor,
+//' usually the output from \code{\link{vecchia_Linv}}.
 //' @param z the vector to be multiplied
-//' @param NNarray A matrix of indicies, usually the output from \code{findOrderedNN}. Row \code{i} contains the indices
-//' of the observations that observation \code{i} conditions on. By convention,
-//' the first element of row \code{i} is \code{i}.
+//' @inheritParams vecchia_loglik
 //' @return the product of the sprase inverse Cholesky factor with a vector
 //' @examples
 //' n <- 8000
@@ -173,7 +164,7 @@ NumericVector Linv_mult(NumericMatrix Linv_entries, NumericVector z,
 //' print( sum( (y1-y2)^2 ) )
 //' @export
 // [[Rcpp::export]]
-NumericVector L_mult(NumericMatrix Linv_entries, NumericVector z,
+NumericVector L_mult(NumericMatrix Linv, NumericVector z,
                                IntegerMatrix NNarray) {
 
     // return x = L z
@@ -189,16 +180,16 @@ NumericVector L_mult(NumericMatrix Linv_entries, NumericVector z,
     int m = NNarray.ncol();
 
     // get entry 0
-    x(0) = z(0)/Linv_entries(0,0);
+    x(0) = z(0)/Linv(0,0);
 
     // get entries 1 through n
     for(i=1; i<n; i++){
         B = min(i+1,m);
         x(i) = z(i);
         for(j=1; j<B; j++){
-            x(i) -= Linv_entries(i,j)*x( NNarray(i,j) - 1 );
+            x(i) -= Linv(i,j)*x( NNarray(i,j) - 1 );
         }
-        x(i) = x(i)/Linv_entries(i,0);
+        x(i) = x(i)/Linv(i,0);
     }
 
     return x;

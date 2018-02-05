@@ -4,13 +4,15 @@
 \alias{cond_sim}
 \title{Conditional Simulation using Vecchia's approximation}
 \usage{
-cond_sim(covparms, covfun_name = "matern_isotropic", locs_obs, locs_pred,
-  X_obs, X_pred, beta, y_obs, m = 60, reorder = TRUE)
+cond_sim(covparms, covfun_name = "matern_isotropic", y_obs, locs_obs,
+  locs_pred, X_obs, X_pred, beta, m = 60, nsims = 1, reorder = TRUE)
 }
 \arguments{
 \item{covparms}{Covariance parameters}
 
 \item{covfun_name}{Name of covariance function}
+
+\item{y_obs}{Observations assocaited with locs_obs}
 
 \item{locs_obs}{observation locations}
 
@@ -22,9 +24,14 @@ cond_sim(covparms, covfun_name = "matern_isotropic", locs_obs, locs_pred,
 
 \item{beta}{Linear mean parameters}
 
-\item{y_obs}{Observations assocaited with locs_obs}
+\item{m}{Number of nearest neighbors to use. Larger \code{m} gives
+better approximations.}
 
-\item{m}{Number of nearest neighbors to use}
+\item{nsims}{Number of conditional simulations to return.}
+
+\item{reorder}{TRUE/FALSE for whether reodering should be done. This should
+generally be kept at TRUE, unless testing out the effect of
+reordering.}
 }
 \description{
 With the prediction locations ordered after the observation locations,

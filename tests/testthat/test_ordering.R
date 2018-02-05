@@ -1,5 +1,4 @@
 
-library("GpGp")
 context("Ordering Functions")
 
 test_that("ordering functions give valid permutation in 2d", {

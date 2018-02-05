@@ -4,10 +4,15 @@
 \alias{order_middleout}
 \title{Middle-out ordering}
 \usage{
-order_middleout(locs)
+order_middleout(locs, lonlat = FALSE)
 }
 \arguments{
-\item{locs}{A matrix of locations in R^d. Each row of \code{locs} contains a location.}
+\item{locs}{A matrix of locations. Each row of \code{locs} contains a location, which can
+be a point in Euclidean space R^d, a point in space-time R^d x T, 
+a longitude and latitude (in degrees) giving a point on the sphere, 
+or a longitude, latitude, and time giving a point in the sphere-time domain.}
+
+\item{lonlat}{TRUE/FALSE whether locations are longitudes and latitudes.}
 }
 \value{
 A vector of indices giving the ordering, i.e. 

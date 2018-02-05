@@ -10,27 +10,18 @@ using namespace std;
 using namespace Rcpp;
 
 
-//' Vecchia's approximation to the Gaussian loglikelihood
+//' Grouped Vecchia's approximation to the Gaussian loglikelihood
 //' 
-//' This function returns Vecchia's (1988) approximation to the Gaussian
+//' This function returns the grouped version (Guinness, 2018) of 
+//' Vecchia's (1988) approximation to the Gaussian
 //' loglikelihood. The approximation modifies the ordered conditional
 //' specification of the joint density; rather than each term in the product
 //' conditioning on all previous observations, each term conditions on
 //' a small subset of previous observations.
-//' @param covparms A vector of covariance parameters appropriate
-//' for the specified covariance function
-//' @param covfunName One of "maternIsotropic", "maternSphere", or "maternSphereTime".
-//' "maternIsotropic" and "maternSphere" have four covariance parameters, 
-//' (variange, range, smoothness, nugget), and "maternSphereTime" has five,
-//' (variance, spatial range, temporal range, smoothness, nugget).
-//' @param y vector of response values
-//' @param locs matrix of locations. Row \code{i} of locs specifies the location
-//' of element \code{i} of \code{y}, and so the length of \code{y} should equal
-//' the number of rows of \code{locs}.
-//' @param NNarray A matrix of indicies, usually the output from \code{findOrderedNN}. Row \code{i} contains the indices
-//' of the observations that observation \code{i} conditions on. By convention,
-//' the first element of row \code{i} is \code{i}.
-//' @return the Gaussian loglikelihood
+//' @param NNlist A list with grouped neighbor information. 
+//' Usually the output from \code{group_obs(NNarray)}.
+//' @inheritParams vecchia_loglik
+//' @return grouped version of Vecchia's approximation to the Gaussian loglikelihood
 //' @examples
 //' n1 <- 60
 //' n2 <- 60
@@ -64,18 +55,8 @@ NumericVector vecchia_loglik_grouped(NumericVector covparms, StringVector covfun
 //' specification of the joint density; rather than each term in the product
 //' conditioning on all previous observations, each term conditions on
 //' a small subset of previous observations.
-//' @param covparms A vector of covariance parameters appropriate
-//' for the specified covariance function
-//' @param covfunName One of "maternIsotropic", "maternSphere", or "maternSphereTime".
-//' "maternIsotropic" and "maternSphere" have four covariance parameters, 
-//' (variange, range, smoothness, nugget), and "maternSphereTime" has five,
-//' (variance, spatial range, temporal range, smoothness, nugget).
-//' @param locs matrix of locations. Row \code{i} of locs specifies the location
-//' of element \code{i} of \code{y}, and so the length of \code{y} should equal
-//' the number of rows of \code{locs}.
-//' @param NNarray A matrix of indicies, usually the output from \code{findOrderedNN}. Row \code{i} contains the indices
-//' of the observations that observation \code{i} conditions on. By convention,
-//' the first element of row \code{i} is \code{i}.
+//' @inheritParams vecchia_loglik
+//' @inheritParams vecchia_loglik_grouped
 //' @return the Gaussian loglikelihood
 //' @examples
 //' n1 <- 60
@@ -110,12 +91,10 @@ NumericVector vecchia_Linv_grouped(NumericVector covparms, StringVector covfun_n
 //' Vecchia's approximation implies a sparse approximation to the 
 //' inverse Cholesky factor of the covariance matrix. This function
 //' returns the result of multiplying that matrix by a vector.
-//' @param LinvEntries Entries of the sparse inverse Cholesky factor,
+//' @param Linv Entries of the sparse inverse Cholesky factor,
 //' usually the output from \code{vecchiaLinv}.
 //' @param z the vector to be multiplied
-//' @param NNarray A matrix of indicies, usually the output from \code{findOrderedNN}. Row \code{i} contains the indices
-//' of the observations that observation \code{i} conditions on. By convention,
-//' the first element of row \code{i} is \code{i}.
+//' @inheritParams vecchia_loglik_grouped
 //' @return the product of the sprase inverse Cholesky factor with a vector
 //' @examples
 //' n <- 8000

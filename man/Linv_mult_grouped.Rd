@@ -7,14 +7,13 @@
 Linv_mult_grouped(Linv, z, NNlist)
 }
 \arguments{
-\item{z}{the vector to be multiplied}
-
-\item{LinvEntries}{Entries of the sparse inverse Cholesky factor,
+\item{Linv}{Entries of the sparse inverse Cholesky factor,
 usually the output from \code{vecchiaLinv}.}
 
-\item{NNarray}{A matrix of indicies, usually the output from \code{findOrderedNN}. Row \code{i} contains the indices
-of the observations that observation \code{i} conditions on. By convention,
-the first element of row \code{i} is \code{i}.}
+\item{z}{the vector to be multiplied}
+
+\item{NNlist}{A list with grouped neighbor information. 
+Usually the output from \code{group_obs(NNarray)}.}
 }
 \value{
 the product of the sprase inverse Cholesky factor with a vector

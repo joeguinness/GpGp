@@ -1,16 +1,15 @@
 
 # analyze the averaged jason3 wind speed data
-#library("GpGp")
-devtools::load_all(".")
+library("GpGp")
 
 # loads in object
-load("datasets/jason3_windspeed_avg.RData")
-head(dframe)
-lat       <- dframe$lat
-lon       <- dframe$lon
-windspeed <- dframe$windspeed
-time      <- dframe$time
-n <- length(windspeed)
+data(jason3)
+head(jason3)
+lat       <- jason3$lat
+lon       <- jason3$lon
+windspeed <- jason3$windspeed
+time      <- jason3$time
+n         <- length(windspeed)
 
 # plot of data from first 6 hours
 inds <- time < 6*3600
@@ -46,19 +45,22 @@ locstime_pred <- cbind( locs_pred, rep(mediantime, n_pred) )
 X_pred <- as.matrix( rep(1,n_pred) )
 
 # predictions
-pred <- predictions(fit_spacetime$covparms, "matern_sphere_time", 
-    locstime, locstime_pred, X, X_pred, fit_spacetime$beta, windspeed)
+pred <- predictions(fit_spacetime$covparms, "matern_sphere_time", windspeed,
+    locstime, locstime_pred, X, X_pred, fit_spacetime$beta)
 
 # plot predictions
 pred_array <- array( pred, c(length(longrid),length(latgrid)) )
 fields::image.plot(longrid,latgrid,pred_array)
 
 # conditional simulations
-sim <- cond_sim(fit_spacetime$covparms, "matern_sphere_time", 
-    locstime, locstime_pred, X, X_pred, fit_spacetime$beta, windspeed)
+sim <- cond_sim(fit_spacetime$covparms, "matern_sphere_time", windspeed,
+    locstime, locstime_pred, X, X_pred, fit_spacetime$beta, nsims = 2)
 
 # plot conditional simulations
-sim_array <- array( sim, c(length(longrid),length(latgrid)) )
+par(mfrow=c(1,2))
+sim_array <- array( sim[,1], c(length(longrid),length(latgrid)) )
+fields::image.plot(longrid,latgrid,sim_array)
+sim_array <- array( sim[,2], c(length(longrid),length(latgrid)) )
 fields::image.plot(longrid,latgrid,sim_array)
 
 

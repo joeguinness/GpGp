@@ -50,6 +50,23 @@ matern_sphere <- function(covparms, lonlat) {
     .Call('_GpGp_matern_sphere', PACKAGE = 'GpGp', covparms, lonlat)
 }
 
+#' Space-time Matern-covariance function
+#'
+#' From a matrix of locations and times and a vector covariance parameters of the form
+#' (variance, spatial range, temporal range, smoothness, nugget), return the square matrix of
+#' all pairwise covariances.
+#' @param locstime A matrix with \code{n} rows and d+1 columns. The first d columns
+#' give a location in R^d, and the last column gives a time. Each row corresponds
+#' to a space-time location.
+#' @param covparms A vector giving positive-valued covariance parameters
+#' in the form (variance, spatial range, temporal range, smoothness, nugget)
+#' @return A matrix with \code{n} rows and \code{n} columns, with the \code{i,j} entry
+#' containing the covariance between observations at \code{locstime[i,]} and
+#' \code{locstime[j,]}.
+matern_space_time <- function(covparms, locstime) {
+    .Call('_GpGp_matern_space_time', PACKAGE = 'GpGp', covparms, locstime)
+}
+
 #' Isotropic Matern covariance function on sphere-time
 #'
 #' From a matrix of longitudes, latitudes, and times and a vector covariance parameters of the form
@@ -80,27 +97,18 @@ matern_sphere_time <- function(covparms, lonlattime) {
     .Call('_GpGp_matern_sphere_time', PACKAGE = 'GpGp', covparms, lonlattime)
 }
 
-#' Vecchia's approximation to the Gaussian loglikelihood
+#' Grouped Vecchia's approximation to the Gaussian loglikelihood
 #' 
-#' This function returns Vecchia's (1988) approximation to the Gaussian
+#' This function returns the grouped version (Guinness, 2018) of 
+#' Vecchia's (1988) approximation to the Gaussian
 #' loglikelihood. The approximation modifies the ordered conditional
 #' specification of the joint density; rather than each term in the product
 #' conditioning on all previous observations, each term conditions on
 #' a small subset of previous observations.
-#' @param covparms A vector of covariance parameters appropriate
-#' for the specified covariance function
-#' @param covfunName One of "maternIsotropic", "maternSphere", or "maternSphereTime".
-#' "maternIsotropic" and "maternSphere" have four covariance parameters, 
-#' (variange, range, smoothness, nugget), and "maternSphereTime" has five,
-#' (variance, spatial range, temporal range, smoothness, nugget).
-#' @param y vector of response values
-#' @param locs matrix of locations. Row \code{i} of locs specifies the location
-#' of element \code{i} of \code{y}, and so the length of \code{y} should equal
-#' the number of rows of \code{locs}.
-#' @param NNarray A matrix of indicies, usually the output from \code{findOrderedNN}. Row \code{i} contains the indices
-#' of the observations that observation \code{i} conditions on. By convention,
-#' the first element of row \code{i} is \code{i}.
-#' @return the Gaussian loglikelihood
+#' @param NNlist A list with grouped neighbor information. 
+#' Usually the output from \code{group_obs(NNarray)}.
+#' @inheritParams vecchia_loglik
+#' @return grouped version of Vecchia's approximation to the Gaussian loglikelihood
 #' @examples
 #' n1 <- 60
 #' n2 <- 60
@@ -125,18 +133,8 @@ vecchia_loglik_grouped <- function(covparms, covfun_name, y, locs, NNlist) {
 #' specification of the joint density; rather than each term in the product
 #' conditioning on all previous observations, each term conditions on
 #' a small subset of previous observations.
-#' @param covparms A vector of covariance parameters appropriate
-#' for the specified covariance function
-#' @param covfunName One of "maternIsotropic", "maternSphere", or "maternSphereTime".
-#' "maternIsotropic" and "maternSphere" have four covariance parameters, 
-#' (variange, range, smoothness, nugget), and "maternSphereTime" has five,
-#' (variance, spatial range, temporal range, smoothness, nugget).
-#' @param locs matrix of locations. Row \code{i} of locs specifies the location
-#' of element \code{i} of \code{y}, and so the length of \code{y} should equal
-#' the number of rows of \code{locs}.
-#' @param NNarray A matrix of indicies, usually the output from \code{findOrderedNN}. Row \code{i} contains the indices
-#' of the observations that observation \code{i} conditions on. By convention,
-#' the first element of row \code{i} is \code{i}.
+#' @inheritParams vecchia_loglik
+#' @inheritParams vecchia_loglik_grouped
 #' @return the Gaussian loglikelihood
 #' @examples
 #' n1 <- 60
@@ -157,12 +155,10 @@ vecchia_Linv_grouped <- function(covparms, covfun_name, locs, NNlist) {
 #' Vecchia's approximation implies a sparse approximation to the 
 #' inverse Cholesky factor of the covariance matrix. This function
 #' returns the result of multiplying that matrix by a vector.
-#' @param LinvEntries Entries of the sparse inverse Cholesky factor,
+#' @param Linv Entries of the sparse inverse Cholesky factor,
 #' usually the output from \code{vecchiaLinv}.
 #' @param z the vector to be multiplied
-#' @param NNarray A matrix of indicies, usually the output from \code{findOrderedNN}. Row \code{i} contains the indices
-#' of the observations that observation \code{i} conditions on. By convention,
-#' the first element of row \code{i} is \code{i}.
+#' @inheritParams vecchia_loglik_grouped
 #' @return the product of the sprase inverse Cholesky factor with a vector
 #' @examples
 #' n <- 8000
@@ -189,15 +185,21 @@ Linv_mult_grouped <- function(Linv, z, NNlist) {
 #' a small subset of previous observations.
 #' @param covparms A vector of covariance parameters appropriate
 #' for the specified covariance function
-#' @param covfunName One of "maternIsotropic", "maternSphere", or "maternSphereTime".
-#' "maternIsotropic" and "maternSphere" have four covariance parameters, 
-#' (variange, range, smoothness, nugget), and "maternSphereTime" has five,
-#' (variance, spatial range, temporal range, smoothness, nugget).
+#' @param covfun_name One of "matern_isotropic", "matern_space_time", "matern_sphere", 
+#' or "matern_sphere_time".
+#' "matern_isotropic" and "matern_sphere" have four covariance parameters, 
+#' (variange, range, smoothness, nugget), while "matern_space_time" and 
+#' "matern_sphere_time" have five,
+#' (variance, spatial range, temporal range, smoothness, nugget). 
+#' For more details, see the documentation 
+#' for each of the covariance functions by typing, for example, ?matern_isotropic
+#' or ?matern_sphere_time.
 #' @param y vector of response values
 #' @param locs matrix of locations. Row \code{i} of locs specifies the location
 #' of element \code{i} of \code{y}, and so the length of \code{y} should equal
 #' the number of rows of \code{locs}.
-#' @param NNarray A matrix of indicies, usually the output from \code{findOrderedNN}. Row \code{i} contains the indices
+#' @param NNarray A matrix of indicies, usually the output from \code{\link{find_ordered_nn}}. 
+#' Row \code{i} contains the indices
 #' of the observations that observation \code{i} conditions on. By convention,
 #' the first element of row \code{i} is \code{i}.
 #' @return the Gaussian loglikelihood
@@ -224,18 +226,7 @@ vecchia_loglik <- function(covparms, covfun_name, y, locs, NNarray) {
 #' specification of the joint density; rather than each term in the product
 #' conditioning on all previous observations, each term conditions on
 #' a small subset of previous observations.
-#' @param covparms A vector of covariance parameters appropriate
-#' for the specified covariance function
-#' @param covfunName One of "maternIsotropic", "maternSphere", or "maternSphereTime".
-#' "maternIsotropic" and "maternSphere" have four covariance parameters, 
-#' (variange, range, smoothness, nugget), and "maternSphereTime" has five,
-#' (variance, spatial range, temporal range, smoothness, nugget).
-#' @param locs matrix of locations. Row \code{i} of locs specifies the location
-#' of element \code{i} of \code{y}, and so the length of \code{y} should equal
-#' the number of rows of \code{locs}.
-#' @param NNarray A matrix of indicies, usually the output from \code{findOrderedNN}. Row \code{i} contains the indices
-#' of the observations that observation \code{i} conditions on. By convention,
-#' the first element of row \code{i} is \code{i}.
+#' @inheritParams vecchia_loglik
 #' @return the Gaussian loglikelihood
 #' @examples
 #' n1 <- 60
@@ -256,12 +247,10 @@ vecchia_Linv <- function(covparms, covfun_name, locs, NNarray) {
 #' Vecchia's approximation implies a sparse approximation to the 
 #' inverse Cholesky factor of the covariance matrix. This function
 #' returns the result of multiplying that matrix by a vector.
-#' @param LinvEntries Entries of the sparse inverse Cholesky factor,
-#' usually the output from \code{vecchiaLinv}.
+#' @param Linv Entries of the sparse inverse Cholesky factor,
+#' usually the output from \code{\link{vecchia_Linv}}.
 #' @param z the vector to be multiplied
-#' @param NNarray A matrix of indicies, usually the output from \code{findOrderedNN}. Row \code{i} contains the indices
-#' of the observations that observation \code{i} conditions on. By convention,
-#' the first element of row \code{i} is \code{i}.
+#' @inheritParams vecchia_loglik
 #' @return the product of the sprase inverse Cholesky factor with a vector
 #' @examples
 #' n <- 8000
@@ -275,8 +264,8 @@ vecchia_Linv <- function(covparms, covfun_name, locs, NNarray) {
 #' z2 <- Linv_mult(Linv, y, NNarray)
 #' print( sum( (z1-z2)^2 ) )
 #' @export
-Linv_mult <- function(Linv_entries, z, NNarray) {
-    .Call('_GpGp_Linv_mult', PACKAGE = 'GpGp', Linv_entries, z, NNarray)
+Linv_mult <- function(Linv, z, NNarray) {
+    .Call('_GpGp_Linv_mult', PACKAGE = 'GpGp', Linv, z, NNarray)
 }
 
 #' Multiply approximate Cholesky by a vector
@@ -285,12 +274,10 @@ Linv_mult <- function(Linv_entries, z, NNarray) {
 #' inverse Cholesky factor of the covariance matrix. This function
 #' returns the result of multiplying the inverse of that matrix by a vector 
 #' (i.e. an approximation to the Cholesky factor).
-#' @param LinvEntries Entries of the sparse inverse Cholesky factor,
-#' usually the output from \code{vecchiaLinv}.
+#' @param Linv Entries of the sparse inverse Cholesky factor,
+#' usually the output from \code{\link{vecchia_Linv}}.
 #' @param z the vector to be multiplied
-#' @param NNarray A matrix of indicies, usually the output from \code{findOrderedNN}. Row \code{i} contains the indices
-#' of the observations that observation \code{i} conditions on. By convention,
-#' the first element of row \code{i} is \code{i}.
+#' @inheritParams vecchia_loglik
 #' @return the product of the sprase inverse Cholesky factor with a vector
 #' @examples
 #' n <- 8000
@@ -304,7 +291,7 @@ Linv_mult <- function(Linv_entries, z, NNarray) {
 #' y2 <- L_mult(Linv, z, NNarray)
 #' print( sum( (y1-y2)^2 ) )
 #' @export
-L_mult <- function(Linv_entries, z, NNarray) {
-    .Call('_GpGp_L_mult', PACKAGE = 'GpGp', Linv_entries, z, NNarray)
+L_mult <- function(Linv, z, NNarray) {
+    .Call('_GpGp_L_mult', PACKAGE = 'GpGp', Linv, z, NNarray)
 }
 

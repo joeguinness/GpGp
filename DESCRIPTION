@@ -22,3 +22,4 @@ Suggests:
 LinkingTo: Rcpp
 RoxygenNote: 6.0.1
 VignetteBuilder: knitr
+LazyData: true

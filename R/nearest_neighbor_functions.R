@@ -6,11 +6,16 @@
 
 
 
-# naive brute force nearest neighbor finder
+#' Naive brute force nearest neighbor finder
+#' 
+#' @param locs matrix of locations
+#' @param m number of neighbors
+#' @return integer vector giving ordering
 find_ordered_nn_brute <- function( locs, m ){
      # find the m+1 nearest neighbors to locs[j,] in locs[1:j,]
      # by convention, this includes locs[j,], which is distance 0
      n <- dim(locs)[1]
+     m <- min(m,n-1)
      NNarray <- matrix(NA,n,m+1)
      for(j in 1:n ){
          distvec <- c(fields::rdist(locs[1:j,,drop=FALSE],locs[j,,drop=FALSE]) )
@@ -33,15 +38,17 @@ find_ordered_nn_brute <- function( locs, m ){
 #' where the nearest neighbors must come from previous
 #' in the ordering.
 #'
-#' @param locs Matrix containing ordered locations.
-#' Each row is contains a single location
 #' @param m Nuber of neighbors to return
+#' @inheritParams order_dist_to_point
+#' @param space_time TRUE if locations are euclidean space-time locations, 
+#' FALSE otherwise. If set to TRUE, temporal dimension is ignored. 
+#' If set to FALSE, temporal dimension treated as another spatial dimension (not recommended).
 #' @return An matrix containing the indices of the neighbors. Row \code{i} of the
 #' returned matrix contains the indices of the nearest \code{m}
 #' locations to the \code{i}'th location. Indices are ordered within a
-#' row to be increasing in distance. By convention, consider a location
+#' row to be increasing in distance. By convention, we consider a location
 #' to neighbor itself, so the first entry of row \code{i} is \code{i}, the
-#' second neighbor is the nearest other location, and so on. Because each
+#' second entry is the index of the nearest location, and so on. Because each
 #' location neighbors itself, the returned matrix has \code{m+1} columns.
 #' @examples
 #' locs <- as.matrix( expand.grid( (1:40)/40, (1:40)/40 ) )     # grid of locations
@@ -57,7 +64,7 @@ find_ordered_nn_brute <- function( locs, m ){
 #' points( locsord[ind,1], locsord[ind,2], col = "magenta", cex = 1.5 )
 #' points( locsord[NNarray[ind,2:(m+1)],1], locsord[NNarray[ind,2:(m+1)],2], col = "blue", cex = 1.5 )
 #' @export
-find_ordered_nn <- function(locs,m, lonlat = FALSE){
+find_ordered_nn <- function(locs,m, lonlat = FALSE, space_time = FALSE){
 
     
     if(lonlat){
@@ -70,26 +77,34 @@ find_ordered_nn <- function(locs,m, lonlat = FALSE){
         z <- cos(latrad)
         locs <- cbind(x,y,z)
     }
+    
+    if(space_time){ # simply ignore the temporal dimension
+        # chooses neighbors based on spatial dimension only
+        d <- ncol(locs)-1
+        locs <- locs[,1:d,drop=FALSE]
+    }
+
 
     # number of locations
     n <- nrow(locs)
+    m <- min(m,n-1)
     mult <- 2
 
     # to store the nearest neighbor indices
     NNarray <- matrix(NA,n,m+1)
 
     # to the first mult*m+1 by brutce force
-    NNarray[1:(mult*m+1),] <- find_ordered_nn_brute(locs[1:(mult*m+1),],m)
+    maxval <- min( mult*m + 1, n )
+    NNarray[1:maxval,] <- find_ordered_nn_brute(locs[1:maxval,],m)
 
-    query_inds <- (mult*m+2):n
+    query_inds <- min( maxval+1, n):n
     data_inds <- 1:n
 
     msearch <- m
 
     while( length(query_inds) > 0 ){
-
         msearch <- min( max(query_inds), 2*msearch )
-        data_inds <- 1:max(query_inds)
+        data_inds <- 1:min( max(query_inds), n )
         NN <- FNN::get.knnx( locs[data_inds,,drop=FALSE], locs[query_inds,,drop=FALSE], msearch )$nn.index
         less_than_k <- t(sapply( 1:nrow(NN), function(k) NN[k,] <= query_inds[k]  ))
         sum_less_than_k <- apply(less_than_k,1,sum)
@@ -128,9 +143,23 @@ find_ordered_nn <- function(locs,m, lonlat = FALSE){
 #' @param exponent Within the algorithm, two groups are merged if the number of unique
 #' neighbors raised to the \code{exponent} power is less than the sum of the unique numbers
 #' raised to the \code{exponent} power from the two groups.
-#' @return A list defining the partition of NNarray. Each list element contains the rows
-#' of NNarray corresponding to the grouping, and the collection of all of the elements
-#' is exhaustive, meaning that the entirety of NNarray can be reconstructed from the list.
+#' @return A list with elements defining the grouping. The list entries are:
+#' \itemize{
+#'   \item \code{all_inds}: vector of all indices of all blocks.
+#'   \item \code{last_ind_of_block}: The \code{i}th entry tells us the
+#'       location in \code{all_inds} of the last index of the \code{i}th block. Thus the length
+#'       of \code{last_ind_of_block} is the number of blocks, and \code{last_ind_of_block} can
+#'       be used to chop \code{all_inds} up into blocks.
+#'   \item \code{global_resp_inds}: The \code{i}th entry tells us the
+#'       index of the \code{i}th response, as ordered in \code{all_inds}.
+#'   \item \code{local_resp_inds}: The \code{i}th entry tells us the location within 
+#'       the block of the response index.
+#'   \item \code{last_resp_of_block}: The \code{i}th entry tells us the
+#'       location within \code{local_resp_inds} and \code{global_resp_inds} of the last
+#'       index of the \code{i}th block. \code{last_resp_of_block} is to 
+#'       \code{global_resp_inds} and \code{local_resp_inds}
+#'       as \code{last_ind_of_block} is to \code{all_inds}.
+#' }
 #' @examples
 #' locs <- matrix( runif(200), 100, 2 )   # generate random locations
 #' ord <- order_maxmin(locs)              # calculate an ordering
@@ -144,6 +173,20 @@ find_ordered_nn <- function(locs,m, lonlat = FALSE){
 #' object.size(NNlist3)
 #' mean( NNlist2[["local_resp_inds"]] - 1 )   # average number of neighbors (exponent 2)
 #' mean( NNlist3[["local_resp_inds"]] - 1 )   # average number of neighbors (exponent 3)
+#' 
+#' all_inds <- NNlist2$all_inds
+#' last_ind_of_block <- NNlist2$last_ind_of_block
+#' inds_of_block_2 <- all_inds[ (last_ind_of_block[1] + 1):last_ind_of_block[2] ]
+#' 
+#' local_resp_inds <- NNlist2$local_resp_inds
+#' global_resp_inds <- NNlist2$global_resp_inds
+#' last_resp_of_block <- NNlist2$last_resp_of_block
+#' local_resp_of_block_2 <- local_resp_inds[(last_resp_of_block[1]+1):last_resp_of_block[2]]
+#'
+#' global_resp_of_block_2 <- global_resp_inds[(last_resp_of_block[1]+1):last_resp_of_block[2]]
+#' inds_of_block_2[local_resp_of_block_2]
+#' # these last two should be the same
+#' 
 #' @export
 group_obs <- function(NNarray, exponent = 2){
     n <- nrow(NNarray)
@@ -173,7 +216,7 @@ group_obs <- function(NNarray, exponent = 2){
     all_inds <- rep(NA,n*(m+1))
     last_ind_of_block <- rep(NA,length(clust))
     last_resp_of_block <- rep(NA,length(clust))
-    num_resp_inblock <- rep(NA,length(clust))
+    #num_resp_inblock <- rep(NA,length(clust))
     local_resp_inds <- rep(NA,n)
     global_resp_inds <- rep(NA,n)
 

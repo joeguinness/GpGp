@@ -103,6 +103,40 @@ NumericMatrix matern_sphere(NumericVector covparms, NumericMatrix lonlat ){
 }
 
 
+//' Space-time Matern-covariance function
+//'
+//' From a matrix of locations and times and a vector covariance parameters of the form
+//' (variance, spatial range, temporal range, smoothness, nugget), return the square matrix of
+//' all pairwise covariances.
+//' @param locstime A matrix with \code{n} rows and d+1 columns. The first d columns
+//' give a location in R^d, and the last column gives a time. Each row corresponds
+//' to a space-time location.
+//' @param covparms A vector giving positive-valued covariance parameters
+//' in the form (variance, spatial range, temporal range, smoothness, nugget)
+//' @return A matrix with \code{n} rows and \code{n} columns, with the \code{i,j} entry
+//' containing the covariance between observations at \code{locstime[i,]} and
+//' \code{locstime[j,]}.
+// [[Rcpp::export]]
+NumericMatrix matern_space_time(NumericVector covparms, NumericMatrix locstime ){
+
+    int n = locstime.nrow();
+    int d = locstime.ncol() - 1;
+    NumericVector covparms1(4);
+    covparms1[0] = covparms[0];                    // variance
+    covparms1[1] = 1;                              // locations scaled below, so set range = 1
+    covparms1[2] = covparms[3];                 // smoothness
+    covparms1[3] = covparms[4];
+    for(int i = 0; i < n; i++){
+        for(int j=0; j<d; j++){
+            locstime(i,j) = locstime(i,j)/covparms[2];
+        }
+        locstime(i,d) = locstime(i,d)/covparms[3];
+    }
+
+    NumericMatrix covmat = matern_isotropic( covparms1, locstime );
+    return covmat;
+}
+
 
 //' Isotropic Matern covariance function on sphere-time
 //'
@@ -151,6 +185,6 @@ NumericMatrix matern_sphere_time(NumericVector covparms, NumericMatrix lonlattim
         xyzt(i,3) = lonlattime(i,2)/covparms[2];
     }
 
-    NumericMatrix covmat = matern_isotropic( covparms, xyzt );
+    NumericMatrix covmat = matern_isotropic( covparms1, xyzt );
     return covmat;
 }

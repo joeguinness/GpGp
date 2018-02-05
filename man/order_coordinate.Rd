@@ -7,10 +7,19 @@
 order_coordinate(locs, coordinate)
 }
 \arguments{
-\item{locs}{A matrix of locations in R^d. Each row of \code{locs} contains a location.}
+\item{locs}{A matrix of locations. Each row of \code{locs} contains a location, which can
+be a point in Euclidean space R^d, a point in space-time R^d x T, 
+a longitude and latitude (in degrees) giving a point on the sphere, 
+or a longitude, latitude, and time giving a point in the sphere-time domain.}
+
+\item{coordinate}{integer or vector of integers in {1,...,d}. If a single integer,
+coordinates are ordered along that coordinate. If multiple integers,
+coordinates are ordered according to the sum of specified coordinate values. For example,
+when \code{d=2}, \code{coordinate = c(1,2)} orders from bottom left to top right.}
 }
 \value{
-A vector of indices giving the ordering,
+A vector of indices giving the ordering, i.e. 
+the first element of this vector is the index of the first location.
 }
 \description{
 Return the ordering of locations sorted along one of the

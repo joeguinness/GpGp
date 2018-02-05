@@ -6,8 +6,12 @@
 #' Return the ordering of locations increasing in their
 #' distance to some specified location
 #' 
-#' @param locs A matrix of locations in R^d. Each row of \code{locs} contains a location.
+#' @param locs A matrix of locations. Each row of \code{locs} contains a location, which can
+#' be a point in Euclidean space R^d, a point in space-time R^d x T, 
+#' a longitude and latitude (in degrees) giving a point on the sphere, 
+#' or a longitude, latitude, and time giving a point in the sphere-time domain.
 #' @param loc0 A vector containing a single location in R^d.
+#' @param lonlat TRUE/FALSE whether locations are longitudes and latitudes.
 #' @return A vector of indices giving the ordering, i.e. 
 #' the first element of this vector is the index of the location nearest to \code{loc0}.
 #' @examples
@@ -17,8 +21,20 @@
 #' loc0 <- c(1/2,1/2)
 #' ord <- order_dist_to_point(locs,loc0)
 #' @export
-order_dist_to_point <- function( locs, loc0 ){
+order_dist_to_point <- function( locs, loc0, lonlat = FALSE ){
+    
+    if(lonlat){
+        lon <- locs[,1]
+        lat <- locs[,2]
+        lonrad <- lon*2*pi/360
+        latrad <- (lat+90)*2*pi/360
+        x <- sin(latrad)*cos(lonrad)
+        y <- sin(latrad)*sin(lonrad)
+        z <- cos(latrad)
+        locs <- cbind(x,y,z)
+    }
 
+    
     if (!requireNamespace("fields", quietly = TRUE)) {
         stop("fields package required for this function. Please install it.",
              call. = FALSE)
@@ -38,7 +54,8 @@ order_dist_to_point <- function( locs, loc0 ){
 #' Return the ordering of locations increasing in their
 #' distance to the average location 
 #' 
-#' @param locs A matrix of locations in R^d. Each row of \code{locs} contains a location.
+#' @inheritParams order_dist_to_point
+#' 
 #' @return A vector of indices giving the ordering, i.e. 
 #' the first element of this vector is the index of the location nearest the center.
 #' @examples
@@ -47,7 +64,19 @@ order_dist_to_point <- function( locs, loc0 ){
 #' locs <- matrix( runif(n*d), n, d )
 #' ord <- order_middleout(locs)
 #' @export
-order_middleout <- function( locs ){
+order_middleout <- function( locs, lonlat = FALSE ){
+    
+    if(lonlat){
+        lon <- locs[,1]
+        lat <- locs[,2]
+        lonrad <- lon*2*pi/360
+        latrad <- (lat+90)*2*pi/360
+        x <- sin(latrad)*cos(lonrad)
+        y <- sin(latrad)*sin(lonrad)
+        z <- cos(latrad)
+        locs <- cbind(x,y,z)
+    }
+
     d <- ncol(locs)
     loc0 <- matrix(colMeans(locs),1,d)
     orderinds <- order_dist_to_point(locs,loc0)
@@ -60,8 +89,13 @@ order_middleout <- function( locs ){
 #' Return the ordering of locations sorted along one of the
 #' coordinates or the sum of multiple coordinates
 #' 
-#' @param locs A matrix of locations in R^d. Each row of \code{locs} contains a location.
-#' @return A vector of indices giving the ordering, 
+#' @param coordinate integer or vector of integers in {1,...,d}. If a single integer,
+#' coordinates are ordered along that coordinate. If multiple integers,
+#' coordinates are ordered according to the sum of specified coordinate values. For example,
+#' when \code{d=2}, \code{coordinate = c(1,2)} orders from bottom left to top right.
+#' @inheritParams order_dist_to_point
+#' @return A vector of indices giving the ordering, i.e. 
+#' the first element of this vector is the index of the first location.
 #' @examples
 #' n <- 100             # Number of locations
 #' d <- 2               # dimension of domain
@@ -81,9 +115,12 @@ order_coordinate <- function( locs, coordinate ){
 #' A point in the center is chosen first, and then each successive point
 #' is chosen to maximize the minimum distance to previously selected points
 #'  
-#' @param locs A matrix of locations in R^d. Each row of \code{locs} contains a location.
-#' @param lonlat Flag indicating whether the \code{locs} are longitudes and latitudes.
-#' @return A vector of indices giving the ordering, 
+#' @inheritParams order_dist_to_point
+#' @param space_time TRUE if locations are euclidean space-time locations, 
+#' FALSE otherwise. If set to TRUE, temporal dimension is ignored. 
+#' If set to FALSE, temporal dimension treated as another spatial dimension (not recommended).
+#' @return A vector of indices giving the ordering, i.e. 
+#' the first element of this vector is the index of the first location.
 #' @examples
 #' # planar coordinates
 #' nvec <- c(50,50)
@@ -105,7 +142,7 @@ order_coordinate <- function( locs, coordinate ){
 #' plot( locs[ord[1:900],1], locs[ord[1:900],2], xlim = c(0,360), ylim = c(-90,90) )
 #' 
 #' @export
-order_maxmin <- function(locs, lonlat = FALSE){
+order_maxmin <- function(locs, lonlat = FALSE, space_time = FALSE){
 
     if(lonlat){
         lon <- locs[,1]
@@ -117,7 +154,12 @@ order_maxmin <- function(locs, lonlat = FALSE){
         z <- cos(latrad)
         locs <- cbind(x,y,z)
     }
-
+    
+    if(space_time){ # simply ignore the temporal dimension
+        # this will give roughly random order in time
+        d <- ncol(locs)-1
+        locs <- locs[,1:d,drop=FALSE]
+    }
     
     # get number of locs
     n <- nrow(locs)
@@ -132,7 +174,7 @@ order_maxmin <- function(locs, lonlat = FALSE){
     # move an index to the end if it is a
     # near neighbor of a previous location
     curlen <- n
-    curpos <- 1
+    #curpos <- 1
     nmoved <- 0
     for(j in 2:(2*n) ){
         nneigh <- round( min(m,n/(j-nmoved+1)) )

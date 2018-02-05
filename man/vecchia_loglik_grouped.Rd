@@ -2,7 +2,7 @@
 % Please edit documentation in R/RcppExports.R
 \name{vecchia_loglik_grouped}
 \alias{vecchia_loglik_grouped}
-\title{Vecchia's approximation to the Gaussian loglikelihood}
+\title{Grouped Vecchia's approximation to the Gaussian loglikelihood}
 \usage{
 vecchia_loglik_grouped(covparms, covfun_name, y, locs, NNlist)
 }
@@ -10,26 +10,31 @@ vecchia_loglik_grouped(covparms, covfun_name, y, locs, NNlist)
 \item{covparms}{A vector of covariance parameters appropriate
 for the specified covariance function}
 
+\item{covfun_name}{One of "matern_isotropic", "matern_space_time", "matern_sphere", 
+or "matern_sphere_time".
+"matern_isotropic" and "matern_sphere" have four covariance parameters, 
+(variange, range, smoothness, nugget), while "matern_space_time" and 
+"matern_sphere_time" have five,
+(variance, spatial range, temporal range, smoothness, nugget). 
+For more details, see the documentation 
+for each of the covariance functions by typing, for example, ?matern_isotropic
+or ?matern_sphere_time.}
+
 \item{y}{vector of response values}
 
 \item{locs}{matrix of locations. Row \code{i} of locs specifies the location
 of element \code{i} of \code{y}, and so the length of \code{y} should equal
 the number of rows of \code{locs}.}
 
-\item{covfunName}{One of "maternIsotropic", "maternSphere", or "maternSphereTime".
-"maternIsotropic" and "maternSphere" have four covariance parameters, 
-(variange, range, smoothness, nugget), and "maternSphereTime" has five,
-(variance, spatial range, temporal range, smoothness, nugget).}
-
-\item{NNarray}{A matrix of indicies, usually the output from \code{findOrderedNN}. Row \code{i} contains the indices
-of the observations that observation \code{i} conditions on. By convention,
-the first element of row \code{i} is \code{i}.}
+\item{NNlist}{A list with grouped neighbor information. 
+Usually the output from \code{group_obs(NNarray)}.}
 }
 \value{
-the Gaussian loglikelihood
+grouped version of Vecchia's approximation to the Gaussian loglikelihood
 }
 \description{
-This function returns Vecchia's (1988) approximation to the Gaussian
+This function returns the grouped version (Guinness, 2018) of 
+Vecchia's (1988) approximation to the Gaussian
 loglikelihood. The approximation modifies the ordered conditional
 specification of the joint density; rather than each term in the product
 conditioning on all previous observations, each term conditions on

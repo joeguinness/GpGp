@@ -11,15 +11,35 @@ proflik_mean(parms, covfun_name = "matern_isotropic", y, X, locs, NNarray,
 \item{parms}{All parameters.  The specific meaning
 of each parameter depends on \code{covfun_name}.}
 
-\item{covfun_name}{String specifying which covariance function to use}
+\item{covfun_name}{One of "matern_isotropic", "matern_space_time", "matern_sphere", 
+or "matern_sphere_time".
+"matern_isotropic" and "matern_sphere" have four covariance parameters, 
+(variange, range, smoothness, nugget), while "matern_space_time" and 
+"matern_sphere_time" have five,
+(variance, spatial range, temporal range, smoothness, nugget). 
+For more details, see the documentation 
+for each of the covariance functions by typing, for example, ?matern_isotropic
+or ?matern_sphere_time.}
 
-\item{y}{response}
+\item{y}{vector of response values}
 
 \item{X}{design matrix, each column of X is a single covariate}
 
-\item{NNarray}{matrix holding nearest neighbor indices. Usually the result of \code{find_ordered_nn}.}
+\item{locs}{matrix of locations. Row \code{i} of locs specifies the location
+of element \code{i} of \code{y}, and so the length of \code{y} should equal
+the number of rows of \code{locs}.}
 
-\item{return_parms}{flag for whether the function should return the loglikelihood only (\code{return_parms = FALSE}) or to return both the loglikelihood and all of the parameter values, including mean vector and variance parameter (\code{return_parms = TRUE})}
+\item{NNarray}{A matrix of indicies, usually the output from \code{\link{find_ordered_nn}}. 
+Row \code{i} contains the indices
+of the observations that observation \code{i} conditions on. By convention,
+the first element of row \code{i} is \code{i}.}
+
+\item{return_parms}{flag for whether the function should return the loglikelihood 
+only (\code{return_parms = FALSE}) or to return both the loglikelihood and 
+all of the parameter values, including mean vector and variance parameter 
+(\code{return_parms = TRUE}). Usually, we do the optimization using
+\code{return_parms = FALSE} and then collect the parameter estimates
+with another call with \code{return_parms = TRUE}.}
 }
 \value{
 Either the loglikelihood only (if \code{return_parms = FALSE}) or a list containing the loglikelihood, parameter values, and covariance matrix for linear mean parameters (if \code{return_parms = TRUE}).
@@ -52,15 +72,20 @@ locsord <- locs[ord,]             # reordered locations
 NNarray <- find_ordered_nn(locsord, m = 30)     # nearest neighbor indices
 
 # loglikelihood at true values of parameters
-vecchia_loglik( covparms, "matern_isotropic", yord - 2*Xord[,1], locsord, NNarray )
+vecchia_loglik( covparms, "matern_isotropic", 
+    yord - 2*Xord[,1], locsord, NNarray )
 # profile out mean only (likelihood larger than vecchia_loglik)
-proflik_mean( covparms[1:4], "matern_isotropic", yord, Xord, locsord, NNarray, return_parms = FALSE)
+proflik_mean( covparms[1:4], "matern_isotropic", 
+    yord, Xord, locsord, NNarray, return_parms = FALSE)
 # profile out variance (likelihood larger than vecchia_loglik)
-proflik_variance( covparms[2:4], "matern_isotropic", yord - 2*Xord[,1], locsord, NNarray, return_parms = FALSE)
+proflik_variance( covparms[2:4], "matern_isotropic", 
+    yord - 2*Xord[,1], locsord, NNarray, return_parms = FALSE)
 # profile out mean and variance (likelihood largest)
-proflik_mean_variance( covparms[2:4], "matern_isotropic", yord, Xord, locsord, NNarray, return_parms = FALSE)
+proflik_mean_variance( covparms[2:4], "matern_isotropic", 
+    yord, Xord, locsord, NNarray, return_parms = FALSE)
 # get all parameter values 
-proflik_mean_variance( covparms[2:4], "matern_isotropic", yord, Xord, locsord, NNarray, return_parms = TRUE)
+proflik_mean_variance( covparms[2:4], "matern_isotropic", 
+    yord, Xord, locsord, NNarray, return_parms = TRUE)
 
 
 }

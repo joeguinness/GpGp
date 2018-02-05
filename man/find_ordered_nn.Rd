@@ -4,21 +4,29 @@
 \alias{find_ordered_nn}
 \title{Find ordered nearest neighbors.}
 \usage{
-find_ordered_nn(locs, m, lonlat = FALSE)
+find_ordered_nn(locs, m, lonlat = FALSE, space_time = FALSE)
 }
 \arguments{
-\item{locs}{Matrix containing ordered locations.
-Each row is contains a single location}
+\item{locs}{A matrix of locations. Each row of \code{locs} contains a location, which can
+be a point in Euclidean space R^d, a point in space-time R^d x T, 
+a longitude and latitude (in degrees) giving a point on the sphere, 
+or a longitude, latitude, and time giving a point in the sphere-time domain.}
 
 \item{m}{Nuber of neighbors to return}
+
+\item{lonlat}{TRUE/FALSE whether locations are longitudes and latitudes.}
+
+\item{space_time}{TRUE if locations are euclidean space-time locations, 
+FALSE otherwise. If set to TRUE, temporal dimension is ignored. 
+If set to FALSE, temporal dimension treated as another spatial dimension (not recommended).}
 }
 \value{
 An matrix containing the indices of the neighbors. Row \code{i} of the
 returned matrix contains the indices of the nearest \code{m}
 locations to the \code{i}'th location. Indices are ordered within a
-row to be increasing in distance. By convention, consider a location
+row to be increasing in distance. By convention, we consider a location
 to neighbor itself, so the first entry of row \code{i} is \code{i}, the
-second neighbor is the nearest other location, and so on. Because each
+second entry is the index of the nearest location, and so on. Because each
 location neighbors itself, the returned matrix has \code{m+1} columns.
 }
 \description{

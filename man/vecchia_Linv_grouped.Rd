@@ -10,18 +10,22 @@ vecchia_Linv_grouped(covparms, covfun_name, locs, NNlist)
 \item{covparms}{A vector of covariance parameters appropriate
 for the specified covariance function}
 
+\item{covfun_name}{One of "matern_isotropic", "matern_space_time", "matern_sphere", 
+or "matern_sphere_time".
+"matern_isotropic" and "matern_sphere" have four covariance parameters, 
+(variange, range, smoothness, nugget), while "matern_space_time" and 
+"matern_sphere_time" have five,
+(variance, spatial range, temporal range, smoothness, nugget). 
+For more details, see the documentation 
+for each of the covariance functions by typing, for example, ?matern_isotropic
+or ?matern_sphere_time.}
+
 \item{locs}{matrix of locations. Row \code{i} of locs specifies the location
 of element \code{i} of \code{y}, and so the length of \code{y} should equal
 the number of rows of \code{locs}.}
 
-\item{covfunName}{One of "maternIsotropic", "maternSphere", or "maternSphereTime".
-"maternIsotropic" and "maternSphere" have four covariance parameters, 
-(variange, range, smoothness, nugget), and "maternSphereTime" has five,
-(variance, spatial range, temporal range, smoothness, nugget).}
-
-\item{NNarray}{A matrix of indicies, usually the output from \code{findOrderedNN}. Row \code{i} contains the indices
-of the observations that observation \code{i} conditions on. By convention,
-the first element of row \code{i} is \code{i}.}
+\item{NNlist}{A list with grouped neighbor information. 
+Usually the output from \code{group_obs(NNarray)}.}
 }
 \value{
 the Gaussian loglikelihood

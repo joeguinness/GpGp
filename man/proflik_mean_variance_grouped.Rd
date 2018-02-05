@@ -11,15 +11,32 @@ proflik_mean_variance_grouped(subparms, covfun_name = "matern_isotropic", y,
 \item{subparms}{All parameters except for variance parameter. The specific meaning
 of each parameter depends on \code{covfun_name}.}
 
-\item{covfun_name}{String specifying which covariance function to use}
+\item{covfun_name}{One of "matern_isotropic", "matern_space_time", "matern_sphere", 
+or "matern_sphere_time".
+"matern_isotropic" and "matern_sphere" have four covariance parameters, 
+(variange, range, smoothness, nugget), while "matern_space_time" and 
+"matern_sphere_time" have five,
+(variance, spatial range, temporal range, smoothness, nugget). 
+For more details, see the documentation 
+for each of the covariance functions by typing, for example, ?matern_isotropic
+or ?matern_sphere_time.}
 
-\item{y}{response}
+\item{y}{vector of response values}
 
 \item{X}{design matrix, each column of X is a single covariate}
 
+\item{locs}{matrix of locations. Row \code{i} of locs specifies the location
+of element \code{i} of \code{y}, and so the length of \code{y} should equal
+the number of rows of \code{locs}.}
+
 \item{NNlist}{List object for grouped version of Vecchia's likelihood. Usually the result of \code{group_obs(NNarray)}.}
 
-\item{return_parms}{flag for whether the function should return the loglikelihood only (\code{return_parms = FALSE}) or to return both the loglikelihood and all of the parameter values, including mean vector and variance parameter (\code{return_parms = TRUE})}
+\item{return_parms}{flag for whether the function should return the loglikelihood 
+only (\code{return_parms = FALSE}) or to return both the loglikelihood and 
+all of the parameter values, including mean vector and variance parameter 
+(\code{return_parms = TRUE}). Usually, we do the optimization using
+\code{return_parms = FALSE} and then collect the parameter estimates
+with another call with \code{return_parms = TRUE}.}
 }
 \value{
 Either the loglikelihood only (if \code{return_parms = FALSE}) or a list containing the loglikelihood, parameter values, and covariance matrix for linear mean parameters (if \code{return_parms = TRUE}).
@@ -53,15 +70,20 @@ NNarray <- find_ordered_nn(locsord, m = 30)     # nearest neighbor indices
 NNlist <- group_obs(NNarray)
 
 # loglikelihood at true values of parameters
-vecchia_loglik_grouped( covparms, "matern_isotropic", yord - 2*Xord[,1], locsord, NNlist )
+vecchia_loglik_grouped( covparms, "matern_isotropic", 
+    yord - 2*Xord[,1], locsord, NNlist )
 # profile out mean only (likelihood larger than vecchia_loglik)
-proflik_mean_grouped( covparms[1:4], "matern_isotropic", yord, Xord, locsord, NNlist, return_parms = FALSE)
+proflik_mean_grouped( covparms[1:4], "matern_isotropic", 
+    yord, Xord, locsord, NNlist, return_parms = FALSE)
 # profile out variance (likelihood larger than vecchia_loglik)
-proflik_variance_grouped( covparms[2:4], "matern_isotropic", yord - 2*Xord[,1], locsord, NNlist, return_parms = FALSE)
+proflik_variance_grouped( covparms[2:4], "matern_isotropic", 
+    yord - 2*Xord[,1], locsord, NNlist, return_parms = FALSE)
 # profile out mean and variance (likelihood largest)
-proflik_mean_variance_grouped( covparms[2:4], "matern_isotropic", yord, Xord, locsord, NNlist, return_parms = FALSE)
+proflik_mean_variance_grouped( covparms[2:4], "matern_isotropic", 
+    yord, Xord, locsord, NNlist, return_parms = FALSE)
 # get all parameter values 
-proflik_mean_variance_grouped( covparms[2:4], "matern_isotropic", yord, Xord, locsord, NNlist, return_parms = TRUE)
+proflik_mean_variance_grouped( covparms[2:4], "matern_isotropic", 
+    yord, Xord, locsord, NNlist, return_parms = TRUE)
 
 
 }

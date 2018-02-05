@@ -4,13 +4,15 @@
 \alias{predictions}
 \title{Compute Gaussian process predictions using Vecchia's approximations}
 \usage{
-predictions(covparms, covfun_name = "matern_isotropic", locs_obs, locs_pred,
-  X_obs, X_pred, beta, y_obs, m = 60, reorder = TRUE)
+predictions(covparms, covfun_name = "matern_isotropic", y_obs, locs_obs,
+  locs_pred, X_obs, X_pred, beta, m = 60, reorder = TRUE)
 }
 \arguments{
 \item{covparms}{Covariance parameters}
 
 \item{covfun_name}{Name of covariance function}
+
+\item{y_obs}{Observations assocaited with locs_obs}
 
 \item{locs_obs}{observation locations}
 
@@ -22,9 +24,11 @@ predictions(covparms, covfun_name = "matern_isotropic", locs_obs, locs_pred,
 
 \item{beta}{Linear mean parameters}
 
-\item{y_obs}{Observations assocaited with locs_obs}
-
 \item{m}{Number of nearest neighbors to use}
+
+\item{reorder}{TRUE/FALSE for whether reodering should be done. This should
+generally be kept at TRUE, unless testing out the effect of
+reordering.}
 }
 \description{
 With the prediction locations ordered after the observation locations,

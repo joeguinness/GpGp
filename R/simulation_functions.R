@@ -5,7 +5,7 @@
 #' factor of the covariance matrix using Vecchia's approximation,
 #' then the simulation is produced by solving a linear system
 #' with a vector of uncorrelated standard normals
-#' @param covfunNames string name of covariance functions. Currently supported
+#' @param covfun_name string name of covariance functions. Currently supported
 #' covariance functions are "maternIsotropic", "maternSphere", and "maternSphereTime"
 #' @param covparms Vector of covariance function parameters. For "maternIsotropic" and
 #' "maternSphere", these are (variance, range, smoothness, nugget). For "maternSphereTime",
@@ -22,10 +22,27 @@
 #' fields::image.plot( matrix(y,100,100) )
 #' @export
 fast_Gp_sim <- function( covparms, covfun_name = "matern_isotropic", locs, m = 30 ){
+    
+    print(covparms)
+    # figure out if lonlat or not
+    if( covfun_name == "matern_sphere" || covfun_name == "matern_sphere_time" ){
+        lonlat <- TRUE
+    } else {
+        lonlat <- FALSE
+    }
+    
+    if( covfun_name == "matern_space_time" ){
+        space_time = TRUE
+    } else {
+        space_time = FALSE
+    }
 
-    ord <- order_maxmin(locs)
+    n <- nrow(locs)
+    m <- min(m,n-1)
+    ord <- order_maxmin(locs,lonlat=lonlat,space_time=space_time)
+    print(ord[1])
     locsord <- locs[ord,]
-    NNarray <- find_ordered_nn(locsord,m)
+    NNarray <- find_ordered_nn(locsord,m,lonlat=lonlat,space_time=space_time)
     Linv <- vecchia_Linv( covparms, covfun_name, locsord, NNarray )
     y <- fast_Gp_sim_Linv( Linv, NNarray )
     y[ord] <- y
@@ -60,7 +77,7 @@ fast_Gp_sim <- function( covparms, covfun_name = "matern_isotropic", locs, m = 3
 #' @export
 fast_Gp_sim_Linv <- function( Linv, NNarray, z = NULL ){
 
-    if( is.null(z) ){ z = rnorm(nrow(Linv)) }
+    if( is.null(z) ){ z = stats::rnorm(nrow(Linv)) }
     y <- L_mult( Linv, z, NNarray )
     return(y)
 

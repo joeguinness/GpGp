@@ -10,16 +10,19 @@
 #' the conditional expectation.
 #' @param covparms Covariance parameters
 #' @param covfun_name Name of covariance function
+#' @param y_obs Observations assocaited with locs_obs
 #' @param locs_obs observation locations
 #' @param locs_pred prediction locations
 #' @param X_obs Design matrix for observations
 #' @param X_pred Design matrix for predictions
 #' @param beta Linear mean parameters
-#' @param y_obs Observations assocaited with locs_obs
 #' @param m Number of nearest neighbors to use
+#' @param reorder TRUE/FALSE for whether reodering should be done. This should
+#' generally be kept at TRUE, unless testing out the effect of
+#' reordering.
 #' @export
-predictions <- function(covparms, covfun_name = "matern_isotropic", locs_obs, locs_pred, 
-    X_obs, X_pred, beta, y_obs, m = 60, reorder = TRUE){
+predictions <- function(covparms, covfun_name = "matern_isotropic", y_obs, 
+    locs_obs, locs_pred, X_obs, X_pred, beta, m = 60, reorder = TRUE){
     
     n_obs <- nrow(locs_obs)
     n_pred <- nrow(locs_pred)
@@ -77,16 +80,21 @@ predictions <- function(covparms, covfun_name = "matern_isotropic", locs_obs, lo
 #' a conditional simulation.
 #' @param covparms Covariance parameters
 #' @param covfun_name Name of covariance function
+#' @param y_obs Observations assocaited with locs_obs
 #' @param locs_obs observation locations
 #' @param locs_pred prediction locations
 #' @param X_obs Design matrix for observations
 #' @param X_pred Design matrix for predictions
 #' @param beta Linear mean parameters
-#' @param y_obs Observations assocaited with locs_obs
-#' @param m Number of nearest neighbors to use
+#' @param m Number of nearest neighbors to use. Larger \code{m} gives
+#' better approximations.
+#' @param nsims Number of conditional simulations to return.
+#' @param reorder TRUE/FALSE for whether reodering should be done. This should
+#' generally be kept at TRUE, unless testing out the effect of
+#' reordering.
 #' @export
-cond_sim <- function(covparms, covfun_name = "matern_isotropic", locs_obs, locs_pred, 
-    X_obs, X_pred, beta, y_obs, m = 60, reorder = TRUE){
+cond_sim <- function(covparms, covfun_name = "matern_isotropic", y_obs, 
+    locs_obs, locs_pred, X_obs, X_pred, beta, m = 60, nsims = 1, reorder = TRUE){
     
     n_obs <- nrow(locs_obs)
     n_pred <- nrow(locs_pred)
@@ -119,14 +127,16 @@ cond_sim <- function(covparms, covfun_name = "matern_isotropic", locs_obs, locs_
     Linv_all <- vecchia_Linv(covparms,covfun_name,locs_all,NNarray_all)
     
     # an unconditional simulation
-    z <- L_mult(Linv_all, rnorm(n_obs+n_pred), NNarray_all)
+    condsim <- matrix(NA, n_pred, nsims)
+    for(j in 1:nsims){
+        z <- L_mult(Linv_all, stats::rnorm(n_obs+n_pred), NNarray_all)
     
-    y_withzeros <- c(yord_obs - Xord_obs %*% beta + z[inds1], rep(0,n_pred) )
-    v1 <- Linv_mult(Linv_all, y_withzeros, NNarray_all )
-    v1[inds1] <- 0
-    v2 <- -L_mult(Linv_all,v1,NNarray_all)
+        y_withzeros <- c(yord_obs - Xord_obs %*% beta + z[inds1], rep(0,n_pred) )
+        v1 <- Linv_mult(Linv_all, y_withzeros, NNarray_all )
+        v1[inds1] <- 0
+        v2 <- -L_mult(Linv_all,v1,NNarray_all)
 
-    condsim <- c(v2[inds2] + Xord_pred %*% beta) - z[inds2]
-    condsim[ord2] <- condsim
+        condsim[ord2,j] <- c(v2[inds2] + Xord_pred %*% beta) - z[inds2]
+    }
     return(condsim)
 }

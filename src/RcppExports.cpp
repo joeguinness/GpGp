@@ -29,6 +29,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// matern_space_time
+NumericMatrix matern_space_time(NumericVector covparms, NumericMatrix locstime);
+RcppExport SEXP _GpGp_matern_space_time(SEXP covparmsSEXP, SEXP locstimeSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type covparms(covparmsSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type locstime(locstimeSEXP);
+    rcpp_result_gen = Rcpp::wrap(matern_space_time(covparms, locstime));
+    return rcpp_result_gen;
+END_RCPP
+}
 // matern_sphere_time
 NumericMatrix matern_sphere_time(NumericVector covparms, NumericMatrix lonlattime);
 RcppExport SEXP _GpGp_matern_sphere_time(SEXP covparmsSEXP, SEXP lonlattimeSEXP) {
@@ -113,28 +125,28 @@ BEGIN_RCPP
 END_RCPP
 }
 // Linv_mult
-NumericVector Linv_mult(NumericMatrix Linv_entries, NumericVector z, IntegerMatrix NNarray);
-RcppExport SEXP _GpGp_Linv_mult(SEXP Linv_entriesSEXP, SEXP zSEXP, SEXP NNarraySEXP) {
+NumericVector Linv_mult(NumericMatrix Linv, NumericVector z, IntegerMatrix NNarray);
+RcppExport SEXP _GpGp_Linv_mult(SEXP LinvSEXP, SEXP zSEXP, SEXP NNarraySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericMatrix >::type Linv_entries(Linv_entriesSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type Linv(LinvSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type z(zSEXP);
     Rcpp::traits::input_parameter< IntegerMatrix >::type NNarray(NNarraySEXP);
-    rcpp_result_gen = Rcpp::wrap(Linv_mult(Linv_entries, z, NNarray));
+    rcpp_result_gen = Rcpp::wrap(Linv_mult(Linv, z, NNarray));
     return rcpp_result_gen;
 END_RCPP
 }
 // L_mult
-NumericVector L_mult(NumericMatrix Linv_entries, NumericVector z, IntegerMatrix NNarray);
-RcppExport SEXP _GpGp_L_mult(SEXP Linv_entriesSEXP, SEXP zSEXP, SEXP NNarraySEXP) {
+NumericVector L_mult(NumericMatrix Linv, NumericVector z, IntegerMatrix NNarray);
+RcppExport SEXP _GpGp_L_mult(SEXP LinvSEXP, SEXP zSEXP, SEXP NNarraySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericMatrix >::type Linv_entries(Linv_entriesSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type Linv(LinvSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type z(zSEXP);
     Rcpp::traits::input_parameter< IntegerMatrix >::type NNarray(NNarraySEXP);
-    rcpp_result_gen = Rcpp::wrap(L_mult(Linv_entries, z, NNarray));
+    rcpp_result_gen = Rcpp::wrap(L_mult(Linv, z, NNarray));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -142,6 +154,7 @@ END_RCPP
 static const R_CallMethodDef CallEntries[] = {
     {"_GpGp_matern_isotropic", (DL_FUNC) &_GpGp_matern_isotropic, 2},
     {"_GpGp_matern_sphere", (DL_FUNC) &_GpGp_matern_sphere, 2},
+    {"_GpGp_matern_space_time", (DL_FUNC) &_GpGp_matern_space_time, 2},
     {"_GpGp_matern_sphere_time", (DL_FUNC) &_GpGp_matern_sphere_time, 2},
     {"_GpGp_vecchia_loglik_grouped", (DL_FUNC) &_GpGp_vecchia_loglik_grouped, 5},
     {"_GpGp_vecchia_Linv_grouped", (DL_FUNC) &_GpGp_vecchia_Linv_grouped, 4},

@@ -12,14 +12,14 @@ fast_Gp_sim(covparms, covfun_name = "matern_isotropic", locs, m = 30)
 these are (variance, spatial range, temporal range, smoothness, nugget). See documentation
 of the covariance functions for more details.}
 
+\item{covfun_name}{string name of covariance functions. Currently supported
+covariance functions are "maternIsotropic", "maternSphere", and "maternSphereTime"}
+
 \item{locs}{Matrix of locations. Each row is an individual location. For "maternSphere",
 locations are (lon,lat), where lon is in (-180,180), and lat is in (-90,90). For "maternSphereTime"
 locations are (lon,lat,time).}
 
 \item{m}{Number of nearest neighbors to use in approximation}
-
-\item{covfunNames}{string name of covariance functions. Currently supported
-covariance functions are "maternIsotropic", "maternSphere", and "maternSphereTime"}
 }
 \value{
 vector of simulated values

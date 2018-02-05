@@ -4,12 +4,17 @@
 \alias{order_dist_to_point}
 \title{Distance to specified point ordering}
 \usage{
-order_dist_to_point(locs, loc0)
+order_dist_to_point(locs, loc0, lonlat = FALSE)
 }
 \arguments{
-\item{locs}{A matrix of locations in R^d. Each row of \code{locs} contains a location.}
+\item{locs}{A matrix of locations. Each row of \code{locs} contains a location, which can
+be a point in Euclidean space R^d, a point in space-time R^d x T, 
+a longitude and latitude (in degrees) giving a point on the sphere, 
+or a longitude, latitude, and time giving a point in the sphere-time domain.}
 
 \item{loc0}{A vector containing a single location in R^d.}
+
+\item{lonlat}{TRUE/FALSE whether locations are longitudes and latitudes.}
 }
 \value{
 A vector of indices giving the ordering, i.e. 
