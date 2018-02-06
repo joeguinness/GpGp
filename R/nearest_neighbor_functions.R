@@ -67,6 +67,16 @@ find_ordered_nn_brute <- function( locs, m ){
 find_ordered_nn <- function(locs,m, lonlat = FALSE, space_time = FALSE){
 
     
+    # number of locations
+    n <- nrow(locs)
+    m <- min(m,n-1)
+    mult <- 2
+    
+    # FNN::get.knnx has strange behavior for exact matches
+    # so add a small amount of noise to each location
+    ee <- min(apply( locs, 2, sd ))
+    locs <- locs + matrix( ee*1e-4*rnorm(n*ncol(locs)), n, ncol(locs) )    
+    
     if(lonlat){
         lon <- locs[,1]
         lat <- locs[,2]
@@ -84,11 +94,6 @@ find_ordered_nn <- function(locs,m, lonlat = FALSE, space_time = FALSE){
         locs <- locs[,1:d,drop=FALSE]
     }
 
-
-    # number of locations
-    n <- nrow(locs)
-    m <- min(m,n-1)
-    mult <- 2
 
     # to store the nearest neighbor indices
     NNarray <- matrix(NA,n,m+1)
@@ -109,7 +114,6 @@ find_ordered_nn <- function(locs,m, lonlat = FALSE, space_time = FALSE){
         less_than_k <- t(sapply( 1:nrow(NN), function(k) NN[k,] <= query_inds[k]  ))
         sum_less_than_k <- apply(less_than_k,1,sum)
         ind_less_than_k <- which(sum_less_than_k >= m+1)
-        #NN_less_than_k <- NN[ind_less_than_k,]
 
         NN_m <- t(sapply(ind_less_than_k,function(k) NN[k,][less_than_k[k,]][1:(m+1)] ))
 

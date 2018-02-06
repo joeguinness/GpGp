@@ -23,7 +23,6 @@
 #' @export
 fast_Gp_sim <- function( covparms, covfun_name = "matern_isotropic", locs, m = 30 ){
     
-    print(covparms)
     # figure out if lonlat or not
     if( covfun_name == "matern_sphere" || covfun_name == "matern_sphere_time" ){
         lonlat <- TRUE
@@ -32,15 +31,14 @@ fast_Gp_sim <- function( covparms, covfun_name = "matern_isotropic", locs, m = 3
     }
     
     if( covfun_name == "matern_space_time" ){
-        space_time = TRUE
+        space_time <- TRUE
     } else {
-        space_time = FALSE
+        space_time <- FALSE
     }
 
     n <- nrow(locs)
     m <- min(m,n-1)
     ord <- order_maxmin(locs,lonlat=lonlat,space_time=space_time)
-    print(ord[1])
     locsord <- locs[ord,]
     NNarray <- find_ordered_nn(locsord,m,lonlat=lonlat,space_time=space_time)
     Linv <- vecchia_Linv( covparms, covfun_name, locsord, NNarray )

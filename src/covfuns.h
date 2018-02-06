@@ -91,7 +91,6 @@ inline void update_vars_based_on_covfun(std::string covfun_name_string,
     else if( covfun_name_string.compare("matern_space_time") == 0 )
     {
         int d = (*locs).ncol() - 1;
-        Rcpp::Rcout << d << std::endl;
         cparms[0] = covparms[0];                    // variance
         cparms[1] = 1;                              // locations scaled below, so set range = 1
         cparms[2] = covparms[3];                    // smoothness
@@ -102,8 +101,7 @@ inline void update_vars_based_on_covfun(std::string covfun_name_string,
             }
             (*locs)(i,d) = (*locs)(i,d)/covparms[2];
         }
-        Rcpp::Rcout << (*locs)(0,0) << " " <<  (*locs)(0,1) << " " <<(*locs)(0,2) << " " <<std::endl;
-            
+
     }
     else   // stop the program
     {

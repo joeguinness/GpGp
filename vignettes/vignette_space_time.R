@@ -1,26 +1,26 @@
 
 
 # a short vignette demonstrating how to use the functions
-library("GpGp")
+#library("GpGp")
 
 # grid size for data locations
 gsize <- 50
-times <- 10
+times <- 3
 nvec <- c(gsize,gsize,times)
 n <- prod(nvec)
 
 # generate data locations and plot them
 x1 <- (1:nvec[1])/nvec[1]
 x2 <- (1:nvec[2])/nvec[2]
-locstime <- as.matrix(expand.grid(x1,x2,1:times))
+locs_time <- as.matrix(expand.grid(x1,x2,1:times)) 
 
 # covariance function and parameters
 # covfun <- maternIsotropic
-covparms <- c(variance = 4, sp_range = 0.5, t_range = 3, smoothness = 1/2, nugget = 0)
+covparms <- c(variance = 4, sp_range = 0.1, t_range = 3, smoothness = 3/2, nugget = 0)
 
 # simulate some data
-y <- fast_Gp_sim(covparms, "matern_space_time",locs = locstime,m = 100)
-y <- fast_Gp_sim(covparms[c(1,2,4,5)], "matern_isotropic",locs = locstime,m = 100)
+y <- fast_Gp_sim(covparms, "matern_space_time",locs = locs_time,m = 100)
+#y <- fast_Gp_sim(covparms[c(1,2,4,5)], "matern_isotropic",locs = locstime,m = 100)
 y_array <- array( y, nvec )
 par(mfrow=c(1,3))
 image(y_array[,,1], col = viridis::viridis(64))
@@ -29,15 +29,15 @@ image(y_array[,,3], col = viridis::viridis(64))
 
 
 # generate an ordering
-ord <- order_maxmin(locs)
-
+ord <- order_maxmin(locs_time,space_time = TRUE)
+ord <- 1:n
 # define ordered locations and observations
-locsord <- locs[ord,]
+locs_time_ord <- locs_time[ord,]
 yord <- y[ord]
 
 # find the ordered m nearest neighbors
-m <- 30
-NNarray <- find_ordered_nn(locsord,m)
+m <- 10
+NNarray <- find_ordered_nn(locs_time_ord,m,space_time=FALSE)
 
 # automatically group the observations
 NNlist <- group_obs(NNarray, 2)
