@@ -117,7 +117,10 @@ order_coordinate <- function( locs, coordinate ){
 #'  
 #' @inheritParams order_dist_to_point
 #' @param space_time TRUE if locations are euclidean space-time locations, 
-#' FALSE otherwise. If set to TRUE, temporal dimension is ignored. 
+#' FALSE otherwise. If set to TRUE, temporal dimension is ignored.
+#' @param st_scale two-vector giving the amount by which the spatial
+#' and temporal coordinates are scaled. If \code{NULL}, the function
+#' uses the locations to automatically select a scaling.
 #' If set to FALSE, temporal dimension treated as another spatial dimension (not recommended).
 #' @return A vector of indices giving the ordering, i.e. 
 #' the first element of this vector is the index of the first location.
@@ -142,7 +145,8 @@ order_coordinate <- function( locs, coordinate ){
 #' plot( locs[ord[1:900],1], locs[ord[1:900],2], xlim = c(0,360), ylim = c(-90,90) )
 #' 
 #' @export
-order_maxmin <- function(locs, lonlat = FALSE, space_time = FALSE){
+order_maxmin <- function(locs, lonlat = FALSE, 
+    space_time = FALSE, st_scale = NULL){
 
     if(lonlat){
         lon <- locs[,1]
@@ -155,10 +159,20 @@ order_maxmin <- function(locs, lonlat = FALSE, space_time = FALSE){
         locs <- cbind(x,y,z)
     }
     
-    if(space_time){ # simply ignore the temporal dimension
-        # this will give roughly random order in time
+    if(space_time){ 
         d <- ncol(locs)-1
-        locs <- locs[,1:d,drop=FALSE]
+        if( is.null(st_scale) ){
+            randinds <- sample(1:n, min(n,200) )
+            dvec <- c(fields::rdist( locs[randinds,1:d,drop=FALSE] ))
+            dvec <- dvec[ dvec > 0]
+            med1 <- mean(dvec)
+            dvec <- c(fields::rdist( locs[randinds, d + 1, drop=FALSE] ))
+            dvec <- dvec[ dvec > 0]
+            med2 <- mean(dvec)
+            st_scale <- c(med1,med2)
+        }
+        locs[ , 1:d] <- locs[ , 1:d]/st_scale[1]
+        locs[ , d+1] <- locs[ , d+1]/st_scale[2]
     }
     
     # get number of locs

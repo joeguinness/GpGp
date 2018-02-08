@@ -40,9 +40,7 @@ find_ordered_nn_brute <- function( locs, m ){
 #'
 #' @param m Nuber of neighbors to return
 #' @inheritParams order_dist_to_point
-#' @param space_time TRUE if locations are euclidean space-time locations, 
-#' FALSE otherwise. If set to TRUE, temporal dimension is ignored. 
-#' If set to FALSE, temporal dimension treated as another spatial dimension (not recommended).
+#' @inheritParams order_maxmin
 #' @return An matrix containing the indices of the neighbors. Row \code{i} of the
 #' returned matrix contains the indices of the nearest \code{m}
 #' locations to the \code{i}'th location. Indices are ordered within a
@@ -64,7 +62,7 @@ find_ordered_nn_brute <- function( locs, m ){
 #' points( locsord[ind,1], locsord[ind,2], col = "magenta", cex = 1.5 )
 #' points( locsord[NNarray[ind,2:(m+1)],1], locsord[NNarray[ind,2:(m+1)],2], col = "blue", cex = 1.5 )
 #' @export
-find_ordered_nn <- function(locs,m, lonlat = FALSE, space_time = FALSE){
+find_ordered_nn <- function(locs,m, lonlat = FALSE, space_time = FALSE, st_scale = NULL){
 
     
     # number of locations
@@ -74,8 +72,8 @@ find_ordered_nn <- function(locs,m, lonlat = FALSE, space_time = FALSE){
     
     # FNN::get.knnx has strange behavior for exact matches
     # so add a small amount of noise to each location
-    ee <- min(apply( locs, 2, sd ))
-    locs <- locs + matrix( ee*1e-4*rnorm(n*ncol(locs)), n, ncol(locs) )    
+    ee <- min(apply( locs, 2, stats::sd ))
+    locs <- locs + matrix( ee*1e-4*stats::rnorm(n*ncol(locs)), n, ncol(locs) )    
     
     if(lonlat){
         lon <- locs[,1]
@@ -88,12 +86,21 @@ find_ordered_nn <- function(locs,m, lonlat = FALSE, space_time = FALSE){
         locs <- cbind(x,y,z)
     }
     
-    if(space_time){ # simply ignore the temporal dimension
-        # chooses neighbors based on spatial dimension only
+    if(space_time){ 
         d <- ncol(locs)-1
-        locs <- locs[,1:d,drop=FALSE]
+        if( is.null(st_scale) ){
+            randinds <- sample(1:n, min(n,200))
+            dvec <- c(fields::rdist( locs[randinds,1:d,drop=FALSE] ))
+            dvec <- dvec[ dvec > 0]
+            med1 <- mean(dvec)
+            dvec <- c(fields::rdist( locs[randinds, d + 1, drop=FALSE] ))
+            dvec <- dvec[ dvec > 0]
+            med2 <- mean(dvec)
+            st_scale <- c(med1,med2)
+        }
+        locs[ , 1:d] <- locs[ , 1:d]/st_scale[1]
+        locs[ , d+1] <- locs[ , d+1]/st_scale[2]
     }
-
 
     # to store the nearest neighbor indices
     NNarray <- matrix(NA,n,m+1)

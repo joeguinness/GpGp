@@ -96,7 +96,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // vecchia_loglik
-NumericVector vecchia_loglik(NumericVector covparms, StringVector covfun_name, NumericVector y, NumericMatrix locs, IntegerMatrix NNarray);
+NumericVector vecchia_loglik(NumericVector covparms, StringVector covfun_name, NumericVector y, const NumericMatrix locs, IntegerMatrix NNarray);
 RcppExport SEXP _GpGp_vecchia_loglik(SEXP covparmsSEXP, SEXP covfun_nameSEXP, SEXP ySEXP, SEXP locsSEXP, SEXP NNarraySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -104,7 +104,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< NumericVector >::type covparms(covparmsSEXP);
     Rcpp::traits::input_parameter< StringVector >::type covfun_name(covfun_nameSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type y(ySEXP);
-    Rcpp::traits::input_parameter< NumericMatrix >::type locs(locsSEXP);
+    Rcpp::traits::input_parameter< const NumericMatrix >::type locs(locsSEXP);
     Rcpp::traits::input_parameter< IntegerMatrix >::type NNarray(NNarraySEXP);
     rcpp_result_gen = Rcpp::wrap(vecchia_loglik(covparms, covfun_name, y, locs, NNarray));
     return rcpp_result_gen;

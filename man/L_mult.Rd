@@ -27,7 +27,7 @@ returns the result of multiplying the inverse of that matrix by a vector
 (i.e. an approximation to the Cholesky factor).
 }
 \examples{
-n <- 8000
+n <- 2000
 locs <- matrix( runif(2*n), n, 2 )
 covparms <- c(2, 0.2, 0.75, 0.1)
 ord <- order_maxmin(locs)

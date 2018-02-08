@@ -68,9 +68,7 @@ fit_model <- function(y, locs, X = NULL, covfun_name = "matern_isotropic",
     
     # check if design matrix is specified
     if( is.null(X) ){
-        if( !silent ){
-            if(!silent) cat("Design matrix not specified, using constant mean \n")
-        }
+        if(!silent) cat("Design matrix not specified, using constant mean \n")
         X <- rep(1,n) 
     }
     X <- as.matrix(X)
@@ -86,12 +84,13 @@ fit_model <- function(y, locs, X = NULL, covfun_name = "matern_isotropic",
     
     # starting values and covariance-specific settings
     start_var <- stats::var(y)
-    start_smooth <- 1
+    start_smooth <- 0.8
     start_nug <- 0.1
     
-    randinds <- sample(1:n,100)    
+    randinds <- sample(1:n, min(n,200))    
     if(covfun_name == "matern_isotropic"){
         lonlat <- FALSE
+        space_time <- FALSE
         dmat <- fields::rdist(locs[randinds,])
         start_range <- mean( dmat )/4
         start_parms <- c(start_var, start_range, start_smooth, start_nug)
@@ -99,16 +98,18 @@ fit_model <- function(y, locs, X = NULL, covfun_name = "matern_isotropic",
 
     if(covfun_name == "matern_space_time"){
         lonlat <- FALSE
+        space_time <- TRUE
         d <- ncol(locs)-1
         dmat1 <- fields::rdist(locs[randinds,1:d])
         dmat2 <- fields::rdist(locs[randinds,d+1,drop=FALSE])
         start_range1 <- mean( dmat1 )/4
-        start_range2 <- mean( dmat2 )/4
+        start_range2 <- mean( dmat2 )/1
         start_parms <- c(start_var, start_range1, start_range2, start_smooth, start_nug)
     }
 
     if( covfun_name == "matern_sphere" ){
         lonlat <- TRUE
+        space_time <- FALSE
         dmat <- fields::rdist.earth(locs[randinds,], R = 1)
         start_range <- mean( dmat )/4
         start_parms <- c(start_var, start_range, start_smooth, start_nug)
@@ -117,7 +118,7 @@ fit_model <- function(y, locs, X = NULL, covfun_name = "matern_isotropic",
     
     if( covfun_name == "matern_sphere_time" ){
         lonlat <- TRUE
-        lonlat <- TRUE
+        space_time <- FALSE
         dmat <- fields::rdist.earth(locs[randinds,1:2], R = 1)
         start_range1 <- mean( dmat )/4
         dmat <- fields::rdist(locs[randinds,3])
@@ -131,7 +132,7 @@ fit_model <- function(y, locs, X = NULL, covfun_name = "matern_isotropic",
     # get an ordering and reorder everything
     if(reorder){
         if(!silent) cat("Reordering...")
-        ord <- order_maxmin(locs, lonlat = lonlat)
+        ord <- order_maxmin(locs, lonlat = lonlat, space_time = space_time)
         if(!silent) cat("Done \n")
     } else {
         ord <- 1:n
@@ -139,14 +140,14 @@ fit_model <- function(y, locs, X = NULL, covfun_name = "matern_isotropic",
     yord <- y[ord]
     locsord <- locs[ord,]
     Xord <- as.matrix( X[ord,] )
-    
+
     # get nearest neighbors    
     if(!silent) cat("Finding nearest neighbors...")
-    NNarray <- find_ordered_nn(locsord, m=30, lonlat = lonlat)
+    NNarray <- find_ordered_nn(locsord, m=30, lonlat = lonlat, space_time = space_time)
     if(!silent) cat("Done \n")
     
     fit <- list(par=log(start_parms[2:nparms]))
-    
+
     # refine the estimates for m = c(15,30,45)
     for(m in c(5,15,30)){
         NNlist <- group_obs(NNarray[,1:(m+1)])

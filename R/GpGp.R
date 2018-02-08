@@ -1,11 +1,11 @@
-#' GpGp: Fast approximations to Gaussian process computations.
+#' GpGp: Fast Gaussian Process Computing.
 #' 
 #' Vecchia's (1988)
 #' Gaussian process approximation has emerged among its competitors
 #' as a leader in computational scalability and accuracy. This package includes
 #' implementations of the original approximation, as well as several
-#' updates to it, including reordered and grouped versions of the 
-#' approximations outlined in Guinness (2018). 
+#' updates to it, including the reordered and grouped versions of the 
+#' approximation outlined in Guinness (2018). 
 #'
 #' @details The main functions of the package are \code{fit_model}, and \code{\link{predictions}}.
 #' \code{fit_model} returns maximum likelihood estimates for covariance parameters

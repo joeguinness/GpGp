@@ -42,10 +42,10 @@ inline double matern_isotropic_internal( const std::vector<double>* loc1, const 
 }
 
 inline void update_vars_based_on_covfun(std::string covfun_name_string, 
-    double cparms[], double* nugget, Rcpp::NumericMatrix* locs, 
+    double cparms[], double* nugget, Rcpp::NumericMatrix* locs_scaled, 
     const Rcpp::NumericVector covparms){
     
-    int n = (*locs).nrow();
+    int n = (*locs_scaled).nrow();
     
         // set p_covfun, cparms, and locations based on covfun_name_string
     if( covfun_name_string.compare("matern_isotropic") == 0 )
@@ -61,13 +61,13 @@ inline void update_vars_based_on_covfun(std::string covfun_name_string,
         double latrad;                                  // latitude
         Rcpp::NumericMatrix xyz(n, 3);
         for(int i = 0; i < n; i++){
-            lonrad = 2*M_PI*(*locs)(i,0)/360;
-            latrad = 2*M_PI*((*locs)(i,1)+90)/360;
+            lonrad = 2*M_PI*(*locs_scaled)(i,0)/360;
+            latrad = 2*M_PI*((*locs_scaled)(i,1)+90)/360;
             xyz(i,0) = sin(latrad)*cos(lonrad);         // convert lon,lat to x,y,z
             xyz(i,1) = sin(latrad)*sin(lonrad);
             xyz(i,2) = cos(latrad);
         }
-        *locs = xyz;
+        *locs_scaled = xyz;
     }
     else if( covfun_name_string.compare("matern_sphere_time") == 0 )
     {
@@ -79,27 +79,27 @@ inline void update_vars_based_on_covfun(std::string covfun_name_string,
         double latrad;
         Rcpp::NumericMatrix xyzt(n, 4);
         for(int i = 0; i < n; i++){
-            lonrad = 2*M_PI*(*locs)(i,0)/360;
-            latrad = 2*M_PI*((*locs)(i,1)+90)/360;
+            lonrad = 2*M_PI*(*locs_scaled)(i,0)/360;
+            latrad = 2*M_PI*((*locs_scaled)(i,1)+90)/360;
             xyzt(i,0) = sin(latrad)*cos(lonrad)/covparms[1];   // convert lon,lat,time to
             xyzt(i,1) = sin(latrad)*sin(lonrad)/covparms[1];   // scaled x,y,z, and scaled time
             xyzt(i,2) = cos(latrad)/covparms[1];
-            xyzt(i,3) = (*locs)(i,2)/covparms[2];
+            xyzt(i,3) = (*locs_scaled)(i,2)/covparms[2];
         }
-        *locs = xyzt;
+        *locs_scaled = xyzt;
     }
     else if( covfun_name_string.compare("matern_space_time") == 0 )
     {
-        int d = (*locs).ncol() - 1;
+        int d = (*locs_scaled).ncol() - 1;
         cparms[0] = covparms[0];                    // variance
         cparms[1] = 1;                              // locations scaled below, so set range = 1
         cparms[2] = covparms[3];                    // smoothness
         *nugget = covparms[0]*covparms[4];          // nugget
         for(int i = 0; i < n; i++){
             for(int j=0; j<d; j++){
-                (*locs)(i,j) = (*locs)(i,j)/covparms[1];
+                (*locs_scaled)(i,j) = (*locs_scaled)(i,j)/covparms[1];
             }
-            (*locs)(i,d) = (*locs)(i,d)/covparms[2];
+            (*locs_scaled)(i,d) = (*locs_scaled)(i,d)/covparms[2];
         }
 
     }

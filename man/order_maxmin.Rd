@@ -4,7 +4,7 @@
 \alias{order_maxmin}
 \title{Maximum minimum distance ordering}
 \usage{
-order_maxmin(locs, lonlat = FALSE, space_time = FALSE)
+order_maxmin(locs, lonlat = FALSE, space_time = FALSE, st_scale = NULL)
 }
 \arguments{
 \item{locs}{A matrix of locations. Each row of \code{locs} contains a location, which can
@@ -15,7 +15,11 @@ or a longitude, latitude, and time giving a point in the sphere-time domain.}
 \item{lonlat}{TRUE/FALSE whether locations are longitudes and latitudes.}
 
 \item{space_time}{TRUE if locations are euclidean space-time locations, 
-FALSE otherwise. If set to TRUE, temporal dimension is ignored. 
+FALSE otherwise. If set to TRUE, temporal dimension is ignored.}
+
+\item{st_scale}{two-vector giving the amount by which the spatial
+and temporal coordinates are scaled. If \code{NULL}, the function
+uses the locations to automatically select a scaling.
 If set to FALSE, temporal dimension treated as another spatial dimension (not recommended).}
 }
 \value{

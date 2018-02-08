@@ -72,7 +72,7 @@
             }
         ],
         "file" : "/Users/guinness/Dropbox/research/rpackages/GpGp/src/covfuns.h",
-        "file_last_write" : 1517872497
+        "file_last_write" : 1518031869
     },
     {
         "definitions" : [
@@ -81,13 +81,13 @@
                 "file" : "/Users/guinness/Dropbox/research/rpackages/GpGp/src/vecchia_fun_grouped.h",
                 "kind" : 6,
                 "line" : 10,
-                "name" : "vecchia_grouped(NumericVector, StringVector, NumericMatrix, List, NumericVector &, NumericVector *, NumericVector *, int)",
+                "name" : "vecchia_grouped(NumericVector, StringVector, const NumericMatrix, List, NumericVector &, NumericVector *, NumericVector *, int)",
                 "parent_name" : "",
-                "usr" : "c:@F@vecchia_grouped#$@N@Rcpp@C@Vector>#VI14#@N@Rcpp@CT>1#T@PreserveStorage#$@N@Rcpp@C@Vector>#VI16#@N@Rcpp@CT>1#T@PreserveStorage#$@N@Rcpp@C@Matrix>#VI14#@N@Rcpp@CT>1#T@PreserveStorage#$@N@Rcpp@C@Vector>#VI19#@N@Rcpp@CT>1#T@PreserveStorage#&S0_#*S0_#S5_#I#"
+                "usr" : "c:@F@vecchia_grouped#$@N@Rcpp@C@Vector>#VI14#@N@Rcpp@CT>1#T@PreserveStorage#$@N@Rcpp@C@Vector>#VI16#@N@Rcpp@CT>1#T@PreserveStorage#1$@N@Rcpp@C@Matrix>#VI14#@N@Rcpp@CT>1#T@PreserveStorage#$@N@Rcpp@C@Vector>#VI19#@N@Rcpp@CT>1#T@PreserveStorage#&S0_#*S0_#S5_#I#"
             }
         ],
         "file" : "/Users/guinness/Dropbox/research/rpackages/GpGp/src/vecchia_fun_grouped.h",
-        "file_last_write" : 1517867620
+        "file_last_write" : 1517939547
     },
     {
         "definitions" : [
@@ -96,9 +96,9 @@
                 "file" : "/Users/guinness/Dropbox/research/rpackages/GpGp/src/vecchia_functions.cpp",
                 "kind" : 6,
                 "line" : 52,
-                "name" : "vecchia_loglik(NumericVector, StringVector, NumericVector, NumericMatrix, IntegerMatrix)",
+                "name" : "vecchia_loglik(NumericVector, StringVector, NumericVector, const NumericMatrix, IntegerMatrix)",
                 "parent_name" : "",
-                "usr" : "c:@F@vecchia_loglik#$@N@Rcpp@C@Vector>#VI14#@N@Rcpp@CT>1#T@PreserveStorage#$@N@Rcpp@C@Vector>#VI16#@N@Rcpp@CT>1#T@PreserveStorage#S0_#$@N@Rcpp@C@Matrix>#VI14#@N@Rcpp@CT>1#T@PreserveStorage#$@N@Rcpp@C@Matrix>#VI13#@N@Rcpp@CT>1#T@PreserveStorage#"
+                "usr" : "c:@F@vecchia_loglik#$@N@Rcpp@C@Vector>#VI14#@N@Rcpp@CT>1#T@PreserveStorage#$@N@Rcpp@C@Vector>#VI16#@N@Rcpp@CT>1#T@PreserveStorage#S0_#1$@N@Rcpp@C@Matrix>#VI14#@N@Rcpp@CT>1#T@PreserveStorage#$@N@Rcpp@C@Matrix>#VI13#@N@Rcpp@CT>1#T@PreserveStorage#"
             },
             {
                 "column" : 15,
@@ -129,7 +129,7 @@
             }
         ],
         "file" : "/Users/guinness/Dropbox/research/rpackages/GpGp/src/vecchia_functions.cpp",
-        "file_last_write" : 1517871037
+        "file_last_write" : 1518035832
     },
     {
         "definitions" : [
@@ -162,7 +162,7 @@
             }
         ],
         "file" : "/Users/guinness/Dropbox/research/rpackages/GpGp/src/vecchia_functions_grouped.cpp",
-        "file_last_write" : 1517865065
+        "file_last_write" : 1518035885
     },
     {
         "definitions" : [
@@ -171,12 +171,12 @@
                 "file" : "/Users/guinness/Dropbox/research/rpackages/GpGp/src/vecchiafun.h",
                 "kind" : 6,
                 "line" : 10,
-                "name" : "vecchia(NumericVector, StringVector, NumericMatrix, IntegerMatrix, NumericVector &, NumericMatrix *, NumericVector *, int)",
+                "name" : "vecchia(NumericVector, StringVector, const NumericMatrix, IntegerMatrix, NumericVector &, NumericMatrix *, NumericVector *, int)",
                 "parent_name" : "",
-                "usr" : "c:@F@vecchia#$@N@Rcpp@C@Vector>#VI14#@N@Rcpp@CT>1#T@PreserveStorage#$@N@Rcpp@C@Vector>#VI16#@N@Rcpp@CT>1#T@PreserveStorage#$@N@Rcpp@C@Matrix>#VI14#@N@Rcpp@CT>1#T@PreserveStorage#$@N@Rcpp@C@Matrix>#VI13#@N@Rcpp@CT>1#T@PreserveStorage#&S0_#*S2_#*S0_#I#"
+                "usr" : "c:@F@vecchia#$@N@Rcpp@C@Vector>#VI14#@N@Rcpp@CT>1#T@PreserveStorage#$@N@Rcpp@C@Vector>#VI16#@N@Rcpp@CT>1#T@PreserveStorage#1$@N@Rcpp@C@Matrix>#VI14#@N@Rcpp@CT>1#T@PreserveStorage#$@N@Rcpp@C@Matrix>#VI13#@N@Rcpp@CT>1#T@PreserveStorage#&S0_#*S2_#*S0_#I#"
             }
         ],
         "file" : "/Users/guinness/Dropbox/research/rpackages/GpGp/src/vecchiafun.h",
-        "file_last_write" : 1517867578
+        "file_last_write" : 1518036762
     }
 ]

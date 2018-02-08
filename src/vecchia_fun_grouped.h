@@ -8,7 +8,7 @@
 using namespace Rcpp;
 
 void vecchia_grouped(NumericVector covparms, StringVector covfun_name,
-                                  NumericMatrix locs, List NNlist,
+                                  const NumericMatrix locs, List NNlist,
                                   NumericVector& y, NumericVector* Linv,
                                   NumericVector* ll, int whichreturn){
 
@@ -49,12 +49,18 @@ void vecchia_grouped(NumericVector covparms, StringVector covfun_name,
     std::string covfun_name_string;
     covfun_name_string = covfun_name[0];
 
-    // update everything based on the covariance functin name
-    update_vars_based_on_covfun(covfun_name_string, cparms, &nugget, &locs, covparms); 
+    // update everything based on the covariance function name
+    NumericMatrix locs_scaled( locs.nrow(), locs.ncol() );
+    for(i=0; i<locs.nrow(); i++){
+        for(j=0; j<locs.ncol(); j++){
+            locs_scaled(i,j) = locs(i,j);
+        }
+    }
+    update_vars_based_on_covfun(covfun_name_string, cparms, &nugget, &locs_scaled, covparms); 
     p_covfun = &matern_isotropic_internal; // pointer to covariance fun
     // only matern functions implemented so far
 
-    int dim = locs.ncol();            // dimension of newly defined locations
+    int dim = locs_scaled.ncol();            // dimension of newly defined locations
     
     // figure out size of largest block
     // for preallocating L, g, ysub, and sig
@@ -97,7 +103,7 @@ void vecchia_grouped(NumericVector covparms, StringVector covfun_name,
         
         // first, fill in ysub and locsub in forward order
         for(j=0; j<bsize; j++){
-            for(k=0;k<dim;k++){ locsub[j][k] = locs( inds[j] - 1, k ); }
+            for(k=0;k<dim;k++){ locsub[j][k] = locs_scaled( inds[j] - 1, k ); }
             ysub[j] = y( inds[j] - 1 );
         }
 

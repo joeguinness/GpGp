@@ -1,0 +1,17 @@
+## To cite GpGp in publications use:
+## 
+##   Joseph Guinness (2018). Permutation and Grouping Methods
+##   for Sharpening Gaussian Process Approximations. 
+##   Technometrics
+## 
+## A BibTeX entry for LaTeX users is
+## 
+##   @Article{,
+##     title = {Permutation and Grouping Methods for Sharpening Gaussian Process Approximations},
+##     author = {Joseph Guinness},
+##     journal = {Technometrics},
+##     year = {2018},
+##     volume = {TBD},
+##     number = {TBD},
+##     pages = {TBD}
+##   }

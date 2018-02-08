@@ -8,7 +8,7 @@
 using namespace Rcpp;
 
 void vecchia(NumericVector covparms, StringVector covfun_name,
-                                  NumericMatrix locs, IntegerMatrix NNarray,
+                                  const NumericMatrix locs, IntegerMatrix NNarray,
                                   NumericVector& y, NumericMatrix* Linv,
                                   NumericVector* ll, int whichreturn){
 
@@ -18,7 +18,8 @@ void vecchia(NumericVector covparms, StringVector covfun_name,
     int n = NNarray.nrow();               // length of response
     int m = NNarray.ncol();           // number of neighbors + 1
     double d;                         // utility double
-    double ysub[m];                   // subset of response values
+//    double ysub[m];                   // subset of response values
+    std::vector<double> ysub (m,0);                   // subset of response values
 
     // cholesky factor
     std::vector<std::vector<double> > L(m, std::vector<double>(m, 0));
@@ -37,12 +38,18 @@ void vecchia(NumericVector covparms, StringVector covfun_name,
     covfun_name_string = covfun_name[0];
     
     // update everything based on the covariance functin name
-    update_vars_based_on_covfun(covfun_name_string, cparms, &nugget, &locs, covparms); 
+    NumericMatrix locs_scaled( locs.nrow(), locs.ncol() );
+    for(i=0; i<locs.nrow(); i++){
+        for(j=0; j<locs.ncol(); j++){
+            locs_scaled(i,j) = locs(i,j);
+        }
+    }
+    update_vars_based_on_covfun(covfun_name_string, cparms, &nugget, &locs_scaled, covparms); 
     p_covfun = &matern_isotropic_internal; // pointer to covariance fun
     // only matern functions implemented so far
 
 
-    int dim = locs.ncol();            // dimension of newly defined locations
+    int dim = locs_scaled.ncol();            // dimension of newly defined locations
     // subvector of locations
     std::vector<std::vector<double> > locsub(m, std::vector<double>(dim, 0));
 
@@ -53,7 +60,7 @@ void vecchia(NumericVector covparms, StringVector covfun_name,
 
         // first, fill in ysub and locsub in reverse order
         for(j=bsize-1; j>=0; j--){
-            for(k=0;k<dim;k++){ locsub[bsize-1-j][k] = locs( NNarray(i,j)-1, k ); }
+            for(k=0;k<dim;k++){ locsub[bsize-1-j][k] = locs_scaled( NNarray(i,j)-1, k ); }
             ysub[bsize-1-j] = y( NNarray(i,j)-1 );
         }
 

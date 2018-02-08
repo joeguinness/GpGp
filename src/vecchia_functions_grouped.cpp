@@ -23,12 +23,12 @@ using namespace Rcpp;
 //' @inheritParams vecchia_loglik
 //' @return grouped version of Vecchia's approximation to the Gaussian loglikelihood
 //' @examples
-//' n1 <- 60
-//' n2 <- 60
+//' n1 <- 40
+//' n2 <- 40
 //' n <- n1*n2
 //' locs <- as.matrix( expand.grid( (1:n1)/n1, (1:n2)/n2 ) )
 //' covparms <- c(2, 0.2, 0.75, 0)
-//' y <- fast_Gp_sim(covparms, "matern_isotropic", locs, 60 ) 
+//' y <- fast_Gp_sim(covparms, "matern_isotropic", locs, 50 ) 
 //' ord <- order_maxmin(locs)
 //' NNarray <- find_ordered_nn(locs,20)
 //' NNlist <- group_obs(NNarray)
@@ -59,8 +59,8 @@ NumericVector vecchia_loglik_grouped(NumericVector covparms, StringVector covfun
 //' @inheritParams vecchia_loglik_grouped
 //' @return the Gaussian loglikelihood
 //' @examples
-//' n1 <- 60
-//' n2 <- 60
+//' n1 <- 40
+//' n2 <- 40
 //' n <- n1*n2
 //' locs <- as.matrix( expand.grid( (1:n1)/n1, (1:n2)/n2 ) )
 //' covparms <- c(2, 0.2, 0.75, 0)
@@ -97,7 +97,7 @@ NumericVector vecchia_Linv_grouped(NumericVector covparms, StringVector covfun_n
 //' @inheritParams vecchia_loglik_grouped
 //' @return the product of the sprase inverse Cholesky factor with a vector
 //' @examples
-//' n <- 8000
+//' n <- 2000
 //' locs <- matrix( runif(2*n), n, 2 )
 //' covparms <- c(2, 0.2, 0.75, 0.1)
 //' ord <- order_maxmin(locs)

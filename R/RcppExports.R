@@ -110,12 +110,12 @@ matern_sphere_time <- function(covparms, lonlattime) {
 #' @inheritParams vecchia_loglik
 #' @return grouped version of Vecchia's approximation to the Gaussian loglikelihood
 #' @examples
-#' n1 <- 60
-#' n2 <- 60
+#' n1 <- 40
+#' n2 <- 40
 #' n <- n1*n2
 #' locs <- as.matrix( expand.grid( (1:n1)/n1, (1:n2)/n2 ) )
 #' covparms <- c(2, 0.2, 0.75, 0)
-#' y <- fast_Gp_sim(covparms, "matern_isotropic", locs, 60 ) 
+#' y <- fast_Gp_sim(covparms, "matern_isotropic", locs, 50 ) 
 #' ord <- order_maxmin(locs)
 #' NNarray <- find_ordered_nn(locs,20)
 #' NNlist <- group_obs(NNarray)
@@ -137,8 +137,8 @@ vecchia_loglik_grouped <- function(covparms, covfun_name, y, locs, NNlist) {
 #' @inheritParams vecchia_loglik_grouped
 #' @return the Gaussian loglikelihood
 #' @examples
-#' n1 <- 60
-#' n2 <- 60
+#' n1 <- 40
+#' n2 <- 40
 #' n <- n1*n2
 #' locs <- as.matrix( expand.grid( (1:n1)/n1, (1:n2)/n2 ) )
 #' covparms <- c(2, 0.2, 0.75, 0)
@@ -161,7 +161,7 @@ vecchia_Linv_grouped <- function(covparms, covfun_name, locs, NNlist) {
 #' @inheritParams vecchia_loglik_grouped
 #' @return the product of the sprase inverse Cholesky factor with a vector
 #' @examples
-#' n <- 8000
+#' n <- 2000
 #' locs <- matrix( runif(2*n), n, 2 )
 #' covparms <- c(2, 0.2, 0.75, 0.1)
 #' ord <- order_maxmin(locs)
@@ -204,12 +204,12 @@ Linv_mult_grouped <- function(Linv, z, NNlist) {
 #' the first element of row \code{i} is \code{i}.
 #' @return the Gaussian loglikelihood
 #' @examples
-#' n1 <- 60
-#' n2 <- 60
+#' n1 <- 40
+#' n2 <- 40
 #' n <- n1*n2
 #' locs <- as.matrix( expand.grid( (1:n1)/n1, (1:n2)/n2 ) )
 #' covparms <- c(2, 0.2, 0.75, 0)
-#' y <- fast_Gp_sim(covparms, "matern_isotropic", locs, 60 ) 
+#' y <- fast_Gp_sim(covparms, "matern_isotropic", locs, 50 ) 
 #' ord <- order_maxmin(locs)
 #' NNarray <- find_ordered_nn(locs,20)
 #' loglik <- vecchia_loglik( covparms, "matern_isotropic", y, locs, NNarray )
@@ -229,8 +229,8 @@ vecchia_loglik <- function(covparms, covfun_name, y, locs, NNarray) {
 #' @inheritParams vecchia_loglik
 #' @return the Gaussian loglikelihood
 #' @examples
-#' n1 <- 60
-#' n2 <- 60
+#' n1 <- 40
+#' n2 <- 40
 #' n <- n1*n2
 #' locs <- as.matrix( expand.grid( (1:n1)/n1, (1:n2)/n2 ) )
 #' covparms <- c(2, 0.2, 0.75, 0)
@@ -253,7 +253,7 @@ vecchia_Linv <- function(covparms, covfun_name, locs, NNarray) {
 #' @inheritParams vecchia_loglik
 #' @return the product of the sprase inverse Cholesky factor with a vector
 #' @examples
-#' n <- 8000
+#' n <- 2000
 #' locs <- matrix( runif(2*n), n, 2 )
 #' covparms <- c(2, 0.2, 0.75, 0.1)
 #' ord <- order_maxmin(locs)
@@ -280,7 +280,7 @@ Linv_mult <- function(Linv, z, NNarray) {
 #' @inheritParams vecchia_loglik
 #' @return the product of the sprase inverse Cholesky factor with a vector
 #' @examples
-#' n <- 8000
+#' n <- 2000
 #' locs <- matrix( runif(2*n), n, 2 )
 #' covparms <- c(2, 0.2, 0.75, 0.1)
 #' ord <- order_maxmin(locs)
