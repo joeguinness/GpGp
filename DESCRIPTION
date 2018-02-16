@@ -7,7 +7,7 @@ Authors@R: c(
     person("Joseph", "Guinness", email = "joeguinness@gmail.com", role = c("aut", "cre")),
     person("Matthias", "Katzfuss", email = "katzfuss@gmail.com", role = "aut" ) )
 Maintainer: Joseph Guinness <joeguinness@gmail.com>
-Description: GpGp includes functions for reordering
+Description: Functions for reordering
     input locations, finding ordered nearest neighbors
     (with help from FNN package), grouping operations, 
     approximate likelihood evaluations, profile likelihoods,

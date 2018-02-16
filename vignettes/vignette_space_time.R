@@ -1,7 +1,7 @@
 
 
 # a short vignette demonstrating how to use the functions
-#library("GpGp")
+library("GpGp")
 
 # grid size for data locations
 gsize <- 15

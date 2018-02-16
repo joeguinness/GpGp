@@ -70,7 +70,7 @@ We fit two models here, both of which use the Mat\'ern covariance function. The 
 The two models take several minutes to fit on my system.
 
 ```{r}
-inds <- round( seq(1,n,length.out = round(n/4)) )  # set to 1:n to fit to full dataset
+inds <- round( seq(1,n,length.out = round(n/8)) )  # set to 1:n to fit to full dataset
 inds <- 1:n
 fit_space     <- fit_model(windspeed[inds], locs[inds,], X[inds,], "matern_sphere")
 fit_spacetime <- fit_model(windspeed[inds], locstime[inds,], X[inds,], "matern_sphere_time")
