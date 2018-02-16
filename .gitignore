@@ -5,3 +5,4 @@ inst/doc
 .Rbuildignore
 cran-comments.md
 .gitignore~
+GpGp.Rproj
