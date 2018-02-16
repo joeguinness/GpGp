@@ -1,3 +1,7 @@
 .DS_Store
-.Rproj.user/*
+.Rproj.user
 inst/doc
+.Rproj.user
+.Rbuildignore
+cran-comments.md
+.gitignore~
