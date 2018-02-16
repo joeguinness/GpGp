@@ -118,7 +118,7 @@ fit_model <- function(y, locs, X = NULL, covfun_name = "matern_isotropic",
     
     if( covfun_name == "matern_sphere_time" ){
         lonlat <- TRUE
-        space_time <- FALSE
+        space_time <- TRUE
         dmat <- fields::rdist.earth(locs[randinds,1:2], R = 1)
         start_range1 <- mean( dmat )/4
         dmat <- fields::rdist(locs[randinds,3])
@@ -150,6 +150,10 @@ fit_model <- function(y, locs, X = NULL, covfun_name = "matern_isotropic",
 
     # refine the estimates for m = c(15,30,45)
     for(m in c(5,15,30)){
+        if(space_time){
+            NNarray <- find_ordered_nn(locsord, m=m, lonlat = lonlat, 
+                space_time = space_time, st_scale = exp(fit$par[1:2]) )
+        }
         NNlist <- group_obs(NNarray[,1:(m+1)])
         funtomax <- function( logparms ){
             parms <- exp(logparms)

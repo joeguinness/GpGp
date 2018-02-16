@@ -148,7 +148,13 @@ order_coordinate <- function( locs, coordinate ){
 order_maxmin <- function(locs, lonlat = FALSE, 
     space_time = FALSE, st_scale = NULL){
 
-    if(lonlat){
+    # FNN::get.knnx has strange behavior for exact matches
+    # so add a small amount of noise to each location
+    n <- nrow(locs)
+    ee <- min(apply( locs, 2, stats::sd ))
+    locs <- locs + matrix( ee*1e-4*stats::rnorm(n*ncol(locs)), n, ncol(locs) )    
+
+    if(lonlat){ # convert lonlattime to xyztime or lonlat to xyz
         lon <- locs[,1]
         lat <- locs[,2]
         lonrad <- lon*2*pi/360
@@ -156,9 +162,14 @@ order_maxmin <- function(locs, lonlat = FALSE,
         x <- sin(latrad)*cos(lonrad)
         y <- sin(latrad)*sin(lonrad)
         z <- cos(latrad)
-        locs <- cbind(x,y,z)
+        if(space_time){
+            time <- locs[,3]
+            locs <- cbind(x,y,z,time)
+        } else {
+            locs <- cbind(x,y,z)
+        }
     }
-    
+
     if(space_time){ 
         d <- ncol(locs)-1
         if( is.null(st_scale) ){

@@ -63,7 +63,6 @@ find_ordered_nn_brute <- function( locs, m ){
 #' points( locsord[NNarray[ind,2:(m+1)],1], locsord[NNarray[ind,2:(m+1)],2], col = "blue", cex = 1.5 )
 #' @export
 find_ordered_nn <- function(locs,m, lonlat = FALSE, space_time = FALSE, st_scale = NULL){
-
     
     # number of locations
     n <- nrow(locs)
@@ -75,7 +74,7 @@ find_ordered_nn <- function(locs,m, lonlat = FALSE, space_time = FALSE, st_scale
     ee <- min(apply( locs, 2, stats::sd ))
     locs <- locs + matrix( ee*1e-4*stats::rnorm(n*ncol(locs)), n, ncol(locs) )    
     
-    if(lonlat){
+    if(lonlat){ # convert lonlattime to xyztime or lonlat to xyz
         lon <- locs[,1]
         lat <- locs[,2]
         lonrad <- lon*2*pi/360
@@ -83,8 +82,14 @@ find_ordered_nn <- function(locs,m, lonlat = FALSE, space_time = FALSE, st_scale
         x <- sin(latrad)*cos(lonrad)
         y <- sin(latrad)*sin(lonrad)
         z <- cos(latrad)
-        locs <- cbind(x,y,z)
+        if(space_time){
+            time <- locs[,3]
+            locs <- cbind(x,y,z,time)
+        } else {
+            locs <- cbind(x,y,z)
+        }
     }
+
     
     if(space_time){ 
         d <- ncol(locs)-1

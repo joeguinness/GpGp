@@ -30,8 +30,10 @@ locstime <- cbind(locs,time)
 X <- as.matrix( rep(1,length(windspeed)) )
 
 # fit the model
-fit_space     <- fit_model(windspeed, locs, X, "matern_sphere")
-system.time( fit_spacetime <- fit_model(windspeed, locstime, X, "matern_sphere_time") )
+inds <- round( seq(1,n,length.out = round(n/4)) )  # set to 1:n to fit to full dataset
+#inds <- 1:n
+#fit_space     <- fit_model(windspeed[inds], locs[inds,], X[inds,], "matern_sphere")
+system.time( fit_spacetime <- fit_model(windspeed[inds], locstime[inds,], X[inds,], "matern_sphere_time") )
 
 # make predictions at a middle time point
 

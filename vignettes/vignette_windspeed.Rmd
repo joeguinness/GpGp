@@ -71,13 +71,16 @@ The two models take several minutes to fit on my system.
 
 ```{r}
 inds <- round( seq(1,n,length.out = round(n/4)) )  # set to 1:n to fit to full dataset
+inds <- 1:n
 fit_space     <- fit_model(windspeed[inds], locs[inds,], X[inds,], "matern_sphere")
 fit_spacetime <- fit_model(windspeed[inds], locstime[inds,], X[inds,], "matern_sphere_time")
 fit_space
 fit_spacetime
 ```
 
-The fitted model objects contain an element `covparms`, which is a vector with the estimated variance, spatial range, temporal range (space-time model only), smoothness, and nugget parameters. The second covariance parameter in both models is the spatial range parameter, in units of radians (i.e. Earth radius = 1). The space-time model has a larger spatial range. This result stems from the fact that when the satellite crosses back over its own path, the measurements from the two paths may not coincide, even though they are close spatially. The space-time model knows that these measurements were taken at different time points, and so does not take non-coinciding measurements as evidence that the spatial correlation is weak. The space-only model does not know that the measurements were taken at different times, and so does take this as evidence that the spatial correlation is weak. For the same reason, the space-only model has a larger nugget parameter.
+The first thing to note is that the space-time model gives a much higher loglikelihood. The fitted model objects contain an element `covparms`, which is a vector with the estimated variance, spatial range, temporal range (space-time model only), smoothness, and nugget parameters. The second covariance parameter in both models is the spatial range parameter, in units of radians (i.e. Earth radius = 1). The space-time model has a larger spatial range. This result stems from the fact that when the satellite crosses back over its own path, the measurements from the two paths may not coincide, even though they are close spatially. 
+
+The space-time model knows that these measurements were taken at different time points, and so does not take the non-coinciding measurements as evidence that the spatial correlation is weak. The space-only model does not know that the measurements were taken at different times, and so does take this as evidence that the spatial correlation is weak. For the same reason, the space-only model has a larger nugget parameter.
 
 # Predictions and Conditional Simulations
 

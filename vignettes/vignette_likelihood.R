@@ -17,7 +17,7 @@ locs <- as.matrix(expand.grid(x1,x2))
 
 # covariance function and parameters
 # covfun <- maternIsotropic
-covparms <- c(variance = 4, range = 0.1, smoothness = 1/2, nugget = 0)
+covparms <- c(variance = 4, range = 0.1, smoothness = 0.8, nugget = 0)
 
 # simulate some data
 y <- fast_Gp_sim(covparms, "matern_isotropic",locs,50)
