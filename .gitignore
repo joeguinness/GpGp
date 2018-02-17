@@ -7,3 +7,5 @@ cran-comments.md
 .gitignore~
 src/*.so
 src/*.o
+R/RcppExports.R
+src/RcppExports.cpp
