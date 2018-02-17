@@ -16,7 +16,7 @@ usually the output from \code{vecchiaLinv}.}
 Usually the output from \code{group_obs(NNarray)}.}
 }
 \value{
-the product of the sprase inverse Cholesky factor with a vector
+the product of the sparse inverse Cholesky factor with a vector
 }
 \description{
 Vecchia's approximation implies a sparse approximation to the 
