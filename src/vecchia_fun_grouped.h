@@ -15,6 +15,8 @@ void vecchia_grouped(NumericVector covparms, StringVector covfun_name,
     // utility integers
     int i, j, k, el, first_ind, last_ind, first_resp, last_resp;
     int first_L_ind = 0;
+    bool trip_chol = false;
+
     
     // number of obs
     int n = y.length();
@@ -143,8 +145,12 @@ void vecchia_grouped(NumericVector covparms, StringVector covfun_name,
             // get diagonal entry
             d = 0.0;
             for( k=0;k<j;k++ ){ d += g[k]*g[k]; }
-            //for(k=0; k<j; k++ ){ d += L[j][k]*L[j][k]; }
-            L[j][j] = pow( (*p_covfun)(&locsub[j],&locsub[j],cparms) + nugget - d, 0.5 );
+            d = (*p_covfun)(&locsub[j],&locsub[j],cparms) + nugget - d;
+            if( d <= 0 ){ 
+                d = cparms[0]*1000000; 
+                trip_chol = true;
+            }
+            L[j][j] = pow( d, 0.5 );
 
         }
 
@@ -188,6 +194,10 @@ void vecchia_grouped(NumericVector covparms, StringVector covfun_name,
     // add the constant
     
     (*ll)(0) += -n*log(2*M_PI)/2;
+    if( trip_chol ){
+        Rcpp::Rcout << "*" << std::endl;
+    }
+
 
 }
 

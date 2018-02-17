@@ -14,6 +14,7 @@ void vecchia(NumericVector covparms, StringVector covfun_name,
 
     // utility integers
     int i, j, k, el;
+    bool trip_chol = false;
 
     int n = NNarray.nrow();               // length of response
     int m = NNarray.ncol();           // number of neighbors + 1
@@ -97,7 +98,12 @@ void vecchia(NumericVector covparms, StringVector covfun_name,
             // get diagonal entry
             d = 0.0;
             for( k=1;k<j;k++ ){ d += g[k-1]*g[k-1]; }
-            L[j-1][j-1] = pow( (*p_covfun)(&locsub[j-1],&locsub[j-1],cparms) + nugget - d, 0.5 );
+            d = (*p_covfun)(&locsub[j-1],&locsub[j-1],cparms) + nugget - d;
+            if( d <= 0 ){ 
+                d = cparms[0]*1000000; 
+                trip_chol = true;
+            }
+            L[j-1][j-1] = pow( d, 0.5 );
         }
 
         // get g = L^{-1}y
@@ -132,6 +138,9 @@ void vecchia(NumericVector covparms, StringVector covfun_name,
 
     // add the constant
     (*ll)(0) += -n*log(2*M_PI)/2;
+    if( trip_chol ){
+        Rcpp::Rcout << "*" << std::endl;
+    }
 
 }
 
