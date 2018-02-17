@@ -13,7 +13,7 @@ for the specified covariance function}
 \item{covfun_name}{One of "matern_isotropic", "matern_space_time", "matern_sphere", 
 or "matern_sphere_time".
 "matern_isotropic" and "matern_sphere" have four covariance parameters, 
-(variange, range, smoothness, nugget), while "matern_space_time" and 
+(variance, range, smoothness, nugget), while "matern_space_time" and 
 "matern_sphere_time" have five,
 (variance, spatial range, temporal range, smoothness, nugget). 
 For more details, see the documentation 

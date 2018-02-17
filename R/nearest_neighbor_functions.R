@@ -38,7 +38,7 @@ find_ordered_nn_brute <- function( locs, m ){
 #' where the nearest neighbors must come from previous
 #' in the ordering.
 #'
-#' @param m Nuber of neighbors to return
+#' @param m Number of neighbors to return
 #' @inheritParams order_dist_to_point
 #' @inheritParams order_maxmin
 #' @return An matrix containing the indices of the neighbors. Row \code{i} of the

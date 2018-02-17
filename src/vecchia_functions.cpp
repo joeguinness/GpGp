@@ -22,7 +22,7 @@ using namespace Rcpp;
 //' @param covfun_name One of "matern_isotropic", "matern_space_time", "matern_sphere", 
 //' or "matern_sphere_time".
 //' "matern_isotropic" and "matern_sphere" have four covariance parameters, 
-//' (variange, range, smoothness, nugget), while "matern_space_time" and 
+//' (variance, range, smoothness, nugget), while "matern_space_time" and 
 //' "matern_sphere_time" have five,
 //' (variance, spatial range, temporal range, smoothness, nugget). 
 //' For more details, see the documentation 
@@ -32,7 +32,7 @@ using namespace Rcpp;
 //' @param locs matrix of locations. Row \code{i} of locs specifies the location
 //' of element \code{i} of \code{y}, and so the length of \code{y} should equal
 //' the number of rows of \code{locs}.
-//' @param NNarray A matrix of indicies, usually the output from \code{\link{find_ordered_nn}}. 
+//' @param NNarray A matrix of indices, usually the output from \code{\link{find_ordered_nn}}. 
 //' Row \code{i} contains the indices
 //' of the observations that observation \code{i} conditions on. By convention,
 //' the first element of row \code{i} is \code{i}.
@@ -100,7 +100,7 @@ NumericMatrix vecchia_Linv(NumericVector covparms, StringVector covfun_name,
 //' usually the output from \code{\link{vecchia_Linv}}.
 //' @param z the vector to be multiplied
 //' @inheritParams vecchia_loglik
-//' @return the product of the sprase inverse Cholesky factor with a vector
+//' @return the product of the sparse inverse Cholesky factor with a vector
 //' @examples
 //' n <- 2000
 //' locs <- matrix( runif(2*n), n, 2 )
@@ -150,7 +150,7 @@ NumericVector Linv_mult(NumericMatrix Linv, NumericVector z,
 //' usually the output from \code{\link{vecchia_Linv}}.
 //' @param z the vector to be multiplied
 //' @inheritParams vecchia_loglik
-//' @return the product of the sprase inverse Cholesky factor with a vector
+//' @return the product of the Cholesky factor with a vector
 //' @examples
 //' n <- 2000
 //' locs <- matrix( runif(2*n), n, 2 )

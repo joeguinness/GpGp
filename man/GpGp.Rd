@@ -19,7 +19,7 @@ The main functions of the package are \code{fit_model}, and \code{\link{predicti
 and linear mean parameters. The user is expected to store the response in a vector
 \code{y} and the locations--either spatial or spatial-temporal--in a matrix \code{locs},
 which contains in each row the spatial or spatial-temporal location of the 
-corresponding respose. The user is also expected to select a covariance function
+corresponding response. The user is also expected to select a covariance function
 and specify it with a string. Currently supported functions are \code{"matern_isotropic"}
 for spatial data, \code{"matern_sphere"} for spatial data over the globe, and 
 \code{"matern_sphere_time"} for spatial-temporal data over the globe. For the \code{sphere}

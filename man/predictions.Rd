@@ -12,7 +12,7 @@ predictions(covparms, covfun_name = "matern_isotropic", y_obs, locs_obs,
 
 \item{covfun_name}{Name of covariance function}
 
-\item{y_obs}{Observations assocaited with locs_obs}
+\item{y_obs}{Observations associated with locs_obs}
 
 \item{locs_obs}{observation locations}
 
@@ -26,7 +26,7 @@ predictions(covparms, covfun_name = "matern_isotropic", y_obs, locs_obs,
 
 \item{m}{Number of nearest neighbors to use}
 
-\item{reorder}{TRUE/FALSE for whether reodering should be done. This should
+\item{reorder}{TRUE/FALSE for whether reordering should be done. This should
 generally be kept at TRUE, unless testing out the effect of
 reordering.}
 }

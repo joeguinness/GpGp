@@ -13,7 +13,7 @@ be a point in Euclidean space R^d, a point in space-time R^d x T,
 a longitude and latitude (in degrees) giving a point on the sphere, 
 or a longitude, latitude, and time giving a point in the sphere-time domain.}
 
-\item{m}{Nuber of neighbors to return}
+\item{m}{Number of neighbors to return}
 
 \item{lonlat}{TRUE/FALSE whether locations are longitudes and latitudes.}
 

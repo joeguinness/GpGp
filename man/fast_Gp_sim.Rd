@@ -7,17 +7,22 @@
 fast_Gp_sim(covparms, covfun_name = "matern_isotropic", locs, m = 30)
 }
 \arguments{
-\item{covparms}{Vector of covariance function parameters. For "maternIsotropic" and
-"maternSphere", these are (variance, range, smoothness, nugget). For "maternSphereTime",
-these are (variance, spatial range, temporal range, smoothness, nugget). See documentation
-of the covariance functions for more details.}
+\item{covparms}{A vector of covariance parameters appropriate
+for the specified covariance function}
 
-\item{covfun_name}{string name of covariance functions. Currently supported
-covariance functions are "maternIsotropic", "maternSphere", and "maternSphereTime"}
+\item{covfun_name}{One of "matern_isotropic", "matern_space_time", "matern_sphere", 
+or "matern_sphere_time".
+"matern_isotropic" and "matern_sphere" have four covariance parameters, 
+(variance, range, smoothness, nugget), while "matern_space_time" and 
+"matern_sphere_time" have five,
+(variance, spatial range, temporal range, smoothness, nugget). 
+For more details, see the documentation 
+for each of the covariance functions by typing, for example, ?matern_isotropic
+or ?matern_sphere_time.}
 
-\item{locs}{Matrix of locations. Each row is an individual location. For "maternSphere",
-locations are (lon,lat), where lon is in (-180,180), and lat is in (-90,90). For "maternSphereTime"
-locations are (lon,lat,time).}
+\item{locs}{matrix of locations. Row \code{i} of locs specifies the location
+of element \code{i} of \code{y}, and so the length of \code{y} should equal
+the number of rows of \code{locs}.}
 
 \item{m}{Number of nearest neighbors to use in approximation}
 }

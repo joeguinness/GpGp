@@ -15,7 +15,7 @@
 #' @param X design matrix. Each row contains covariates for the corresponding
 #' observation in \code{y}. If not specified, the function sets \code{X} to be a 
 #' matrix with a single column of ones, that is, a constant mean function.
-#' @param covfun_name string name of a covariance function. Currrently supported
+#' @param covfun_name string name of a covariance function. Currently supported
 #' are "matern_isotropic", "matern_sphere", and "matern_sphere_time".
 #' @param silent TRUE/FALSE for whether to print some information during fitting.
 #' @param group TRUE/FALSE for whether to use the grouped version of 
@@ -30,7 +30,7 @@
 #' using Vecchia's approximation, including reordering, computing
 #' nearest neighbors, grouping, and optimization. Optimization proceeds
 #' in several steps, using increasingly accurate versions of the approximation. 
-#' The first step usings 5 neighbors, then 15 neighbors, and the last step
+#' The first step using 5 neighbors, then 15 neighbors, and the last step
 #' uses 30 neighbors. The actual number of neighbors in the grouped
 #' version is guaranteed to be larger, though depends on the ordering and
 #' the configuration of the locations. We recommend always using

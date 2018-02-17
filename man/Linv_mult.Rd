@@ -12,13 +12,13 @@ usually the output from \code{\link{vecchia_Linv}}.}
 
 \item{z}{the vector to be multiplied}
 
-\item{NNarray}{A matrix of indicies, usually the output from \code{\link{find_ordered_nn}}. 
+\item{NNarray}{A matrix of indices, usually the output from \code{\link{find_ordered_nn}}. 
 Row \code{i} contains the indices
 of the observations that observation \code{i} conditions on. By convention,
 the first element of row \code{i} is \code{i}.}
 }
 \value{
-the product of the sprase inverse Cholesky factor with a vector
+the product of the sparse inverse Cholesky factor with a vector
 }
 \description{
 Vecchia's approximation implies a sparse approximation to the 

@@ -8,9 +8,9 @@ fast_Gp_sim_Linv(Linv, NNarray, z = NULL)
 }
 \arguments{
 \item{Linv}{Matrix containing the entries of Linverse, usually the output from
-\code{vecchiaLinv}.}
+\code{vecchia_Linv}.}
 
-\item{NNarray}{Matrix of nearest neighbor indices, usually the output from findOrderedNN}
+\item{NNarray}{Matrix of nearest neighbor indices, usually the output from \code{\link{find_ordered_nn}}}
 
 \item{z}{Optional vector of standard normals. If not specified,
 these are computed within the function.}
@@ -28,7 +28,7 @@ This function also allows the user to input the vector of standard normals \code
 locs <- as.matrix( expand.grid( (1:100)/100, (1:100)/100 ) )
 ord <- order_maxmin(locs)
 locsord <- locs[ord,]
-m = 3
+m <- 10
 NNarray <- find_ordered_nn(locsord,m)
 covparms <- c(2, 0.2, 1, 0)
 Linv <- vecchia_Linv( covparms, "matern_isotropic", locsord, NNarray )

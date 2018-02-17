@@ -14,7 +14,7 @@ of each parameter depends on \code{covfun_name}.}
 \item{covfun_name}{One of "matern_isotropic", "matern_space_time", "matern_sphere", 
 or "matern_sphere_time".
 "matern_isotropic" and "matern_sphere" have four covariance parameters, 
-(variange, range, smoothness, nugget), while "matern_space_time" and 
+(variance, range, smoothness, nugget), while "matern_space_time" and 
 "matern_sphere_time" have five,
 (variance, spatial range, temporal range, smoothness, nugget). 
 For more details, see the documentation 
@@ -29,7 +29,7 @@ or ?matern_sphere_time.}
 of element \code{i} of \code{y}, and so the length of \code{y} should equal
 the number of rows of \code{locs}.}
 
-\item{NNarray}{A matrix of indicies, usually the output from \code{\link{find_ordered_nn}}. 
+\item{NNarray}{A matrix of indices, usually the output from \code{\link{find_ordered_nn}}. 
 Row \code{i} contains the indices
 of the observations that observation \code{i} conditions on. By convention,
 the first element of row \code{i} is \code{i}.}

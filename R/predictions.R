@@ -10,14 +10,14 @@
 #' the conditional expectation.
 #' @param covparms Covariance parameters
 #' @param covfun_name Name of covariance function
-#' @param y_obs Observations assocaited with locs_obs
+#' @param y_obs Observations associated with locs_obs
 #' @param locs_obs observation locations
 #' @param locs_pred prediction locations
 #' @param X_obs Design matrix for observations
 #' @param X_pred Design matrix for predictions
 #' @param beta Linear mean parameters
 #' @param m Number of nearest neighbors to use
-#' @param reorder TRUE/FALSE for whether reodering should be done. This should
+#' @param reorder TRUE/FALSE for whether reordering should be done. This should
 #' generally be kept at TRUE, unless testing out the effect of
 #' reordering.
 #' @export
@@ -80,7 +80,7 @@ predictions <- function(covparms, covfun_name = "matern_isotropic", y_obs,
 #' a conditional simulation.
 #' @param covparms Covariance parameters
 #' @param covfun_name Name of covariance function
-#' @param y_obs Observations assocaited with locs_obs
+#' @param y_obs Observations associated with locs_obs
 #' @param locs_obs observation locations
 #' @param locs_pred prediction locations
 #' @param X_obs Design matrix for observations
@@ -89,7 +89,7 @@ predictions <- function(covparms, covfun_name = "matern_isotropic", y_obs,
 #' @param m Number of nearest neighbors to use. Larger \code{m} gives
 #' better approximations.
 #' @param nsims Number of conditional simulations to return.
-#' @param reorder TRUE/FALSE for whether reodering should be done. This should
+#' @param reorder TRUE/FALSE for whether reordering should be done. This should
 #' generally be kept at TRUE, unless testing out the effect of
 #' reordering.
 #' @export
