@@ -31,7 +31,7 @@ X <- as.matrix( rep(1,length(windspeed)) )
 
 # fit the model
 inds <- round( seq(1,n,length.out = round(n/8)) )  # set to 1:n to fit to full dataset
-fit_space     <- fit_model(windspeed[inds], locs[inds,], X[inds,], "matern_sphere")
+system.time( fit_space     <- fit_model(windspeed[inds], locs[inds,], X[inds,], "matern_sphere") )
 system.time( fit_spacetime <- fit_model(windspeed[inds], locstime[inds,], X[inds,], "matern_sphere_time") )
 
 # make predictions at a middle time point
@@ -101,7 +101,10 @@ funtomax1 <- function( logparms ){
     return(-loglik)
 }
 startparms <- c(0.2,0.8,0.001)
-fit1 <- optim(log(startparms),funtomax1,control=list(trace=5,maxit=500))
+
+# just run for 10 iterations for demonstration
+# run for more iterations to get parameter estimates
+fit1 <- optim(log(startparms),funtomax1,control=list(trace=5,maxit=10))
 fit1$value
 fit_space <- proflik_mean_variance_grouped(exp(fit1$par),"matern_sphere",windspeedord,
                                Xord,cbind(lon[ord],lat[ord]),NNlist,return_parms = TRUE)
@@ -115,7 +118,10 @@ funtomax2 <- function( logparms ){
     return(-loglik)
 }
 startparms <- c(0.1,6e4,0.8,0.001)
-system.time( fit2 <- optim(log(startparms),funtomax2,control=list(trace=5,maxit=50), method = "BFGS") )
+
+# just run for 10 iterations for demonstration
+# run for more iterations to get parameter estimates
+system.time( fit2 <- optim(log(startparms),funtomax2,control=list(trace=5,maxit=10)) )
 fit2$value
 fit_spacetime <- proflik_mean_variance(exp(fit2$par),"matern_sphere_time",windspeedord,
                                Xord,cbind(lon[ord],lat[ord],time[ord]),NNarray,return_parms = TRUE)
@@ -141,7 +147,7 @@ Xord_pred <- as.matrix( rep(1,n_pred) )
 
 pred_ord <- predictions(fit_spacetime$covparms, "matern_sphere_time", 
     locstimeord, locstimeord_pred, Xord, Xord_pred, fit_spacetime$beta, windspeedord, 
-    m = 60, lonlat = TRUE, reorder = FALSE )
+    m = 50, lonlat = TRUE, reorder = FALSE )
 
 # undo the ordering
 pred <- rep(NA,length(pred_ord))

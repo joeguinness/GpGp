@@ -5,4 +5,5 @@ inst/doc
 .Rbuildignore
 cran-comments.md
 .gitignore~
-GpGp.Rproj
+src/*.so
+src/*.o

@@ -51,7 +51,7 @@ system.time( Linv2 <- vecchia_Linv_grouped(covparms, "matern_isotropic", locsord
 system.time( z1 <- Linv_mult(Linv1,yord,NNarray) )
 system.time( z2 <- Linv_mult_grouped(Linv2,yord,NNlist) )
 
-if( n < 8000 ){ # only do this if we can store the covariance matrix
+if( n < 6000 ){ # only do this if we can store the covariance matrix
     covmat <- matern_isotropic(covparms,locsord)
     cholmat <- t(chol(covmat))
     z3 <- forwardsolve(cholmat,yord)

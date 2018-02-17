@@ -34,7 +34,7 @@ locs_time_ord <- locs_time[ord,]
 yord <- y[ord]
 
 # find the ordered m nearest neighbors
-m <- 30
+m <- 20
 NNarray <- find_ordered_nn(locs = locs_time_ord,m = m,space_time=TRUE)
 
 # automatically group the observations
@@ -57,5 +57,3 @@ system.time( Linv2 <- vecchia_Linv_grouped(covparms, "matern_space_time", locs_t
 system.time( z1 <- Linv_mult(Linv1,yord,NNarray) )
 system.time( z2 <- Linv_mult_grouped(Linv2,yord,NNlist) )
 
-
-fit <- fit_model(y, locs_time, covfun_name = "matern_space_time", X = as.matrix(rep(1,n)) )
