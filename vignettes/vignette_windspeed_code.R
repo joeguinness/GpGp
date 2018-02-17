@@ -47,7 +47,7 @@ X_pred <- as.matrix( rep(1,n_pred) )
 
 # predictions
 pred <- predictions(fit_spacetime$covparms, "matern_sphere_time", windspeed,
-    locstime, locstime_pred, X, X_pred, fit_spacetime$beta)
+    locstime, locstime_pred, X, X_pred, fit_spacetime$beta, m = 40)
 
 # plot predictions
 pred_array <- array( pred, c(length(longrid),length(latgrid)) )
@@ -55,7 +55,7 @@ fields::image.plot(longrid,latgrid,pred_array)
 
 # conditional simulations
 sim <- cond_sim(fit_spacetime$covparms, "matern_sphere_time", windspeed,
-    locstime, locstime_pred, X, X_pred, fit_spacetime$beta, nsims = 2)
+    locstime, locstime_pred, X, X_pred, fit_spacetime$beta, nsims = 2, m = 40)
 
 # plot conditional simulations
 par(mfrow=c(1,2))
