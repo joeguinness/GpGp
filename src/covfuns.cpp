@@ -20,7 +20,7 @@ using namespace Rcpp;
 //' containing the covariance between observations at \code{locs[i,]} and
 //' \code{locs[j,]}.
 //' @section Parameterization:
-//' The covariance parameter vector is (variange, range, smoothness, nugget)
+//' The covariance parameter vector is (variance, range, smoothness, nugget)
 //' = \eqn{(\sigma^2,\alpha,\nu,\tau^2)}, and the covariance function is parameterized
 //' as
 //' \deqn{ M(x,y) = \sigma^2 2^{1-\nu}/\Gamma(\nu) ( || x - y || / \alpha )^\nu K_\nu( || x - y || / \alpha )  }

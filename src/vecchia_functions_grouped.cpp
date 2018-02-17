@@ -95,7 +95,7 @@ NumericVector vecchia_Linv_grouped(NumericVector covparms, StringVector covfun_n
 //' usually the output from \code{vecchiaLinv}.
 //' @param z the vector to be multiplied
 //' @inheritParams vecchia_loglik_grouped
-//' @return the product of the sprase inverse Cholesky factor with a vector
+//' @return the product of the sparse inverse Cholesky factor with a vector
 //' @examples
 //' n <- 2000
 //' locs <- matrix( runif(2*n), n, 2 )
