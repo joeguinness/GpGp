@@ -17,7 +17,7 @@ Description: Functions for reordering
     approximation is due to Vecchia (1988) 
     <http://www.jstor.org/stable/2345768>, and the reordering and
     grouping methods are from Guinness (2018)
-    <https://doi.org/10.1080/00401706.2018.1437476>.
+    <doi:10.1080/00401706.2018.1437476>.
 Depends: R (>= 2.10)
 License: MIT + file LICENSE
 Imports:
