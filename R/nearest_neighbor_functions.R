@@ -64,6 +64,11 @@ find_ordered_nn_brute <- function( locs, m ){
 #' @export
 find_ordered_nn <- function(locs,m, lonlat = FALSE, space_time = FALSE, st_scale = NULL){
     
+    # if locs is a vector, convert to matrix
+    if( is.null(ncol(locs)) ){
+        locs <- as.matrix(locs)
+    }
+
     # number of locations
     n <- nrow(locs)
     m <- min(m,n-1)
