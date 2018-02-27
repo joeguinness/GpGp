@@ -112,7 +112,7 @@ find_ordered_nn <- function(locs,m, lonlat = FALSE, space_time = FALSE, st_scale
 
     # to the first mult*m+1 by brutce force
     maxval <- min( mult*m + 1, n )
-    NNarray[1:maxval,] <- find_ordered_nn_brute(locs[1:maxval,],m)
+    NNarray[1:maxval,] <- find_ordered_nn_brute(locs[1:maxval,,drop=FALSE],m)
 
     query_inds <- min( maxval+1, n):n
     data_inds <- 1:n
