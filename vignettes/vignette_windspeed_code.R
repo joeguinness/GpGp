@@ -31,7 +31,8 @@ X <- as.matrix( rep(1,length(windspeed)) )
 
 # fit the model
 inds <- round( seq(1,n,length.out = round(n/8)) )  # set to 1:n to fit to full dataset
-system.time( fit_space     <- fit_model(windspeed[inds], locs[inds,], X[inds,], "matern_sphere") )
+inds <- 1:n
+#system.time( fit_space     <- fit_model(windspeed[inds], locs[inds,], X[inds,], "matern_sphere") )
 system.time( fit_spacetime <- fit_model(windspeed[inds], locstime[inds,], X[inds,], "matern_sphere_time") )
 
 # make predictions at a middle time point
@@ -66,6 +67,65 @@ fields::image.plot(longrid,latgrid,sim_array)
 
 
 
+
+
+# make predictions at middle of each day
+predtimes <- 24*3600*( seq(0.5,5.5,by=1) )
+latgrid <- seq( min(lat), max(lat), length.out = 120 )
+longrid <- seq( 0, 360, length.out = 241)[1:240] # so no locations repeated
+locs_pred <- as.matrix( expand.grid(longrid,latgrid) )
+n_pred <- nrow(locs_pred)
+X_pred <- as.matrix( rep(1,n_pred) )
+pred <- matrix(NA, n_pred, length(predtimes) )
+for( j in 1:6 ){
+    locstime_pred <- cbind( locs_pred, rep(predtimes[j], n_pred) )
+    pred[,j] <- predictions(fit_spacetime$covparms, "matern_sphere_time", windspeed,
+        locstime, locstime_pred, X, X_pred, fit_spacetime$beta, m = 60)
+}
+
+library("maps")
+library("maptools")
+data(wrld_simpl)
+lon_pred_forflag <- longrid
+lon_pred_forflag[longrid > 180] <- -360 + longrid[longrid > 180]
+pnts_forflag <- expand.grid(lon_pred_forflag, latgrid)  # Note that I reversed OP's ordering of lat/long
+pts_forflag <- SpatialPoints(pnts_forflag, proj4string=CRS(proj4string(wrld_simpl)))
+oceanflag <- !is.na(over(pts_forflag, wrld_simpl)$FIPS)
+
+for(j in 1:6){
+    tmp <- pred[,j]
+    tmp[oceanflag] <- NA
+    pred_array <- matrix( tmp, c(length(longrid),length(latgrid)) )
+    fname <- paste0("jason3_pred_day",j,".pdf")
+    pdf( fname, width = 9, height = 5)
+    par(mar=c(1,1,2,3))
+    fields::image.plot( longrid,latgrid,pred_array, 
+        axes = FALSE, ann = FALSE,
+        legend.line = 2.5, zlim = c(0,max(jason3$windspeed)),
+        xlim = c(0,360), ylim = c(-90,90), legend.lab = "windspeed (m/s)")
+    map("world", wrap = c(0,360), add = TRUE)
+    mtext( paste("Midday",j,"Interpolation"), side = 3, line = 0, cex = 1.5 )
+    dev.off()
+}
+
+j <- 3
+    locstime_pred <- cbind( locs_pred, rep(predtimes[j], n_pred) )
+    sim <- cond_sim(fit_spacetime$covparms, "matern_sphere_time", windspeed,
+        locstime, locstime_pred, X, X_pred, fit_spacetime$beta, nsims = 1000, m = 60)
+    sdsim <- apply(sim,1,sd)
+    tmp <- sdsim
+    tmp[oceanflag] <- NA
+    pred_array <- matrix( tmp, c(length(longrid),length(latgrid)) )
+    fname <- paste0("jason3_sd_day",j,".pdf")
+    pdf( fname, width = 9, height = 5)
+    par(mar=c(1,1,2,3))
+    fields::image.plot( longrid,latgrid,pred_array, 
+        axes = FALSE, ann = FALSE,
+        legend.line = 2.5, zlim = c(0,max(tmp,na.rm=TRUE)),
+        xlim = c(0,360), ylim = c(-90,90), legend.lab = "windspeed (m/s)")
+    map("world", wrap = c(0,360), add = TRUE)
+    mtext( paste("Midday",j,"Interpolation Uncertainty"), side = 3, line = 0, cex = 1.5 )
+    dev.off()
 
 
 

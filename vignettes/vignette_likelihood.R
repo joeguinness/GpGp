@@ -4,7 +4,7 @@
 library("GpGp")
 
 # grid size for data locations
-gsize <- 80
+gsize <- 100
 nvec <- c(gsize,gsize)
 n <- prod(nvec)
 
@@ -15,7 +15,7 @@ locs <- as.matrix(expand.grid(x1,x2))
 
 # covariance function and parameters
 # covfun <- maternIsotropic
-covparms <- c(variance = 4, range = 0.1, smoothness = 0.5, nugget = 0)
+covparms <- c(variance = 4, range = 0.1, smoothness = 1.0, nugget = 0)
 
 # simulate some data
 y <- fast_Gp_sim(covparms, "matern_isotropic",locs,40)
@@ -28,7 +28,7 @@ locsord <- locs[ord,]
 yord <- y[ord]
 
 # find the ordered m nearest neighbors
-m <- 20
+m <- 30
 NNarray <- find_ordered_nn(locsord,m)
 
 # automatically group the observations

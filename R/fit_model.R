@@ -165,7 +165,7 @@ fit_model <- function(y, locs, X = NULL, covfun_name = "matern_isotropic",
         }
         if(!silent) cat("Refining estimates...")
         fit <- stats::optim(fit$par,funtomax,
-            control=list(trace=0,maxit=25), method = "BFGS") 
+            control=list(trace=0,maxit=25), method = "Nelder-Mead") 
         if(!silent) cat("Done          ")
         if(!silent) cat(paste(  paste( round(exp(fit$par),3), collapse = " " ), "\n" ) )
     }
