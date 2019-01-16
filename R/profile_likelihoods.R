@@ -61,20 +61,35 @@ proflik_mean_variance <- function(subparms,covfun_name = "matern_isotropic",
     n <- length(y)
     covparms1 <- c(1,subparms)
     Linv <- vecchia_Linv(covparms1,covfun_name,locs,NNarray)
+    z <- Linv_mult(Linv,y,NNarray)
     B <- array(NA, dim(X))
     for(j in 1:ncol(X)){
         B[,j] <- Linv_mult(Linv,X[,j],NNarray)
     }
+    # information matrix
     infomat <- crossprod(B)
-    z <- Linv_mult(Linv,y,NNarray)
-    beta <- solve( infomat, crossprod(B,z) )
+    # is it numerically invertible?
+    if( min( eigen(infomat)$values ) < 1e-9 ){
+        invertible <- FALSE
+    } else {
+        invertible <- TRUE
+    }
+    if( invertible ){ 
+        beta <- solve( infomat, crossprod(B,z) ) 
+    } else {
+        beta <- rep(0, ncol(X))
+    }
     resids <- y - X %*% beta
     z_resids <- Linv_mult(Linv,resids,NNarray)
     sigmasq <- c( crossprod(z_resids)/n )
 
     logdet <- -2*sum(log(Linv[,1])) + n*log(sigmasq)
     quadform <- n
-    profloglik <- -1/2*( n*log(2*pi) + logdet + quadform )
+    if( invertible ){
+        profloglik <- -1/2*( n*log(2*pi) + logdet + quadform )
+    } else {
+        profloglik <- -1e6*sd(y)*n
+    }
     if( !return_parms ){
         return(profloglik)
     }
@@ -209,19 +224,34 @@ proflik_mean <- function(parms,covfun_name = "matern_isotropic",
 
     n <- length(y)
     Linv <- vecchia_Linv(parms,covfun_name,locs,NNarray)
+    z <- Linv_mult(Linv,y,NNarray)
     B <- array(NA, dim(X))
     for(j in 1:ncol(X)){
         B[,j] <- Linv_mult(Linv,X[,j],NNarray)
     }
+    # information matrix
     infomat <- crossprod(B)
-    z <- Linv_mult(Linv,y,NNarray)
-    beta <- solve( infomat, crossprod(B,z) )
+    # is it numerically invertible?
+    if( min( eigen(infomat)$values ) < 1e-9 ){
+        invertible <- FALSE
+    } else {
+        invertible <- TRUE
+    }
+    if( invertible ){ 
+        beta <- solve( infomat, crossprod(B,z) ) 
+    } else {
+        beta <- rep(0, ncol(X))
+    }
     resids <- y - X %*% beta
     z_resids <- Linv_mult(Linv,resids,NNarray)
 
     logdet <- -2*sum(log(Linv[,1]))
     quadform <- sum( z_resids^2 )
-    profloglik <- -1/2*( n*log(2*pi) + logdet + quadform )
+    if( invertible ){
+        profloglik <- -1/2*( n*log(2*pi) + logdet + quadform )
+    } else {
+        profloglik <- -1e6*sd(y)*n
+    }
     if( !return_parms ){
         return(profloglik)
     }
@@ -291,14 +321,28 @@ proflik_mean_variance_grouped <- function(subparms,covfun_name = "matern_isotrop
 
     n <- length(y)
     covparms1 <- c(1,subparms)
+    # get the entries of L inverse
     Linv <- vecchia_Linv_grouped(covparms1,covfun_name,locs,NNlist)
+    # Linv y
+    z <- Linv_mult_grouped(Linv,y,NNlist)
+    # B = Linv X
     B <- array(NA, dim(X))
     for(j in 1:ncol(X)){
         B[,j] <- Linv_mult_grouped(Linv,X[,j],NNlist)
     }
+    # information matrix
     infomat <- crossprod(B)
-    z <- Linv_mult_grouped(Linv,y,NNlist)
-    beta <- solve( infomat, crossprod(B,z) )
+    # is it numerically invertible?
+    if( min( eigen(infomat)$values ) < 1e-9 ){
+        invertible <- FALSE
+    } else {
+        invertible <- TRUE
+    }
+    if( invertible ){ 
+        beta <- solve( infomat, crossprod(B,z) ) 
+    } else {
+        beta <- rep(0, ncol(X))
+    }
     resids <- y - X %*% beta
     z_resids <- Linv_mult_grouped(Linv,resids,NNlist)
     sigmasq <- c( crossprod(z_resids)/n )
@@ -306,7 +350,11 @@ proflik_mean_variance_grouped <- function(subparms,covfun_name = "matern_isotrop
     Linv_diag_indices <- cumsum( NNlist[["local_resp_inds"]] )
     logdet <- -2*sum(log(Linv[ Linv_diag_indices ])) + n*log(sigmasq)
     quadform <- n
-    profloglik <- -1/2*( n*log(2*pi) + logdet + quadform )
+    if( invertible ){
+        profloglik <- -1/2*( n*log(2*pi) + logdet + quadform )
+    } else {
+        profloglik <- -1e6*sd(y)*n
+    }
     if( !return_parms ){
         return(profloglik)
     }
@@ -446,20 +494,35 @@ proflik_mean_grouped <- function(parms,covfun_name = "matern_isotropic",
 
     n <- length(y)
     Linv <- vecchia_Linv_grouped(parms,covfun_name,locs,NNlist)
+    z <- Linv_mult_grouped(Linv,y,NNlist)
     B <- array(NA, dim(X))
     for(j in 1:ncol(X)){
         B[,j] <- Linv_mult_grouped(Linv,X[,j],NNlist)
     }
+    # information matrix
     infomat <- crossprod(B)
-    z <- Linv_mult_grouped(Linv,y,NNlist)
-    beta <- solve( infomat, crossprod(B,z) )
+    # is it numerically invertible?
+    if( min( eigen(infomat)$values ) < 1e-9 ){
+        invertible <- FALSE
+    } else {
+        invertible <- TRUE
+    }
+    if( invertible ){ 
+        beta <- solve( infomat, crossprod(B,z) ) 
+    } else {
+        beta <- rep(0, ncol(X))
+    }
     resids <- y - X %*% beta
     z_resids <- Linv_mult_grouped(Linv,resids,NNlist)
 
     Linv_diag_indices <- cumsum( NNlist[["local_resp_inds"]] )
     logdet <- -2*sum(log(Linv[ Linv_diag_indices ]))
     quadform <- sum( z_resids^2 )
-    profloglik <- -1/2*( n*log(2*pi) + logdet + quadform )
+    if( invertible ){
+        profloglik <- -1/2*( n*log(2*pi) + logdet + quadform )
+    } else {
+        profloglik <- -1e6*sd(y)*n
+    }
     if( !return_parms ){
         return(profloglik)
     }
