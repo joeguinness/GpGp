@@ -4,8 +4,8 @@
 \alias{proflik_mean}
 \title{Profile likelihood (profiling out mean only)}
 \usage{
-proflik_mean(parms, covfun_name = "matern_isotropic", y, X, locs, NNarray,
-  return_parms = FALSE)
+proflik_mean(parms, covfun_name = "matern_isotropic", y, X, locs,
+  NNarray, return_parms = FALSE)
 }
 \arguments{
 \item{parms}{All parameters.  The specific meaning

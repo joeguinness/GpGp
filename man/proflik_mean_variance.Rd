@@ -4,8 +4,8 @@
 \alias{proflik_mean_variance}
 \title{Profile likelihood (profiling out mean and variance)}
 \usage{
-proflik_mean_variance(subparms, covfun_name = "matern_isotropic", y, X, locs,
-  NNarray, return_parms = FALSE)
+proflik_mean_variance(subparms, covfun_name = "matern_isotropic", y, X,
+  locs, NNarray, return_parms = FALSE)
 }
 \arguments{
 \item{subparms}{All parameters except for variance parameter. The specific meaning

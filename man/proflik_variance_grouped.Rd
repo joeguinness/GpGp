@@ -4,8 +4,8 @@
 \alias{proflik_variance_grouped}
 \title{Grouped Version of Profile Likelihood (profiling out variance only)}
 \usage{
-proflik_variance_grouped(subparms, covfun_name = "matern_isotropic", y, locs,
-  NNlist, return_parms = FALSE)
+proflik_variance_grouped(subparms, covfun_name = "matern_isotropic", y,
+  locs, NNlist, return_parms = FALSE)
 }
 \arguments{
 \item{subparms}{All parameters except for variance parameter. The specific meaning
