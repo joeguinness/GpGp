@@ -88,7 +88,7 @@ proflik_mean_variance <- function(subparms,covfun_name = "matern_isotropic",
     if( invertible ){
         profloglik <- -1/2*( n*log(2*pi) + logdet + quadform )
     } else {
-        profloglik <- -1e6*sd(y)*n
+        profloglik <- -1e6*stats::sd(y)*n
     }
     if( !return_parms ){
         return(profloglik)
@@ -250,7 +250,7 @@ proflik_mean <- function(parms,covfun_name = "matern_isotropic",
     if( invertible ){
         profloglik <- -1/2*( n*log(2*pi) + logdet + quadform )
     } else {
-        profloglik <- -1e6*sd(y)*n
+        profloglik <- -1e6*stats::sd(y)*n
     }
     if( !return_parms ){
         return(profloglik)
@@ -353,7 +353,7 @@ proflik_mean_variance_grouped <- function(subparms,covfun_name = "matern_isotrop
     if( invertible ){
         profloglik <- -1/2*( n*log(2*pi) + logdet + quadform )
     } else {
-        profloglik <- -1e6*sd(y)*n
+        profloglik <- -1e6*stats::sd(y)*n
     }
     if( !return_parms ){
         return(profloglik)
@@ -521,7 +521,7 @@ proflik_mean_grouped <- function(parms,covfun_name = "matern_isotropic",
     if( invertible ){
         profloglik <- -1/2*( n*log(2*pi) + logdet + quadform )
     } else {
-        profloglik <- -1e6*sd(y)*n
+        profloglik <- -1e6*stats::sd(y)*n
     }
     if( !return_parms ){
         return(profloglik)
