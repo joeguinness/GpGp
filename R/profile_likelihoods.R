@@ -334,6 +334,7 @@ proflik_mean_variance_grouped <- function(subparms,covfun_name = "matern_isotrop
     infomat <- crossprod(B)
     # is it numerically invertible?
     if( min( eigen(infomat)$values ) < 1e-9 ){
+        print("*")
         invertible <- FALSE
     } else {
         invertible <- TRUE

@@ -49,20 +49,22 @@ find_ordered_nn_brute <- function( locs, m ){
 #' second entry is the index of the nearest location, and so on. Because each
 #' location neighbors itself, the returned matrix has \code{m+1} columns.
 #' @examples
-#' locs <- as.matrix( expand.grid( (1:40)/40, (1:40)/40 ) )     # grid of locations
-#' ord <- order_maxmin(locs)                                     # calculate an ordering
-#' locsord <- locs[ord,]                                        # reorder locations
+#' locs <- as.matrix( expand.grid( (1:40)/40, (1:40)/40 ) )     
+#' ord <- order_maxmin(locs)        # calculate an ordering
+#' locsord <- locs[ord,]            # reorder locations
 #' m <- 20
-#' NNarray <- find_ordered_nn(locsord,20)             # find ordered nearest 20 neighbors
+#' NNarray <- find_ordered_nn(locsord,20)  # find ordered nearest 20 neighbors
 #' ind <- 100
 #' # plot all locations in gray, first ind locations in black,
 #' # ind location with magenta circle, m neighhbors with blue circle
 #' plot( locs[,1], locs[,2], pch = 16, col = "gray" )
 #' points( locsord[1:ind,1], locsord[1:ind,2], pch = 16 )
 #' points( locsord[ind,1], locsord[ind,2], col = "magenta", cex = 1.5 )
-#' points( locsord[NNarray[ind,2:(m+1)],1], locsord[NNarray[ind,2:(m+1)],2], col = "blue", cex = 1.5 )
+#' points( locsord[NNarray[ind,2:(m+1)],1], 
+#'     locsord[NNarray[ind,2:(m+1)],2], col = "blue", cex = 1.5 )
 #' @export
-find_ordered_nn <- function(locs,m, lonlat = FALSE, space_time = FALSE, st_scale = NULL){
+find_ordered_nn <- function(locs,m, lonlat = FALSE, 
+    space_time = FALSE, st_scale = NULL){
     
     # if locs is a vector, convert to matrix
     if( is.null(ncol(locs)) ){
@@ -202,9 +204,11 @@ find_ordered_nn <- function(locs,m, lonlat = FALSE, space_time = FALSE, st_scale
 #' local_resp_inds <- NNlist2$local_resp_inds
 #' global_resp_inds <- NNlist2$global_resp_inds
 #' last_resp_of_block <- NNlist2$last_resp_of_block
-#' local_resp_of_block_2 <- local_resp_inds[(last_resp_of_block[1]+1):last_resp_of_block[2]]
+#' local_resp_of_block_2 <- 
+#'     local_resp_inds[(last_resp_of_block[1]+1):last_resp_of_block[2]]
 #'
-#' global_resp_of_block_2 <- global_resp_inds[(last_resp_of_block[1]+1):last_resp_of_block[2]]
+#' global_resp_of_block_2 <- 
+#'     global_resp_inds[(last_resp_of_block[1]+1):last_resp_of_block[2]]
 #' inds_of_block_2[local_resp_of_block_2]
 #' # these last two should be the same
 #' 

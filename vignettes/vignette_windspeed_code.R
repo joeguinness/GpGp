@@ -1,6 +1,6 @@
 
 # analyze the averaged jason3 wind speed data
-library("GpGp")
+#library("GpGp")
 
 # loads in object
 data(jason3)
@@ -8,7 +8,7 @@ head(jason3)
 lat       <- jason3$lat
 lon       <- jason3$lon
 windspeed <- jason3$windspeed
-time      <- jason3$time
+time      <- jason3$time/3600    # time in hours
 n         <- length(windspeed)
 
 # plot of data from first 6 hours
@@ -31,7 +31,7 @@ X <- as.matrix( rep(1,length(windspeed)) )
 
 # fit the model
 inds <- round( seq(1,n,length.out = round(n/8)) )  # set to 1:n to fit to full dataset
-inds <- 1:n
+#inds <- 1:n
 #system.time( fit_space     <- fit_model(windspeed[inds], locs[inds,], X[inds,], "matern_sphere") )
 system.time( fit_spacetime <- fit_model(windspeed[inds], locstime[inds,], X[inds,], "matern_sphere_time") )
 

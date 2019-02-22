@@ -2,7 +2,7 @@ Package: GpGp
 Type: Package
 Title: Fast Gaussian Process Computation Using Vecchia's Approximation
 Version: 0.1.1
-Date: 2018-02-18
+Date: 2019-01-27
 Authors@R: c(
     person("Joseph", "Guinness", email = "joeguinness@gmail.com", role = c("aut", "cre")),
     person("Matthias", "Katzfuss", email = "katzfuss@gmail.com", role = "aut" ) )
@@ -27,7 +27,9 @@ Suggests:
     fields,
     knitr,
     rmarkdown,
-    testthat
+    testthat,
+    maps,
+    maptools
 LinkingTo: Rcpp
 RoxygenNote: 6.1.0
 VignetteBuilder: knitr

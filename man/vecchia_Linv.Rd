@@ -30,7 +30,7 @@ of the observations that observation \code{i} conditions on. By convention,
 the first element of row \code{i} is \code{i}.}
 }
 \value{
-the Gaussian loglikelihood
+matrix containing entries of sparse approximation to inverse Cholesky
 }
 \description{
 This function returns the entries of the sparse approximation to 

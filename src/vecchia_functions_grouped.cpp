@@ -57,7 +57,7 @@ NumericVector vecchia_loglik_grouped(NumericVector covparms, StringVector covfun
 //' a small subset of previous observations.
 //' @inheritParams vecchia_loglik
 //' @inheritParams vecchia_loglik_grouped
-//' @return the Gaussian loglikelihood
+//' @return vector containing entries of grouped approximation to inverse Cholesky
 //' @examples
 //' n1 <- 40
 //' n2 <- 40
@@ -73,13 +73,13 @@ NumericVector vecchia_Linv_grouped(NumericVector covparms, StringVector covfun_n
                             NumericMatrix locs, List NNlist) {
 
     NumericVector y(locs.nrow());
-    NumericVector ll(1);        // loglikelihood to be returned
+    NumericVector ll(1);        // loglikelihood not to be returned
     NumericVector local_resp_inds = NNlist["local_resp_inds"];
     int nentries = 0;
     for(int j=0; j<local_resp_inds.length(); j++){
         nentries += local_resp_inds[j];
     }
-    NumericVector Linv(nentries);    // Linv not to be returned
+    NumericVector Linv(nentries);    // Linv to be returned
     vecchia_grouped(covparms, covfun_name, locs, NNlist, y, &Linv, &ll, 2);
     return Linv;
 }

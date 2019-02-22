@@ -68,7 +68,7 @@ NumericVector vecchia_loglik(NumericVector covparms, StringVector covfun_name,
 //' conditioning on all previous observations, each term conditions on
 //' a small subset of previous observations.
 //' @inheritParams vecchia_loglik
-//' @return the Gaussian loglikelihood
+//' @return matrix containing entries of sparse approximation to inverse Cholesky
 //' @examples
 //' n1 <- 40
 //' n2 <- 40
@@ -84,8 +84,8 @@ NumericMatrix vecchia_Linv(NumericVector covparms, StringVector covfun_name,
                             NumericMatrix locs, IntegerMatrix NNarray) {
 
     NumericVector y(NNarray.nrow());
-    NumericVector ll(1);        // loglikelihood to be returned
-    NumericMatrix Linv(NNarray.nrow() , NNarray.ncol());    // Linv not to be returned
+    NumericVector ll(1);        // loglikelihood not to be returned
+    NumericMatrix Linv(NNarray.nrow() , NNarray.ncol());    // Linv to be returned
     vecchia(covparms, covfun_name, locs, NNarray, y, &Linv, &ll, 2);
     return Linv;
 }

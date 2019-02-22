@@ -28,7 +28,7 @@ the number of rows of \code{locs}.}
 Usually the output from \code{group_obs(NNarray)}.}
 }
 \value{
-the Gaussian loglikelihood
+vector containing entries of grouped approximation to inverse Cholesky
 }
 \description{
 This function returns the entries of the sparse approximation to 

@@ -132,7 +132,11 @@ fit_model <- function(y, locs, X = NULL, covfun_name = "matern_isotropic",
     # get an ordering and reorder everything
     if(reorder){
         if(!silent) cat("Reordering...")
-        ord <- order_maxmin(locs, lonlat = lonlat, space_time = space_time)
+        if( n < 1e5 ){  # maximum ordering if n < 100000
+            ord <- order_maxmin(locs, lonlat = lonlat, space_time = space_time)
+        } else {        # otherwise random order
+            ord <- sample(n)
+        }
         if(!silent) cat("Done \n")
     } else {
         ord <- 1:n
@@ -155,17 +159,25 @@ fit_model <- function(y, locs, X = NULL, covfun_name = "matern_isotropic",
                 space_time = space_time, st_scale = exp(fit$par[1:2]) )
         }
         NNlist <- group_obs(NNarray[,1:(m+1)])
+        max_smooth <- 4.0
         funtomax <- function( logparms ){
             parms <- exp(logparms)
             # set a maximum value for smoothness
-            parms[length(parms)-1] = min(parms[length(parms)-1], 4)
+            parms[length(parms)-1] <- min(parms[length(parms)-1], max_smooth)
+            ## delete next line
+            #print(parms)
             loglik <- proflik_mean_variance_grouped(
                 parms, covfun_name, yord, Xord, locsord, NNlist )
             return(-loglik)
         }
         if(!silent) cat("Refining estimates...")
         fit <- stats::optim(fit$par,funtomax,
-            control=list(trace=0,maxit=25), method = "Nelder-Mead") 
+            control=list(trace=0,maxit=100), method = "Nelder-Mead") 
+        # set smoothness to maximum smoothness
+        parms <- exp(fit$par)
+        parms[length(parms)-1] <- min(parms[length(parms)-1], max_smooth)
+        fit$par <- log(parms)
+
         if(!silent) cat("Done          ")
         if(!silent) cat(paste(  paste( round(exp(fit$par),3), collapse = " " ), "\n" ) )
     }

@@ -61,9 +61,11 @@ inds_of_block_2 <- all_inds[ (last_ind_of_block[1] + 1):last_ind_of_block[2] ]
 local_resp_inds <- NNlist2$local_resp_inds
 global_resp_inds <- NNlist2$global_resp_inds
 last_resp_of_block <- NNlist2$last_resp_of_block
-local_resp_of_block_2 <- local_resp_inds[(last_resp_of_block[1]+1):last_resp_of_block[2]]
+local_resp_of_block_2 <- 
+    local_resp_inds[(last_resp_of_block[1]+1):last_resp_of_block[2]]
 
-global_resp_of_block_2 <- global_resp_inds[(last_resp_of_block[1]+1):last_resp_of_block[2]]
+global_resp_of_block_2 <- 
+    global_resp_inds[(last_resp_of_block[1]+1):last_resp_of_block[2]]
 inds_of_block_2[local_resp_of_block_2]
 # these last two should be the same
 
