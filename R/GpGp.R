@@ -36,4 +36,6 @@
 #'
 #' @docType package
 #' @name GpGp
+#' @useDynLib GpGp
+#' @importFrom Rcpp sourceCpp
 NULL
