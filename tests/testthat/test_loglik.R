@@ -23,13 +23,13 @@ test_that("likelihood approximations are exact when m = n-1", {
     quadform_exact <- c(crossprod(z))
     
     # ungrouped
-    ll0 <- vecchia_loglik(covparms,"matern_isotropic",rep(0,n),locsord,NNarray)
+    ll0 <- arma_vecchia_loglik(covparms,"matern_isotropic",rep(0,n),locsord,NNarray)
     logdet_approx <- -2*( ll0 + n/2*log(2*pi) )
-    ll1 <- vecchia_loglik(covparms,"matern_isotropic",y,locsord,NNarray)
+    ll1 <- arma_vecchia_loglik(covparms,"matern_isotropic",y,locsord,NNarray)
     quadform_approx <- -2*( ll1 - ll0 )
-
+    
     expect_equal( logdet_exact, logdet_approx )
-    expect_equal( quadform_exact, quadform_approx )
+    expect_equal( quadform_exact, quadform_approx, tolerance = 1e-4 )
     
     # grouped
     ll0 <- vecchia_loglik_grouped(covparms,"matern_isotropic",rep(0,n),locsord,NNlist)

@@ -53,6 +53,12 @@ inline void update_vars_based_on_covfun(std::string covfun_name_string,
         for(int k=0; k<3; k++){ cparms[k] = covparms[k]; }  // re-assign non-nugget parameters
         *nugget = covparms[0]*covparms[3];               // separate variable for nugget
     }
+    else if( covfun_name_string.compare("exponential_isotropic") == 0 )
+    {
+        for(int k=0; k<2; k++){ cparms[k] = covparms[k]; }  // re-assign non-nugget parameters
+        cparms[2] = 0.5;
+        *nugget = covparms[0]*covparms[2];               // separate variable for nugget
+    }
     else if( covfun_name_string.compare("matern_sphere") == 0 )
     {
         for(int k=0; k<3; k++){ cparms[k] = covparms[k]; }  // re-assign non-nugget parameters

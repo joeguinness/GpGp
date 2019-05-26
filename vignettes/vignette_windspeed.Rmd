@@ -73,8 +73,10 @@ The two models take several minutes to fit on my system.
 # fit to a subset of the data (for faster CRAN checks)
 # use 'inds <- 1:n' to fit to full dataset
 inds <- round( seq(1,n,length.out = 1500) ) 
-fit_space     <- fit_model(windspeed[inds], locs[inds,], X[inds,], "matern_sphere")
-fit_spacetime <- fit_model(windspeed[inds], locstime[inds,], X[inds,], "matern_sphere_time")
+fit_space     <- fit_model(windspeed[inds], locs[inds,], X[inds,], 
+    covfun_name = "matern_sphere")
+fit_spacetime <- fit_model(windspeed[inds], locstime[inds,], X[inds,], 
+    covfun_name = "matern_sphere_time")
 fit_space
 fit_spacetime
 ```

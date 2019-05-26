@@ -4,8 +4,9 @@
 \alias{fit_model}
 \title{Estimate mean and covariance parameters}
 \usage{
-fit_model(y, locs, X = NULL, covfun_name = "matern_isotropic",
-  silent = FALSE, group = TRUE, reorder = TRUE)
+fit_model(y, locs, X = NULL, NNarray = NULL,
+  covfun_name = "matern_isotropic", silent = FALSE, group = TRUE,
+  reorder = TRUE)
 }
 \arguments{
 \item{y}{response vector}

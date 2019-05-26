@@ -61,6 +61,39 @@ NumericMatrix matern_isotropic(NumericVector covparms, NumericMatrix locs ){
 
 
 
+// [[Rcpp::export]]
+NumericMatrix exponential_isotropic(NumericVector covparms, NumericMatrix locs ){
+
+
+    int dim = locs.ncol();
+    int n = locs.nrow();
+    std::vector<double> cloc1(dim);
+    std::vector<double> cloc2(dim);
+    double cparms[3];
+    cparms[0] = covparms(0);
+    cparms[1] = covparms(1);
+    cparms[2] = 0.5;
+    double nugget = covparms( 0 )*covparms( 2 );
+
+    NumericMatrix covmat(n,n);
+    for(int i1 = 0; i1 < n; i1++){
+        for(int i2 = 0; i2 <= i1; i2++){
+            for(int j = 0; j < dim; j++){
+                cloc1[j] = locs(i1,j);
+                cloc2[j] = locs(i2,j);
+            }
+            covmat(i1,i2) = matern_isotropic_internal( &cloc1, &cloc2, cparms );
+            if( i1 == i2 ){
+                covmat(i2,i2) += nugget;
+            } else {
+                covmat(i2,i1) = covmat(i1,i2);
+            }
+        }
+    }
+    return covmat;
+}
+
+
 
 //' Isotropic Matern covariance function on sphere
 //'

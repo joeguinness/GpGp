@@ -17,7 +17,6 @@ void vecchia_grouped(NumericVector covparms, StringVector covfun_name,
     int first_L_ind = 0;
     bool trip_chol = false;
 
-    
     // number of obs
     int n = y.length();
     

@@ -1,7 +1,7 @@
 
 
 # a short vignette demonstrating how to use the functions
-library("GpGp")
+# library("GpGp")
 
 # grid size for data locations
 gsize <- 100
@@ -15,7 +15,7 @@ locs <- as.matrix(expand.grid(x1,x2))
 
 # covariance function and parameters
 # covfun <- maternIsotropic
-covparms <- c(variance = 4, range = 0.1, smoothness = 1.0, nugget = 0)
+covparms <- c(variance = 4, range = 0.1, smoothness = 0.5, nugget = 0.1)
 
 # simulate some data
 y <- fast_Gp_sim(covparms, "matern_isotropic",locs,40)
@@ -28,7 +28,7 @@ locsord <- locs[ord,]
 yord <- y[ord]
 
 # find the ordered m nearest neighbors
-m <- 30
+m <- 20
 NNarray <- find_ordered_nn(locsord,m)
 
 # automatically group the observations
@@ -38,10 +38,19 @@ object.size(NNlist)
 num_cond <- NNlist[["local_resp_inds"]]-1
 mean(num_cond)
 
+X <- matrix( rep(1,n), n, 1 )
+Xord <- X[ord,,drop=FALSE]
+
+# I think it works!
+system.time( llgh <- arma_vecchia_grad_hess(
+    covparms[c(1,2,4)],"arma_exponential_isotropic",yord,Xord,locsord,NNarray ) )
 
 # get ungrouped and grouped likelihood
-system.time( ll1 <- vecchia_loglik(covparms, "matern_isotropic", yord, locsord, NNarray) )
-system.time( ll2 <- vecchia_loglik_grouped(covparms, "matern_isotropic", yord, locsord, NNlist) )
+system.time( ll0 <- arma_vecchia_loglik(covparms,"arma_matern_isotropic",yord-llgh$betahat,locsord,NNarray ) )
+system.time( ll1 <- arma_vecchia_loglik(covparms[c(1,2,2,3,4)],"arma_matern_scaledim",yord,locsord,NNarray ) )
+system.time( ll2 <- arma_vecchia_loglik(covparms[c(1,2,4)],"arma_exponential_isotropic",yord,locsord,NNarray ) )
+system.time( ll3 <- vecchia_loglik(covparms, "matern_isotropic", yord, locsord, NNarray) )
+system.time( ll4 <- vecchia_loglik_grouped(covparms, "matern_isotropic", yord, locsord, NNlist) )
 
 # get entries of L^{-1}
 system.time( Linv1 <- vecchia_Linv(covparms, "matern_isotropic", locsord, NNarray) )

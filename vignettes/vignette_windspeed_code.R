@@ -31,10 +31,24 @@ X <- as.matrix( rep(1,length(windspeed)) )
 
 # fit the model
 inds <- round( seq(1,n,length.out = round(n/8)) )  # set to 1:n to fit to full dataset
+#inds <- round( seq(1,n,length.out = 1000) )  # set to 1:n to fit to full dataset
+#inds <- sample(n, 1000)
 #inds <- 1:n
 #system.time( fit_space     <- fit_model(windspeed[inds], locs[inds,], X[inds,], "matern_sphere") )
-system.time( fit_spacetime <- fit_model(windspeed[inds], locstime[inds,], X[inds,], "matern_sphere_time") )
 
+
+system.time( 
+    fit_spacetime1 <- fit_model(windspeed[inds], locstime[inds,], X[inds,], 
+        covfun_name = "matern_sphere_time", group = FALSE) 
+)
+system.time( 
+    fit_spacetime2 <- fit_model_arma(windspeed[inds], locstime[inds,], X[inds,], 
+        covfun_name = "arma_matern_spheretime", group = FALSE) 
+)
+system.time(
+    fit_spacetime3 <- fit_model_fisher(windspeed[inds], locstime[inds,], 
+        X[inds,,drop=FALSE], covfun_name = "arma_matern_spheretime" )
+)
 # make predictions at a middle time point
 
 # prediction locations and design matrix

@@ -196,4 +196,55 @@ NumericVector L_mult(NumericMatrix Linv, NumericVector z,
 }
 
 
+// [[Rcpp::export]]
+NumericVector Linv_t_mult(NumericMatrix Linv, NumericVector z,
+                                  IntegerMatrix NNarray) {
+
+    // return x = t(Linv) * z
+    int n = z.length();
+    NumericVector x(n);
+    for(int j=0;j<n;j++){ x[j] = 0.0; }
+
+    // number of neighbors + 1
+    int m = NNarray.ncol();
+
+    // rows 1 though n
+    for(int i=0; i<n; i++){
+        int bsize = min(i+1,m);
+        for(int j=0; j<bsize; j++){
+            x( NNarray(i,j) - 1 ) += z( i )*Linv(i,j);
+        }
+    }
+
+    return x;
+}
+
+
+
+// [[Rcpp::export]]
+NumericVector L_t_mult(NumericMatrix Linv, NumericVector z,
+                               IntegerMatrix NNarray) {
+
+    // return x = L z
+    // by solving (L^{-1})x = z
+    int n = z.length();
+    NumericVector x(n);
+
+    // number of neighbors + 1
+    int m = NNarray.ncol();
+
+    // initialize all the entries
+    for(int i=0; i<n; i++){ x(i) = z(i)/Linv(i,0); }
+
+    // update entries n-2 through 0
+    for(int i=n-1; i>=0; i--){
+        int B = min(i+1,m);
+        for(int j=1; j<B; j++){
+            x( NNarray(i,j) - 1 ) -= Linv(i,j)*x(i)/Linv(NNarray(i,j)-1,0);
+        }
+    }
+
+    return x;
+}
+
 
