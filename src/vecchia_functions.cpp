@@ -80,7 +80,7 @@ NumericVector vecchia_loglik(NumericVector covparms, StringVector covfun_name,
 //' Linv <- vecchia_Linv( covparms, "matern_isotropic", locs, NNarray )
 //' @export
 // [[Rcpp::export]]
-NumericMatrix vecchia_Linv(NumericVector covparms, StringVector covfun_name,
+NumericMatrix vecchia_Linv_old(NumericVector covparms, StringVector covfun_name,
                             NumericMatrix locs, IntegerMatrix NNarray) {
 
     NumericVector y(NNarray.nrow());

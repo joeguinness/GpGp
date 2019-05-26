@@ -74,9 +74,9 @@ The two models take several minutes to fit on my system.
 # use 'inds <- 1:n' to fit to full dataset
 inds <- round( seq(1,n,length.out = 1500) ) 
 fit_space     <- fit_model(windspeed[inds], locs[inds,], X[inds,], 
-    covfun_name = "matern_sphere")
+    covfun_name = "arma_matern_sphere", silent = TRUE)
 fit_spacetime <- fit_model(windspeed[inds], locstime[inds,], X[inds,], 
-    covfun_name = "matern_sphere_time")
+    covfun_name = "arma_matern_spheretime", silent = TRUE)
 fit_space
 fit_spacetime
 ```
@@ -99,15 +99,15 @@ n_pred <- nrow(locs_pred)
 locstime_pred <- cbind( locs_pred, rep(mediantime, n_pred) )
 X_pred <- as.matrix( rep(1,n_pred) )
 # predictions
-pred <- predictions(fit_spacetime$covparms, "matern_sphere_time", windspeed,
-    locstime, locstime_pred, X, X_pred, fit_spacetime$beta, m = 40)
+pred <- predictions(fit_spacetime$covparms, "arma_matern_spheretime", windspeed,
+    locstime, locstime_pred, X, X_pred, fit_spacetime$betahat, m = 40)
 # plot predictions
 par(mar=c(4,4,1,1))
 pred_array <- array( pred, c(length(longrid),length(latgrid)) )
 fields::image.plot(longrid,latgrid,pred_array)
 # conditional simulations
-sim <- cond_sim(fit_spacetime$covparms, "matern_sphere_time", windspeed,
-    locstime, locstime_pred, X, X_pred, fit_spacetime$beta, m = 40)
+sim <- cond_sim(fit_spacetime$covparms, "arma_matern_spheretime", windspeed,
+    locstime, locstime_pred, X, X_pred, fit_spacetime$betahat, m = 40)
 # plot conditional simulations
 sim_array <- array( sim, c(length(longrid),length(latgrid)) )
 fields::image.plot(longrid,latgrid,sim_array)

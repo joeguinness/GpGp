@@ -54,175 +54,7 @@
 #'
 #'
 #' @export
-fit_model_old <- function(y, locs, X = NULL, NNarray = NULL,
-    covfun_name = "matern_isotropic",
-    silent = FALSE, group = TRUE, reorder = TRUE){
-
-    n <- length(y)
-
-    # check that length of observation vector same as
-    # number of locations
-    if( nrow(locs) != n ){
-        stop("length of observation vector y not equal
-              to the number of locations (rows in locs)")
-    }
-
-    # check if design matrix is specified
-    if( is.null(X) ){
-        if(!silent) cat("Design matrix not specified, using constant mean \n")
-        X <- rep(1,n)
-    }
-    X <- as.matrix(X)
-
-    # check if one of the allowed covariance functions is chosen
-    if( ! covfun_name %in% c(
-        "exponential_isotropic",
-        "matern_isotropic","matern_sphere",
-        "matern_sphere_time",
-        "matern_space_time")
-    ){
-        stop("unrecognized covariance function name `covfun_name'. Choose from
-             'matern_isotropic', 'matern_sphere',
-            'matern_sphere_time', or 'matern_space_time' " )
-    }
-
-    # missing values???
-
-    # starting values and covariance-specific settings
-    start_var <- stats::var(y)
-    start_smooth <- 0.8
-    start_nug <- 0.1
-
-    randinds <- sample(1:n, min(n,200))
-    if(covfun_name == "matern_isotropic"){
-        lonlat <- FALSE
-        space_time <- FALSE
-        dmat <- fields::rdist(locs[randinds,])
-        start_range <- mean( dmat )/4
-        start_parms <- c(start_var, start_range, start_smooth, start_nug)
-    }
-
-    if(covfun_name == "exponential_isotropic"){
-        lonlat <- FALSE
-        space_time <- FALSE
-        dmat <- fields::rdist(locs[randinds,])
-        start_range <- mean( dmat )/4
-        start_parms <- c(start_var, start_range, start_nug)
-    }
-
-
-    if(covfun_name == "matern_space_time"){
-        lonlat <- FALSE
-        space_time <- TRUE
-        d <- ncol(locs)-1
-        dmat1 <- fields::rdist(locs[randinds,1:d])
-        dmat2 <- fields::rdist(locs[randinds,d+1,drop=FALSE])
-        start_range1 <- mean( dmat1 )/4
-        start_range2 <- mean( dmat2 )/1
-        start_parms <- c(start_var, start_range1, start_range2,
-            start_smooth, start_nug)
-    }
-
-    if( covfun_name == "matern_sphere" ){
-        lonlat <- TRUE
-        space_time <- FALSE
-        dmat <- fields::rdist.earth(locs[randinds,], R = 1)
-        start_range <- mean( dmat )/4
-        start_parms <- c(start_var, start_range, start_smooth, start_nug)
-        if(!silent){
-            cat("Using 'matern_sphere_time'.\n")
-            cat("Assuming that argument 'locs' is (longitude,latitude,time)\n")
-        }
-    }
-
-    if( covfun_name == "matern_sphere_time" ){
-        lonlat <- TRUE
-        space_time <- TRUE
-        dmat <- fields::rdist.earth(locs[randinds,1:2], R = 1)
-        start_range1 <- mean( dmat )/4
-        dmat <- fields::rdist(locs[randinds,3])
-        start_range2 <- mean( dmat )/4
-        start_parms <- c(start_var, start_range1, start_range2,
-            start_smooth, start_nug)
-        if(!silent){
-            cat("Using 'matern_sphere_time'.\n")
-            cat("Assuming that argument 'locs' is (longitude,latitude,time)\n")
-        }
-    }
-
-    nparms <- length(start_parms)
-
-    # get an ordering and reorder everything
-    if(reorder){
-        if(!silent) cat("Reordering...")
-        if( n < 1e5 ){  # maximum ordering if n < 100000
-            ord <- order_maxmin(locs, lonlat = lonlat, space_time = space_time)
-        } else {        # otherwise random order
-            ord <- sample(n)
-        }
-        if(!silent) cat("Done \n")
-    } else {
-        ord <- 1:n
-    }
-    yord <- y[ord]
-    locsord <- locs[ord,]
-    Xord <- as.matrix( X[ord,] )
-
-    # get neighbor array if not provided
-    if( is.null(NNarray) ){
-        if(!silent) cat("Finding nearest neighbors...")
-        NNarray <- find_ordered_nn(locsord, m=30, lonlat = lonlat, space_time = space_time)
-        if(!silent) cat("Done \n")
-    }
-    fit <- list(par=log(start_parms[2:nparms]))
-
-    # refine the estimates for m = c(15,30,45)
-    for(m in c(10,30)){
-        if(space_time){
-            NNarray <- find_ordered_nn(locsord, m=m, lonlat = lonlat,
-                space_time = space_time, st_scale = exp(fit$par[1:2]) )
-        }
-        if(group){ NNlist <- group_obs(NNarray[,1:(m+1)]) }
-        max_smooth <- 4.0
-        funtomax <- function( logparms ){
-            parms <- exp(logparms)
-            if(group){
-                loglik <- proflik_mean_variance_grouped(
-                    parms, covfun_name, yord, Xord, locsord, NNlist )
-            } else {
-                loglik <- proflik_mean_variance(
-                    parms, covfun_name, yord, Xord, locsord, NNarray[,1:(m+1)] )
-            }
-            return(-loglik)
-        }
-        if(!silent) cat("Refining estimates...")
-        fit <- stats::optim(fit$par,funtomax,
-            control=list(trace=0,maxit=1000), method = "Nelder-Mead")
-        # set smoothness to maximum smoothness
-        parms <- exp(fit$par)
-        # need to be more careful about this part
-        #parms[length(parms)-1] <- min(parms[length(parms)-1], max_smooth)
-        fit$par <- log(parms)
-
-        if(!silent) cat("Done          ")
-        if(!silent) cat(paste(  paste( round(exp(fit$par),3), collapse = " " ), "\n" ) )
-    }
-    if(group){
-        fitted_model <- proflik_mean_variance_grouped(
-            exp(fit$par), covfun_name, yord, Xord, locsord, NNlist, return_parms = TRUE )
-    } else {
-        fitted_model <- proflik_mean_variance(
-            exp(fit$par), covfun_name, yord, Xord, locsord, NNarray, return_parms = TRUE )
-    }
-    return(fitted_model)
-}
-
-
-
-
-
-#' @export
-fit_model_arma <- function(y, locs, X = NULL, NNarray = NULL,
+fit_model_optim <- function(y, locs, X = NULL, NNarray = NULL,
     covfun_name = "arma_matern_isotropic",
     silent = FALSE, group = TRUE, reorder = TRUE, method = "Nelder-Mead"){
 
@@ -348,106 +180,10 @@ fit_model_arma <- function(y, locs, X = NULL, NNarray = NULL,
 
 
 #' @export
-fit_model_fisher <- function(y, locs, X = NULL, NNarray = NULL,
-    covfun_name = "matern_isotropic",
-    silent = FALSE, group = TRUE, reorder = TRUE){
-
-    n <- length(y)
-
-    # check that length of observation vector same as
-    # number of locations
-    if( nrow(locs) != n ){
-        stop("length of observation vector y not equal
-              to the number of locations (rows in locs)")
-    }
-
-    # check if design matrix is specified
-    if( is.null(X) ){
-        if(!silent) cat("Design matrix not specified, using constant mean \n")
-        X <- rep(1,n)
-    }
-    X <- as.matrix(X)
-
-    # check if one of the allowed covariance functions is chosen
-    if( ! covfun_name %in%
-            c("arma_exponential_isotropic",
-              "arma_matern_isotropic",
-              "arma_matern_anisotropic2D",
-              "arma_matern_anisotropic3D",
-              "arma_matern_nonstat_var",
-              "arma_matern_sphere",
-              "arma_matern_sphere_warp",
-              "arma_matern_spheretime_warp",
-              "arma_matern_spheretime",
-              "arma_matern_spacetime"   ) )
-    {
-        stop("unrecognized covariance function name `covfun_name'. Choose from
-             'matern_isotropic', 'matern_sphere',
-            'matern_sphere_time', or 'matern_space_time' " )
-    }
-
-    # missing values???
-
-    # get starting values for parameters
-    start <- get_start_parms_linkfun(y,X,locs,covfun_name)
-    start_parms <- start$start_parms
-    link <- start$link
-    dlink <- start$dlink
-    invlink <- start$invlink
-    lonlat <- start$lonlat
-    space_time <- start$space_time
-
-    # get an ordering and reorder everything
-    if(reorder){
-        if(!silent) cat("Reordering...")
-        if( n < 1e5 ){  # maximum ordering if n < 100000
-            ord <- order_maxmin(locs, lonlat = lonlat, space_time = space_time)
-        } else {        # otherwise random order
-            ord <- sample(n)
-        }
-        if(!silent) cat("Done \n")
-    } else {
-        ord <- 1:n
-    }
-    yord <- y[ord]
-    locsord <- locs[ord,]
-    Xord <- as.matrix( X[ord,] )
-
-    # get neighbor array if not provided
-    if( is.null(NNarray) ){
-        if(!silent) cat("Finding nearest neighbors...")
-        NNarray <- find_ordered_nn(locsord, m=30, lonlat = lonlat, space_time = space_time)
-        if(!silent) cat("Done \n")
-    }
-
-    # refine the estimates for m = c(10,30)
-    for(m in c(10,30)){
-        if(group){
-            NNlist <- group_obs(NNarray[,1:(m+1)])
-            likfun <- function(parms){
-                likobj <- arma_vecchia_grad_hess_grouped(parms,covfun_name,
-                    yord,Xord,locsord,NNlist)
-                return(likobj)
-            }
-        } else {
-            likfun <- function(parms){
-                likobj <- arma_vecchia_grad_hess(parms,covfun_name,yord,Xord,locsord,NNarray[,1:(m+1)])
-                return(likobj)
-            }
-        }
-        #fit <- fisher_scoring(likfun,start_parms,link,dlink,invlink,silent=silent)
-        fit <- fisher_scoring4(likfun,start_parms,link,dlink,invlink,silent=silent)
-        start_parms <- fit$covparms
-    }
-    return(fit)
-}
-
-
-
-#' @export
 fit_model <- function(y, locs, X = NULL, NNarray = NULL,
     covfun_name = "matern_isotropic", start_parms = NULL,
-    silent = FALSE, group = TRUE, reorder = TRUE){
+    silent = FALSE, group = TRUE, reorder = TRUE,
+    m_seq = c(10,30)){
 
     n <- length(y)
 
@@ -519,12 +255,12 @@ fit_model <- function(y, locs, X = NULL, NNarray = NULL,
     # get neighbor array if not provided
     if( is.null(NNarray) ){
         if(!silent) cat("Finding nearest neighbors...")
-        NNarray <- find_ordered_nn(locsord, m=30, lonlat = lonlat, space_time = space_time)
+        NNarray <- find_ordered_nn(locsord, m=max(m_seq), lonlat = lonlat, space_time = space_time)
         if(!silent) cat("Done \n")
     }
 
-    # refine the estimates for m = c(10,30)
-    for(m in c(10,30)){
+    # refine the estimates for m in m_seq
+    for(m in m_seq){
         if(group){
             NNlist <- group_obs(NNarray[,1:(m+1)])
             likfun <- function(logparms){
@@ -535,7 +271,6 @@ fit_model <- function(y, locs, X = NULL, NNarray = NULL,
                     dpen(link(logparms))*dlink(logparms)
                 likobj$info <- likobj$info*outer(dlink(logparms),dlink(logparms)) -
                     ddpen(link(logparms))*outer(dlink(logparms),dlink(logparms))
-                    #diag(dpen(link(logparms))*ddlink(logparms))
                 return(likobj)
             }
         } else {
@@ -547,12 +282,10 @@ fit_model <- function(y, locs, X = NULL, NNarray = NULL,
                     dpen(link(logparms))*dlink(logparms) )
                 likobj$info <- likobj$info*outer(dlink(logparms),dlink(logparms)) -
                     ddpen(link(logparms))*outer(dlink(logparms),dlink(logparms))
-                    #diag(dpen(link(logparms))*ddlink(logparms))
                 return(likobj)
             }
         }
-        #fit <- fisher_scoring(likfun,start_parms,link,dlink,invlink,silent=silent)
-        fit <- fisher_scoring5(likfun,invlink(start_parms),link,silent=silent)
+        fit <- fisher_scoring(likfun,invlink(start_parms),link,silent=silent)
         fit$loglik <- -fit$loglik - pen(fit$covparms)
         start_parms <- fit$covparms
     }
@@ -560,96 +293,6 @@ fit_model <- function(y, locs, X = NULL, NNarray = NULL,
 }
 
 
-
-
-#' @export
-fit_model_fisher_profile <- function(y, locs, X = NULL, NNarray = NULL,
-    covfun_name = "matern_isotropic",
-    silent = FALSE, group = TRUE, reorder = TRUE){
-
-    n <- length(y)
-
-    # check that length of observation vector same as
-    # number of locations
-    if( nrow(locs) != n ){
-        stop("length of observation vector y not equal
-              to the number of locations (rows in locs)")
-    }
-
-    # check if design matrix is specified
-    if( is.null(X) ){
-        if(!silent) cat("Design matrix not specified, using constant mean \n")
-        X <- rep(1,n)
-    }
-    X <- as.matrix(X)
-
-    # check if one of the allowed covariance functions is chosen
-    if( ! covfun_name %in%
-            c("arma_exponential_isotropic",
-              "arma_matern_isotropic",
-              "arma_matern_nonstat_var",
-              "matern_sphere",
-              "matern_sphere_time",
-              "matern_space_time"   ) )
-    {
-        stop("unrecognized covariance function name `covfun_name'. Choose from
-             'matern_isotropic', 'matern_sphere',
-            'matern_sphere_time', or 'matern_space_time' " )
-    }
-
-    # missing values???
-
-    # get starting values for parameters
-    start <- get_start_parms_linkfun(y,X,locs,covfun_name)
-    start_parms <- start$start_parms[2:length(start$start_parms)]
-    link <- start$link
-    dlink <- start$dlink
-    invlink <- start$invlink
-    lonlat <- start$lonlat
-    space_time <- start$space_time
-
-    # get an ordering and reorder everything
-    if(reorder){
-        if(!silent) cat("Reordering...")
-        if( n < 1e5 ){  # maximum ordering if n < 100000
-            ord <- order_maxmin(locs, lonlat = lonlat, space_time = space_time)
-        } else {        # otherwise random order
-            ord <- sample(n)
-        }
-        if(!silent) cat("Done \n")
-    } else {
-        ord <- 1:n
-    }
-    yord <- y[ord]
-    locsord <- locs[ord,]
-    Xord <- as.matrix( X[ord,] )
-
-    # get neighbor array if not provided
-    if( is.null(NNarray) ){
-        if(!silent) cat("Finding nearest neighbors...")
-        NNarray <- find_ordered_nn(locsord, m=30, lonlat = lonlat, space_time = space_time)
-        if(!silent) cat("Done \n")
-    }
-
-    # refine the estimates for m = c(15,30,45)
-    for(m in c(10,30)){
-        likfun <- function(parms){
-            likobj <- arma_vecchia_profile_grad_hess(parms,covfun_name,
-                yord,Xord,locsord,NNarray[,1:(m+1)])
-            return(likobj)
-        }
-        fit <- fisher_scoring(likfun,start_parms,link,dlink,invlink,silent=silent)
-        start_parms <- fit$covparms
-
-        if(!silent) cat("Done          ")
-        if(!silent) cat(paste(  paste( round(fit$covparms,3), collapse = " " ), "\n" ) )
-    }
-    # call one more time to get sigmasq
-    likobj <- arma_vecchia_profile_grad_hess(fit$covparms,covfun_name,
-        yord,Xord,locsord,NNarray[,1:(m+1)])
-    fit$covparms <- c(likobj$sigmasq,fit$covparms)
-    return(fit)
-}
 
 
 

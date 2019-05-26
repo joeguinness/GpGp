@@ -723,7 +723,7 @@ void arma_onepass_profile_synthesize(
 
 
 // [[Rcpp::export]]
-NumericMatrix arma_vecchia_Linv(
+NumericMatrix vecchia_Linv(
     NumericVector covparms,
     StringVector covfun_name,
     const NumericMatrix locs,
