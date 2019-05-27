@@ -5,7 +5,7 @@ arma_proflik_mean_variance <- function(subparms,covfun_name = "arma_matern_isotr
 
     n <- length(y)
     covparms1 <- c(1,subparms)
-    Linv <- arma_vecchia_Linv(covparms1,covfun_name,locs,NNarray)
+    Linv <- vecchia_Linv(covparms1,covfun_name,locs,NNarray)
     z <- Linv_mult(Linv,y,NNarray)
     B <- array(NA, dim(X))
     for(j in 1:ncol(X)){

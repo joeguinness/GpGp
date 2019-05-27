@@ -4,13 +4,14 @@
 #include <iostream>
 #include <vector>
 #include <cassert>
-#include "arma_vecchia_fun.h"
-#include "arma_onepass.h"
+//#include "arma_vecchia_fun.h"
+#include "onepass.h"
 //[[Rcpp::depends(RcppArmadillo)]]
 
 using namespace std;
 using namespace Rcpp;
 
+/*
 // [[Rcpp::export]]
 NumericVector arma_vecchia_loglik(
     NumericVector covparms, 
@@ -24,6 +25,8 @@ NumericVector arma_vecchia_loglik(
     arma_vecchia(covparms, covfun_name, locs, NNarray, y, &Linv, &ll, 1);
     return ll;
 }
+
+*/
 
 
 // [[Rcpp::export]]
@@ -84,7 +87,7 @@ List arma_vecchia_grad_hess_grouped(
         
 }
 
-
+/*
 // [[Rcpp::export]]
 List arma_vecchia_profile_grad_hess( 
     NumericVector subparms, 
@@ -123,4 +126,4 @@ List arma_vecchia_profile_grad_hess(
         
 }
 
-
+*/

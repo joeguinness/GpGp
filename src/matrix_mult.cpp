@@ -3,15 +3,14 @@
 #include <iostream>
 #include <vector>
 #include <cassert>
-#include "covfuns.h"
-#include "vecchiafun.h"
 
 using namespace std;
 using namespace Rcpp;
 
+/*
 
 //' Vecchia's approximation to the Gaussian loglikelihood
-//' 
+//'
 //' This function returns Vecchia's (1988) approximation to the Gaussian
 //' loglikelihood. The approximation modifies the ordered conditional
 //' specification of the joint density; rather than each term in the product
@@ -19,20 +18,20 @@ using namespace Rcpp;
 //' a small subset of previous observations.
 //' @param covparms A vector of covariance parameters appropriate
 //' for the specified covariance function
-//' @param covfun_name One of "matern_isotropic", "matern_space_time", "matern_sphere", 
+//' @param covfun_name One of "matern_isotropic", "matern_space_time", "matern_sphere",
 //' or "matern_sphere_time".
-//' "matern_isotropic" and "matern_sphere" have four covariance parameters, 
-//' (variance, range, smoothness, nugget), while "matern_space_time" and 
+//' "matern_isotropic" and "matern_sphere" have four covariance parameters,
+//' (variance, range, smoothness, nugget), while "matern_space_time" and
 //' "matern_sphere_time" have five,
-//' (variance, spatial range, temporal range, smoothness, nugget). 
-//' For more details, see the documentation 
+//' (variance, spatial range, temporal range, smoothness, nugget).
+//' For more details, see the documentation
 //' for each of the covariance functions by typing, for example, ?matern_isotropic
 //' or ?matern_sphere_time.
 //' @param y vector of response values
 //' @param locs matrix of locations. Row \code{i} of locs specifies the location
 //' of element \code{i} of \code{y}, and so the length of \code{y} should equal
 //' the number of rows of \code{locs}.
-//' @param NNarray A matrix of indices, usually the output from \code{\link{find_ordered_nn}}. 
+//' @param NNarray A matrix of indices, usually the output from \code{\link{find_ordered_nn}}.
 //' Row \code{i} contains the indices
 //' of the observations that observation \code{i} conditions on. By convention,
 //' the first element of row \code{i} is \code{i}.
@@ -43,7 +42,7 @@ using namespace Rcpp;
 //' n <- n1*n2
 //' locs <- as.matrix( expand.grid( (1:n1)/n1, (1:n2)/n2 ) )
 //' covparms <- c(2, 0.2, 0.75, 0)
-//' y <- fast_Gp_sim(covparms, "matern_isotropic", locs, 50 ) 
+//' y <- fast_Gp_sim(covparms, "matern_isotropic", locs, 50 )
 //' ord <- order_maxmin(locs)
 //' NNarray <- find_ordered_nn(locs,20)
 //' loglik <- vecchia_loglik( covparms, "matern_isotropic", y, locs, NNarray )
@@ -60,8 +59,8 @@ NumericVector vecchia_loglik(NumericVector covparms, StringVector covfun_name,
 }
 
 //' Inverse Cholesky factor implied by Vecchia's approximation
-//' 
-//' This function returns the entries of the sparse approximation to 
+//'
+//' This function returns the entries of the sparse approximation to
 //' the Cholesky factor implied by Vecchia's (1988) approximation to the Gaussian
 //' loglikelihood. The approximation modifies the ordered conditional
 //' specification of the joint density; rather than each term in the product
@@ -91,9 +90,11 @@ NumericMatrix vecchia_Linv_old(NumericVector covparms, StringVector covfun_name,
 }
 
 
+*/
+
 //' Multiply approximate inverse Cholesky by a vector
-//' 
-//' Vecchia's approximation implies a sparse approximation to the 
+//'
+//' Vecchia's approximation implies a sparse approximation to the
 //' inverse Cholesky factor of the covariance matrix. This function
 //' returns the result of multiplying that matrix by a vector.
 //' @param Linv Entries of the sparse inverse Cholesky factor,
@@ -141,10 +142,10 @@ NumericVector Linv_mult(NumericMatrix Linv, NumericVector z,
 
 
 //' Multiply approximate Cholesky by a vector
-//' 
-//' Vecchia's approximation implies a sparse approximation to the 
+//'
+//' Vecchia's approximation implies a sparse approximation to the
 //' inverse Cholesky factor of the covariance matrix. This function
-//' returns the result of multiplying the inverse of that matrix by a vector 
+//' returns the result of multiplying the inverse of that matrix by a vector
 //' (i.e. an approximation to the Cholesky factor).
 //' @param Linv Entries of the sparse inverse Cholesky factor,
 //' usually the output from \code{\link{vecchia_Linv}}.
@@ -246,5 +247,3 @@ NumericVector L_t_mult(NumericMatrix Linv, NumericVector z,
 
     return x;
 }
-
-

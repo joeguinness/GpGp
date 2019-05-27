@@ -3,7 +3,7 @@
 
 #include <assert.h>
 #include <RcppArmadillo.h>
-#include "arma_covmatrix_funs.h"
+#include "covmatrix_funs.h"
 //[[Rcpp::depends(RcppArmadillo)]]
 
 using namespace Rcpp;
@@ -628,7 +628,7 @@ void arma_onepass_synthesize_grouped(
 
 
 
-
+/*
 
 void arma_onepass_profile_synthesize(
     NumericVector subparms, 
@@ -720,7 +720,7 @@ void arma_onepass_profile_synthesize(
 
 }
 
-
+*/
 
 // [[Rcpp::export]]
 NumericMatrix vecchia_Linv(

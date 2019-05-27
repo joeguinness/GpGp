@@ -7,23 +7,6 @@
 fast_Gp_sim(covparms, covfun_name = "matern_isotropic", locs, m = 30)
 }
 \arguments{
-\item{covparms}{A vector of covariance parameters appropriate
-for the specified covariance function}
-
-\item{covfun_name}{One of "matern_isotropic", "matern_space_time", "matern_sphere", 
-or "matern_sphere_time".
-"matern_isotropic" and "matern_sphere" have four covariance parameters, 
-(variance, range, smoothness, nugget), while "matern_space_time" and 
-"matern_sphere_time" have five,
-(variance, spatial range, temporal range, smoothness, nugget). 
-For more details, see the documentation 
-for each of the covariance functions by typing, for example, ?matern_isotropic
-or ?matern_sphere_time.}
-
-\item{locs}{matrix of locations. Row \code{i} of locs specifies the location
-of element \code{i} of \code{y}, and so the length of \code{y} should equal
-the number of rows of \code{locs}.}
-
 \item{m}{Number of nearest neighbors to use in approximation}
 }
 \value{
