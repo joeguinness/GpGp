@@ -668,8 +668,7 @@ arma::cube d_arma_exponential_anisotropic3D(NumericVector covparms, NumericMatri
     // covparms(4) = L20
     // covparms(5) = L21
     // covparms(6) = L22
-    // covparms(7) = smoothness
-    // covparms(8) = tausq
+    // covparms(7) = tausq
     // nugget = sigmasq*tausq
     // overall variance = sigmasq*(1 + tausq) = sigmasq + nugget
 
@@ -700,7 +699,7 @@ arma::cube d_arma_exponential_anisotropic3D(NumericVector covparms, NumericMatri
             // variance parameter
             dcovmat(i1,i2,0) += cov/covparms(0);
             // cholesky parameters
-            double dcov = -covparms(0)*exp(-d);
+            double dcov = -covparms(0)*exp(-d)/d;
             double Limhm = covparms(1)*h0;
                 dcovmat(i1,i2,1) = dcov*Limhm*h0;
             Limhm = covparms(2)*h0 + covparms(3)*h1;

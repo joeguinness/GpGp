@@ -295,7 +295,7 @@ fit_model <- function(y, locs, X = NULL, NNarray = NULL,
 
 
 
-
+#' @export
 get_start_parms <- function(y,X,locs,covfun_name){
 
     fitlm <- stats::lm(y ~ X - 1 )
