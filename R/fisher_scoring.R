@@ -26,7 +26,7 @@ condition_number <- function(info){
 
 
 # put link functions in fit_model, rather than here
-fisher_scoring <- function( likfun, start_parms, link, silent = FALSE ){
+fisher_scoring <- function( likfun, start_parms, link, silent = FALSE, convtol = 1e-4 ){
     
     # link functions passed for printing purposes
     maxit <- 40
@@ -152,7 +152,7 @@ fisher_scoring <- function( likfun, start_parms, link, silent = FALSE ){
         }
         
         # if gradient is small, then break and return the results        
-        if( abs(stepgrad) < 1e-4 || no_decrease ){
+        if( abs(stepgrad) < convtol || no_decrease ){
             break
         }
     }
@@ -174,7 +174,8 @@ fisher_scoring <- function( likfun, start_parms, link, silent = FALSE ){
         tbeta = tbeta,
         #pbeta = pbeta,
         loglik = loglik,
-        no_decrease = no_decrease
+        no_decrease = no_decrease,
+        grad = likobj$grad
     )
     return(ret)
 }

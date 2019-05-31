@@ -1,6 +1,6 @@
 
 #' @export
-arma_proflik_mean_variance <- function(subparms,covfun_name = "arma_matern_isotropic",
+proflik_mean_variance <- function(subparms,covfun_name = "matern_isotropic",
                     y,X,locs,NNarray,return_parms = FALSE){
 
     n <- length(y)

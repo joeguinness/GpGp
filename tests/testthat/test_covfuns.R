@@ -7,27 +7,27 @@ get_test_locs <- function(covfun_name,n){
     longrid <- seq(1,360,length.out=nside)
     latgrid <- seq(-80,80,length.out=nside)
     lonlat <- as.matrix(expand.grid(longrid,latgrid))
-    if(covfun_name=="arma_exponential_isotropic"){
+    if(covfun_name=="exponential_isotropic"){
         locs <- matrix(runif(3*n),n,3)           
-    } else if(covfun_name=="arma_matern_isotropic"){
+    } else if(covfun_name=="matern_isotropic"){
         locs <- matrix(runif(2*n),n,2)
-    } else if(covfun_name=="arma_matern_spacetime"){
+    } else if(covfun_name=="matern_spacetime"){
         locs <- matrix(runif(2*n),n,2)
-    } else if(covfun_name=="arma_matern_anisotropic2D"){
+    } else if(covfun_name=="matern_anisotropic2D"){
         locs <- matrix(runif(2*n),n,2)
-    } else if(covfun_name=="arma_exponential_anisotropic3D"){
+    } else if(covfun_name=="exponential_anisotropic3D"){
         locs <- matrix(runif(3*n),n,3)           
-    } else if(covfun_name=="arma_matern_anisotropic3D"){
+    } else if(covfun_name=="matern_anisotropic3D"){
         locs <- matrix(runif(3*n),n,3)           
-    } else if(covfun_name=="arma_matern_nonstat_var"){
+    } else if(covfun_name=="matern_nonstat_var"){
         locs <- matrix(runif(6*n),n,6)           
-    } else if(covfun_name=="arma_matern_sphere"){
+    } else if(covfun_name=="matern_sphere"){
         locs <- lonlat
-    } else if(covfun_name=="arma_matern_sphere_warp"){
+    } else if(covfun_name=="matern_sphere_warp"){
         locs <- lonlat
-    } else if(covfun_name=="arma_matern_spheretime"){
+    } else if(covfun_name=="matern_spheretime"){
         locs <- cbind(lonlat,runif(n))
-    } else if(covfun_name=="arma_matern_spheretime_warp"){
+    } else if(covfun_name=="matern_spheretime_warp"){
         locs <- cbind(lonlat,runif(n))
     } else {
         stop("unrecognized covariance in testing function")
@@ -38,17 +38,17 @@ get_test_locs <- function(covfun_name,n){
 test_that("covariance functions return positive definite matrix", {
         
     covfun_names <- c(
-        "arma_exponential_isotropic",
-        "arma_matern_isotropic",
-        "arma_matern_spacetime", 
-        "arma_matern_anisotropic2D",
-        "arma_exponential_anisotropic3D",
-        "arma_matern_anisotropic3D",
-        "arma_matern_nonstat_var",
-        "arma_matern_sphere",
-        "arma_matern_sphere_warp",
-        "arma_matern_spheretime_warp",
-        "arma_matern_spheretime"
+        "exponential_isotropic",
+        "matern_isotropic",
+        "matern_spacetime", 
+        "matern_anisotropic2D",
+        "exponential_anisotropic3D",
+        "matern_anisotropic3D",
+        "matern_nonstat_var",
+        "matern_sphere",
+        "matern_sphere_warp",
+        "matern_spheretime_warp",
+        "matern_spheretime"
     )
     
     n <- 100    
@@ -69,17 +69,17 @@ test_that("covariance functions return positive definite matrix", {
 test_that("covariance function derivatives match finite differencing", {
         
     covfun_names <- c(
-        "arma_exponential_isotropic",
-        "arma_matern_isotropic",
-        "arma_matern_spacetime", 
-        "arma_matern_anisotropic2D",
-        "arma_exponential_anisotropic3D",
-        "arma_matern_anisotropic3D",
-        "arma_matern_nonstat_var",
-        "arma_matern_sphere",
-        "arma_matern_sphere_warp",
-        "arma_matern_spheretime_warp",
-        "arma_matern_spheretime"
+        "exponential_isotropic",
+        "matern_isotropic",
+        "matern_spacetime", 
+        "matern_anisotropic2D",
+        "exponential_anisotropic3D",
+        "matern_anisotropic3D",
+        "matern_nonstat_var",
+        "matern_sphere",
+        "matern_sphere_warp",
+        "matern_spheretime_warp",
+        "matern_spheretime"
     )
     
     n <- 100    

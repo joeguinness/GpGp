@@ -5,8 +5,8 @@
 \title{Estimate mean and covariance parameters}
 \usage{
 fit_model_optim(y, locs, X = NULL, NNarray = NULL,
-  covfun_name = "arma_matern_isotropic", silent = FALSE,
-  group = TRUE, reorder = TRUE, method = "Nelder-Mead")
+  covfun_name = "matern_isotropic", silent = FALSE, group = TRUE,
+  reorder = TRUE, method = "Nelder-Mead")
 }
 \arguments{
 \item{y}{response vector}

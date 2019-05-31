@@ -55,7 +55,7 @@
 #'
 #' @export
 fit_model_optim <- function(y, locs, X = NULL, NNarray = NULL,
-    covfun_name = "arma_matern_isotropic",
+    covfun_name = "matern_isotropic",
     silent = FALSE, group = TRUE, reorder = TRUE, method = "Nelder-Mead"){
 
     n <- length(y)
@@ -76,16 +76,16 @@ fit_model_optim <- function(y, locs, X = NULL, NNarray = NULL,
 
     # check if one of the allowed covariance functions is chosen
     if( ! covfun_name %in% c(
-        "arma_exponential_isotropic",
-        "arma_matern_isotropic",
-        "arma_matern_anisotropic2D",
-        "arma_matern_anisotropic3D",
-        "arma_matern_nonstat_var",
-        "arma_matern_sphere",
-        "arma_matern_sphere_warp",
-        "arma_matern_spheretime_warp",
-        "arma_matern_spheretime",
-        "arma_matern_spacetime"   )
+        "exponential_isotropic",
+        "matern_isotropic",
+        "matern_anisotropic2D",
+        "matern_anisotropic3D",
+        "matern_nonstat_var",
+        "matern_sphere",
+        "matern_sphere_warp",
+        "matern_spheretime_warp",
+        "matern_spheretime",
+        "matern_spacetime"   )
     ){
         stop("unrecognized covariance function name `covfun_name'." )
     }
@@ -135,10 +135,10 @@ fit_model_optim <- function(y, locs, X = NULL, NNarray = NULL,
             parms <- link(c(0,logparms))[2:nparms]
             if(group){
                 stop("grouped version not implemented yet")
-                #loglik <- arma_proflik_mean_variance_grouped(
+                #loglik <- proflik_mean_variance_grouped(
                 #    parms, covfun_name, yord, Xord, locsord, NNlist )
             } else {
-                loglik <- arma_proflik_mean_variance( parms, covfun_name,
+                loglik <- proflik_mean_variance( parms, covfun_name,
                     yord, Xord, locsord, NNarray[,1:(m+1)] )
             }
             return(-loglik)
@@ -157,10 +157,10 @@ fit_model_optim <- function(y, locs, X = NULL, NNarray = NULL,
     }
     if(group){
         stop("grouped not implemented yet")
-        #fitted_model <- arma_proflik_mean_variance_grouped(
+        #fitted_model <- proflik_mean_variance_grouped(
         #    link(fit$par), covfun_name, yord, Xord, locsord, NNlist, return_parms = TRUE )
     } else {
-        fitted_model <- arma_proflik_mean_variance(
+        fitted_model <- proflik_mean_variance(
             link(c(0,fit$par))[2:nparms], covfun_name, yord, Xord, locsord, NNarray, return_parms = TRUE )
     }
     fitted_model$loglik <- fitted_model$loglik
@@ -183,7 +183,7 @@ fit_model_optim <- function(y, locs, X = NULL, NNarray = NULL,
 fit_model <- function(y, locs, X = NULL, NNarray = NULL,
     covfun_name = "matern_isotropic", start_parms = NULL,
     silent = FALSE, group = TRUE, reorder = TRUE,
-    m_seq = c(10,30)){
+    m_seq = c(10,30), convtol = 1e-4){
 
     n <- length(y)
 
@@ -203,17 +203,17 @@ fit_model <- function(y, locs, X = NULL, NNarray = NULL,
 
     # check if one of the allowed covariance functions is chosen
     if( ! covfun_name %in%
-            c("arma_exponential_isotropic",
-              "arma_matern_isotropic",
-              "arma_matern_anisotropic2D",
-              "arma_exponential_anisotropic3D",
-              "arma_matern_anisotropic3D",
-              "arma_matern_nonstat_var",
-              "arma_matern_sphere",
-              "arma_matern_sphere_warp",
-              "arma_matern_spheretime_warp",
-              "arma_matern_spheretime",
-              "arma_matern_spacetime"   ) )
+            c("exponential_isotropic",
+              "matern_isotropic",
+              "matern_anisotropic2D",
+              "exponential_anisotropic3D",
+              "matern_anisotropic3D",
+              "matern_nonstat_var",
+              "matern_sphere",
+              "matern_sphere_warp",
+              "matern_spheretime_warp",
+              "matern_spheretime",
+              "matern_spacetime"   ) )
     {
         stop("unrecognized covariance function name `covfun_name'.")
     }
@@ -255,7 +255,8 @@ fit_model <- function(y, locs, X = NULL, NNarray = NULL,
     # get neighbor array if not provided
     if( is.null(NNarray) ){
         if(!silent) cat("Finding nearest neighbors...")
-        NNarray <- find_ordered_nn(locsord, m=max(m_seq), lonlat = lonlat, space_time = space_time)
+        NNarray <- find_ordered_nn(locsord, m=max(m_seq), lonlat = lonlat, 
+            space_time = space_time)
         if(!silent) cat("Done \n")
     }
 
@@ -264,8 +265,8 @@ fit_model <- function(y, locs, X = NULL, NNarray = NULL,
         if(group){
             NNlist <- group_obs(NNarray[,1:(m+1)])
             likfun <- function(logparms){
-                likobj <- arma_vecchia_grad_hess_grouped(link(logparms),covfun_name,
-                    yord,Xord,locsord,NNlist)
+                likobj <- vecchia_grouped_profbeta_loglik_grad_info(
+                    link(logparms),covfun_name,yord,Xord,locsord,NNlist)
                 likobj$loglik <- -likobj$loglik - pen(link(logparms))
                 likobj$grad <- -c(likobj$grad)*dlink(logparms) -
                     dpen(link(logparms))*dlink(logparms)
@@ -275,8 +276,8 @@ fit_model <- function(y, locs, X = NULL, NNarray = NULL,
             }
         } else {
             likfun <- function(logparms){
-                likobj <- arma_vecchia_grad_hess(link(logparms),covfun_name,
-                    yord,Xord,locsord,NNarray[,1:(m+1)])
+                likobj <- vecchia_profbeta_loglik_grad_info(
+                    link(logparms),covfun_name,yord,Xord,locsord,NNarray[,1:(m+1)])
                 likobj$loglik <- -( likobj$loglik + pen(link(logparms)) )
                 likobj$grad <- -( c(likobj$grad)*dlink(logparms) +
                     dpen(link(logparms))*dlink(logparms) )
@@ -285,7 +286,8 @@ fit_model <- function(y, locs, X = NULL, NNarray = NULL,
                 return(likobj)
             }
         }
-        fit <- fisher_scoring(likfun,invlink(start_parms),link,silent=silent)
+        fit <- fisher_scoring(likfun,invlink(start_parms),link,silent=silent,
+            convtol = convtol)
         fit$loglik <- -fit$loglik - pen(fit$covparms)
         start_parms <- fit$covparms
     }
@@ -307,20 +309,20 @@ get_start_parms <- function(y,X,locs,covfun_name){
     randinds <- sample(1:n, min(n,200))
     dmat <- fields::rdist(locs[randinds,])
 
-    if(covfun_name == "arma_exponential_isotropic"){
+    if(covfun_name == "exponential_isotropic"){
         start_range <- mean( dmat )/4
         start_parms <- c(start_var, start_range, start_nug)
     }
-    if(covfun_name == "arma_matern_isotropic"){
+    if(covfun_name == "matern_isotropic"){
         start_range <- mean( dmat )/4
         start_parms <- c(start_var, start_range, start_smooth, start_nug)
     }
-    if(covfun_name == "arma_matern_anisotropic2D"){
+    if(covfun_name == "matern_anisotropic2D"){
         start_range <- mean( dmat )/4
         start_parms <- c(start_var, 1/start_range, 0, 1/start_range,
             start_smooth, start_nug)
     }
-    if(covfun_name == "arma_exponential_anisotropic3D"){
+    if(covfun_name == "exponential_anisotropic3D"){
         dmat <- fields::rdist(locs[randinds,1,drop=FALSE])
         start_range1 <- mean( dmat )/4
         dmat <- fields::rdist(locs[randinds,2,drop=FALSE])
@@ -330,7 +332,7 @@ get_start_parms <- function(y,X,locs,covfun_name){
         start_parms <- c(start_var, 1/start_range1, 0, 1/start_range2,
             0, 0, 1/start_range3, start_nug )
     }
-    if(covfun_name == "arma_matern_anisotropic3D"){
+    if(covfun_name == "matern_anisotropic3D"){
         dmat <- fields::rdist(locs[randinds,1,drop=FALSE])
         start_range1 <- mean( dmat )/4
         dmat <- fields::rdist(locs[randinds,2,drop=FALSE])
@@ -340,24 +342,24 @@ get_start_parms <- function(y,X,locs,covfun_name){
         start_parms <- c(start_var, 1/start_range1, 0, 1/start_range2,
             0, 0, 1/start_range3, start_smooth, start_nug )
     }
-    if(covfun_name == "arma_matern_sphere"){
+    if(covfun_name == "matern_sphere"){
         start_range <- 0.2
         start_parms <- c(start_var, start_range, start_smooth, start_nug)
     }
-    if(covfun_name == "arma_matern_sphere_warp"){
+    if(covfun_name == "matern_sphere_warp"){
         # hard-code Lmax = 2
         start_range <- 0.2
         start_parms <- c(start_var, start_range, start_smooth, start_nug,
             rep(0,5))
     }
-    if(covfun_name == "arma_matern_spheretime_warp"){
+    if(covfun_name == "matern_spheretime_warp"){
         # hard-code Lmax = 2
         start_range <- 0.2
         start_range2 <- abs(diff(range(locs[,3])))/20
         start_parms <- c(start_var, start_range, start_range2, start_smooth,
             start_nug, rep(0,5))
     }
-    if(covfun_name == "arma_matern_spacetime"){
+    if(covfun_name == "matern_spacetime"){
         d <- ncol(locs)-1
         dmat1 <- fields::rdist(locs[randinds,1:d])
         dmat2 <- fields::rdist(locs[randinds,d+1,drop=FALSE])
@@ -366,20 +368,20 @@ get_start_parms <- function(y,X,locs,covfun_name){
         start_parms <-
             c(start_var, start_range1, start_range2, start_smooth, start_nug)
     }
-    if(covfun_name == "arma_matern_spheretime"){
+    if(covfun_name == "matern_spheretime"){
         start_range1 <- 0.2
         start_range2 <- abs(diff(range(locs[,3])))/10
         start_parms <-
             c(start_var, start_range1, start_range2, start_smooth, start_nug)
     }
-    if(covfun_name == "arma_matern_spheretime_nonstatvar"){
+    if(covfun_name == "matern_spheretime_nonstatvar"){
         start_range1 <- 0.2
         start_range2 <- abs(diff(range(locs[,3])))/10
         start_parms <-
             c(start_var, start_range1, start_range2, start_smooth, start_nug,
                 rep(0,ncol(locs)-3))
     }
-    if(covfun_name == "arma_matern_nonstat_var"){
+    if(covfun_name == "matern_nonstat_var"){
         start_range <- mean( dmat )/4
         start_parms <- c(start_var, start_range, start_smooth, start_nug,
             rep(0, ncol(locs)-2) )
@@ -397,13 +399,13 @@ get_linkfun <- function(y,X,locs,covfun_name, silent = FALSE){
     lonlat <- FALSE
     space_time <- FALSE
 
-    if(covfun_name == "arma_matern_anisotropic2D"){
+    if(covfun_name == "matern_anisotropic2D"){
         link <- function(x){    c( exp(x[1:2]), x[3], exp(x[4:6]) )  }
         dlink <- function(x){   c( exp(x[1:2]), 1.0,  exp(x[4:6]) ) }
         ddlink <- function(x){  c( exp(x[1:2]), 0.0,  exp(x[4:6]) ) }
         invlink <- function(x){ c( log(x[1:2]), x[3], log(x[4:6]) ) }
     }
-    if(covfun_name == "arma_exponential_anisotropic3D"){
+    if(covfun_name == "exponential_anisotropic3D"){
         link <- function(x)
         { c( exp(x[1:2]), x[3], exp(x[4]), x[5:6], exp(x[7:8]) ) }
         dlink <- function(x)
@@ -411,7 +413,7 @@ get_linkfun <- function(y,X,locs,covfun_name, silent = FALSE){
         invlink <- function(x)
         { c( log(x[1:2]), x[3], log(x[4]), x[5:6], log(x[7:8]) ) }
     }
-    if(covfun_name == "arma_matern_anisotropic3D"){
+    if(covfun_name == "matern_anisotropic3D"){
         link <- function(x)
         { c( exp(x[1:2]), x[3], exp(x[4]), x[5:6], exp(x[7:9]) ) }
         dlink <- function(x)
@@ -419,34 +421,34 @@ get_linkfun <- function(y,X,locs,covfun_name, silent = FALSE){
         invlink <- function(x)
         { c( log(x[1:2]), x[3], log(x[4]), x[5:6], log(x[7:9]) ) }
     }
-    if(covfun_name == "arma_matern_nonstat_var"){
+    if(covfun_name == "matern_nonstat_var"){
         link <- function(x){    c( exp(x[1:3]), exp(x[4]), x[5:length(x)]     ) }
         dlink <- function(x){   c( exp(x[1:3]), exp(x[4]), rep(1,length(x)-4) ) }
         ddlink <- function(x){  c( exp(x[1:3]), exp(x[4]), rep(0,length(x)-4) ) }
         invlink <- function(x){ c( log(x[1:3]), log(x[4]), x[5:length(x)]     ) }
     }
-    if(covfun_name == "arma_matern_spheretime_nonstatvar"){
+    if(covfun_name == "matern_spheretime_nonstatvar"){
         link <- function(x){    c( exp(x[1:5]), x[6:length(x)]     ) }
         dlink <- function(x){   c( exp(x[1:5]), rep(1,length(x)-5) ) }
         ddlink <- function(x){  c( exp(x[1:5]), rep(0,length(x)-5) ) }
         invlink <- function(x){ c( log(x[1:5]), x[6:length(x)]     ) }
     }
 
-    if(covfun_name == "arma_matern_sphere"){ lonlat <- TRUE }
-    if(covfun_name == "arma_matern_sphere_warp"){
+    if(covfun_name == "matern_sphere"){ lonlat <- TRUE }
+    if(covfun_name == "matern_sphere_warp"){
         lonlat <- TRUE
         link <- function(x){ c(exp(x[1:4]), x[5:length(x)]) }
         dlink <- function(x){c(exp(x[1:4]), rep(1,length(x)-4))}
         invlink <- function(x){ c(log(x[1:4]),x[5:length(x)])}
     }
-    if(covfun_name == "arma_matern_spheretime_warp"){
+    if(covfun_name == "matern_spheretime_warp"){
         lonlat <- TRUE
         link <- function(x){ c(exp(x[1:5]), x[6:length(x)]) }
         dlink <- function(x){c(exp(x[1:5]), rep(1,length(x)-5))}
         invlink <- function(x){ c(log(x[1:5]),x[6:length(x)])}
     }
-    if(covfun_name == "arma_matern_spacetime"){ space_time <- FALSE }
-    if(covfun_name == "arma_matern_spheretime"){
+    if(covfun_name == "matern_spacetime"){ space_time <- FALSE }
+    if(covfun_name == "matern_spheretime"){
         lonlat <- TRUE
         space_time <- FALSE
     }
@@ -506,62 +508,62 @@ get_penalty <- function(y,X,locs,covfun_name, silent = FALSE){
         return(ddpen)
     }
 
-    if(covfun_name == "arma_exponential_isotropic"){
+    if(covfun_name == "exponential_isotropic"){
           pen <- function(x){  pen_nug(x,3) +   pen_var(x,1)   }
          dpen <- function(x){  dpen_nug(x,3) +  dpen_var(x,1)  }
         ddpen <- function(x){  ddpen_nug(x,3) + ddpen_var(x,1) }
     }
-    if(covfun_name == "arma_matern_isotropic"){
+    if(covfun_name == "matern_isotropic"){
           pen <- function(x){  pen_nug(x,4) +   pen_sm(x,3) +   pen_var(x,1)   }
          dpen <- function(x){  dpen_nug(x,4) +  dpen_sm(x,3) +  dpen_var(x,1)  }
         ddpen <- function(x){  ddpen_nug(x,4) + ddpen_sm(x,3) + ddpen_var(x,1) }
     }
-    if(covfun_name == "arma_matern_anisotropic2D"){
+    if(covfun_name == "matern_anisotropic2D"){
           pen <- function(x){  pen_nug(x,6) +   pen_sm(x,5) +   pen_var(x,1)   }
          dpen <- function(x){  dpen_nug(x,6) +  dpen_sm(x,5) +  dpen_var(x,1)  }
         ddpen <- function(x){  ddpen_nug(x,6) + ddpen_sm(x,5) + ddpen_var(x,1) }
     }
-    if(covfun_name == "arma_exponential_anisotropic3D"){
+    if(covfun_name == "exponential_anisotropic3D"){
           pen <- function(x){  pen_nug(x,8)  +   pen_var(x,1)   }
          dpen <- function(x){  dpen_nug(x,8)  +  dpen_var(x,1)  }
         ddpen <- function(x){  ddpen_nug(x,8)  + ddpen_var(x,1) }
     }
-    if(covfun_name == "arma_matern_anisotropic3D"){
+    if(covfun_name == "matern_anisotropic3D"){
           pen <- function(x){  pen_nug(x,9) +   pen_sm(x,8) +   pen_var(x,1)   }
          dpen <- function(x){  dpen_nug(x,9) +  dpen_sm(x,8) +  dpen_var(x,1)  }
         ddpen <- function(x){  ddpen_nug(x,9) + ddpen_sm(x,8) + ddpen_var(x,1) }
     }
-    if(covfun_name == "arma_matern_sphere"){
+    if(covfun_name == "matern_sphere"){
           pen <- function(x){  pen_nug(x,4) +   pen_sm(x,3) +   pen_var(x,1)   }
          dpen <- function(x){  dpen_nug(x,4) +  dpen_sm(x,3) +  dpen_var(x,1)  }
         ddpen <- function(x){  ddpen_nug(x,4) + ddpen_sm(x,3) + ddpen_var(x,1) }
     }
-    if(covfun_name == "arma_matern_sphere_warp"){
+    if(covfun_name == "matern_sphere_warp"){
           pen <- function(x){  pen_nug(x,4) +   pen_sm(x,3) +   pen_var(x,1)   }
          dpen <- function(x){  dpen_nug(x,4) +  dpen_sm(x,3) +  dpen_var(x,1)  }
         ddpen <- function(x){  ddpen_nug(x,4) + ddpen_sm(x,3) + ddpen_var(x,1) }
     }
-    if(covfun_name == "arma_matern_spheretime_warp"){
+    if(covfun_name == "matern_spheretime_warp"){
           pen <- function(x){  pen_nug(x,5) +   pen_sm(x,4) +   pen_var(x,1)   }
          dpen <- function(x){  dpen_nug(x,5) +  dpen_sm(x,4) +  dpen_var(x,1)  }
         ddpen <- function(x){  ddpen_nug(x,5) + ddpen_sm(x,4) + ddpen_var(x,1) }
     }
-    if(covfun_name == "arma_matern_spacetime"){
+    if(covfun_name == "matern_spacetime"){
           pen <- function(x){  pen_nug(x,5) +   pen_sm(x,4) +   pen_var(x,1)   }
          dpen <- function(x){  dpen_nug(x,5) +  dpen_sm(x,4) +  dpen_var(x,1)  }
         ddpen <- function(x){  ddpen_nug(x,5) + ddpen_sm(x,4) + ddpen_var(x,1) }
     }
-    if(covfun_name == "arma_matern_spheretime"){
+    if(covfun_name == "matern_spheretime"){
           pen <- function(x){  pen_nug(x,5) +   pen_sm(x,4) +   pen_var(x,1)   }
          dpen <- function(x){  dpen_nug(x,5) +  dpen_sm(x,4) +  dpen_var(x,1)  }
         ddpen <- function(x){  ddpen_nug(x,5) + ddpen_sm(x,4) + ddpen_var(x,1) }
     }
-    if(covfun_name == "arma_matern_spheretime_nonstatvar"){
+    if(covfun_name == "matern_spheretime_nonstatvar"){
           pen <- function(x){  pen_nug(x,5) +   pen_sm(x,4) +   pen_var(x,1)   }
          dpen <- function(x){  dpen_nug(x,5) +  dpen_sm(x,4) +  dpen_var(x,1)  }
         ddpen <- function(x){  ddpen_nug(x,5) + ddpen_sm(x,4) + ddpen_var(x,1) }
     }
-    if(covfun_name == "arma_matern_nonstat_var"){
+    if(covfun_name == "matern_nonstat_var"){
           pen <- function(x){  pen_nug(x,4) +   pen_sm(x,3) +   pen_var(x,1)   }
          dpen <- function(x){  dpen_nug(x,4) +  dpen_sm(x,3) +  dpen_var(x,1)  }
         ddpen <- function(x){  ddpen_nug(x,4) + ddpen_sm(x,3) + ddpen_var(x,1) }
@@ -583,7 +585,7 @@ get_start_parms_linkfun <- function(y,X,locs,covfun_name, silent = FALSE){
 
 
     randinds <- sample(1:n, min(n,200))
-    if(covfun_name == "arma_exponential_isotropic"){
+    if(covfun_name == "exponential_isotropic"){
         lonlat <- FALSE
         space_time <- FALSE
         dmat <- fields::rdist(locs[randinds,])
@@ -595,7 +597,7 @@ get_start_parms_linkfun <- function(y,X,locs,covfun_name, silent = FALSE){
         invlink <- log
     }
 
-    if(covfun_name == "arma_matern_isotropic"){
+    if(covfun_name == "matern_isotropic"){
         lonlat <- FALSE
         space_time <- FALSE
         dmat <- fields::rdist(locs[randinds,])
@@ -607,7 +609,7 @@ get_start_parms_linkfun <- function(y,X,locs,covfun_name, silent = FALSE){
         invlink <- log
     }
 
-    if(covfun_name == "arma_matern_anisotropic2D"){
+    if(covfun_name == "matern_anisotropic2D"){
         lonlat <- FALSE
         space_time <- FALSE
         dmat <- fields::rdist(locs[randinds,])
@@ -620,7 +622,7 @@ get_start_parms_linkfun <- function(y,X,locs,covfun_name, silent = FALSE){
         invlink <- function(x){ c( log(x[1:2]), x[3], log(x[4:6]) ) }
     }
 
-    if(covfun_name == "arma_matern_anisotropic3D"){
+    if(covfun_name == "matern_anisotropic3D"){
         lonlat <- FALSE
         space_time <- TRUE
         dmat <- fields::rdist(locs[randinds,1,drop=FALSE])
@@ -639,7 +641,7 @@ get_start_parms_linkfun <- function(y,X,locs,covfun_name, silent = FALSE){
         { c( log(x[1:2]), x[3], log(x[4]), x[5:6], log(x[7:8]), x[9] ) }
     }
 
-    if(covfun_name == "arma_matern_sphere"){
+    if(covfun_name == "matern_sphere"){
         lonlat <- TRUE
         space_time <- FALSE
         #dmat <- fields::rdist(locs[randinds,])
@@ -650,7 +652,7 @@ get_start_parms_linkfun <- function(y,X,locs,covfun_name, silent = FALSE){
         invlink <- log
     }
 
-    if(covfun_name == "arma_matern_sphere_warp"){
+    if(covfun_name == "matern_sphere_warp"){
         # Lmax = 2 hard coded
         lonlat <- TRUE
         space_time <- FALSE
@@ -661,7 +663,7 @@ get_start_parms_linkfun <- function(y,X,locs,covfun_name, silent = FALSE){
         dlink <- function(x){c(exp(x[1:4]), rep(1,length(x)-4))}
         invlink <- function(x){ c(log(x[1:4]),x[5:length(x)])}
     }
-    if(covfun_name == "arma_matern_spheretime_warp"){
+    if(covfun_name == "matern_spheretime_warp"){
         # Lmax = 2 hard coded
         lonlat <- TRUE
         space_time <- TRUE
@@ -675,7 +677,7 @@ get_start_parms_linkfun <- function(y,X,locs,covfun_name, silent = FALSE){
     }
 
 
-    if(covfun_name == "arma_matern_spacetime"){
+    if(covfun_name == "matern_spacetime"){
         lonlat <- FALSE
         space_time <- TRUE
         d <- ncol(locs)-1
@@ -691,7 +693,7 @@ get_start_parms_linkfun <- function(y,X,locs,covfun_name, silent = FALSE){
         invlink <- log
     }
 
-    if(covfun_name == "arma_matern_spheretime"){
+    if(covfun_name == "matern_spheretime"){
         lonlat <- TRUE
         space_time <- TRUE
         #dmat <- fields::rdist(locs[randinds,])
@@ -704,7 +706,7 @@ get_start_parms_linkfun <- function(y,X,locs,covfun_name, silent = FALSE){
         invlink <- log
     }
 
-    if(covfun_name == "arma_matern_spheretime_nonstatvar"){
+    if(covfun_name == "matern_spheretime_nonstatvar"){
         lonlat <- TRUE
         space_time <- FALSE
         start_range1 <- 0.2
@@ -718,7 +720,7 @@ get_start_parms_linkfun <- function(y,X,locs,covfun_name, silent = FALSE){
         invlink <- function(x){ c( log(x[1:5]), x[6:length(x)]     ) }
     }
 
-    if(covfun_name == "arma_matern_nonstat_var"){
+    if(covfun_name == "matern_nonstat_var"){
         lonlat <- FALSE
         space_time <- FALSE
         dmat <- fields::rdist(locs[randinds,])

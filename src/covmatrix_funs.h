@@ -15,6 +15,10 @@ using namespace arma;
 //[[Rcpp::depends(RcppArmadillo)]]
 
 
+struct covfun_t {
+    arma::mat    (*p_covfun)(NumericVector, NumericMatrix);
+    arma::cube (*p_d_covfun)(NumericVector, NumericMatrix);
+} ;
 
 
 //' Isotropic Matern covariance function
@@ -38,7 +42,7 @@ using namespace arma;
 //' NOTE: the nugget is \eqn{ \sigma^2 \tau^2 }, not \eqn{ \tau^2 }. The reason for this choice
 //' is for simpler profiling of \eqn{ \sigma^2 }.
 // [[Rcpp::export]]
-arma::mat arma_matern_isotropic(NumericVector covparms, NumericMatrix locs ){
+arma::mat matern_isotropic(NumericVector covparms, NumericMatrix locs ){
 
     int dim = locs.ncol();
     int n = locs.nrow();
@@ -84,7 +88,7 @@ arma::mat arma_matern_isotropic(NumericVector covparms, NumericMatrix locs ){
 
 
 // [[Rcpp::export]]
-arma::cube d_arma_matern_isotropic(NumericVector covparms, NumericMatrix locs ){
+arma::cube d_matern_isotropic(NumericVector covparms, NumericMatrix locs ){
 
     int dim = locs.ncol();
     int n = locs.nrow();
@@ -165,7 +169,7 @@ arma::cube d_arma_matern_isotropic(NumericVector covparms, NumericMatrix locs ){
 //' NOTE: the nugget is \eqn{ \sigma^2 \tau^2 }, not \eqn{ \tau^2 }. The reason for this choice
 //' is for simpler profiling of \eqn{ \sigma^2 }.
 // [[Rcpp::export]]
-arma::mat arma_exponential_isotropic(NumericVector covparms, NumericMatrix locs ){
+arma::mat exponential_isotropic(NumericVector covparms, NumericMatrix locs ){
 
     int dim = locs.ncol();
     int n = locs.nrow();
@@ -202,7 +206,7 @@ arma::mat arma_exponential_isotropic(NumericVector covparms, NumericMatrix locs 
 }
 
 // [[Rcpp::export]]
-arma::cube d_arma_exponential_isotropic(NumericVector covparms, NumericMatrix locs ){
+arma::cube d_exponential_isotropic(NumericVector covparms, NumericMatrix locs ){
 
     int dim = locs.ncol();
     int n = locs.nrow();
@@ -242,7 +246,7 @@ arma::cube d_arma_exponential_isotropic(NumericVector covparms, NumericMatrix lo
 
 
 // [[Rcpp::export]]
-arma::mat arma_matern_scaledim(NumericVector covparms, NumericMatrix locs ){
+arma::mat matern_scaledim(NumericVector covparms, NumericMatrix locs ){
 
     int dim = locs.ncol();
 
@@ -262,7 +266,7 @@ arma::mat arma_matern_scaledim(NumericVector covparms, NumericMatrix locs ){
             locs_scaled(i,j) = locs(i,j)/covparms(1+j);
         }
     }
-    // try simply plugging this into the arma_matern_isotropic function
+    // try simply plugging this into the matern_isotropic function
     
     // calculate covariances
     arma::mat covmat(n,n);
@@ -291,7 +295,7 @@ arma::mat arma_matern_scaledim(NumericVector covparms, NumericMatrix locs ){
 }
 
 // [[Rcpp::export]]
-arma::cube d_arma_matern_scaledim(NumericVector covparms, NumericMatrix locs ){
+arma::cube d_matern_scaledim(NumericVector covparms, NumericMatrix locs ){
 
     int dim = locs.ncol();
     if( covparms.length() - 3 != dim ){
@@ -360,7 +364,7 @@ arma::cube d_arma_matern_scaledim(NumericVector covparms, NumericMatrix locs ){
 
 
 // [[Rcpp::export]]
-arma::mat arma_matern_anisotropic2D(NumericVector covparms, NumericMatrix locs ){
+arma::mat matern_anisotropic2D(NumericVector covparms, NumericMatrix locs ){
     
     // covparms(0) = sigmasq
     // covparms(1) = L00
@@ -408,7 +412,7 @@ arma::mat arma_matern_anisotropic2D(NumericVector covparms, NumericMatrix locs )
 }
 
 // [[Rcpp::export]]
-arma::cube d_arma_matern_anisotropic2D(NumericVector covparms, NumericMatrix locs ){
+arma::cube d_matern_anisotropic2D(NumericVector covparms, NumericMatrix locs ){
 
     // covparms(0) = sigmasq
     // covparms(1) = L00
@@ -477,7 +481,7 @@ arma::cube d_arma_matern_anisotropic2D(NumericVector covparms, NumericMatrix loc
 
 
 // [[Rcpp::export]]
-arma::mat arma_matern_anisotropic3D(NumericVector covparms, NumericMatrix locs ){
+arma::mat matern_anisotropic3D(NumericVector covparms, NumericMatrix locs ){
     
     // covparms(0) = sigmasq
     // covparms(1) = L00
@@ -530,7 +534,7 @@ arma::mat arma_matern_anisotropic3D(NumericVector covparms, NumericMatrix locs )
 }
 
 // [[Rcpp::export]]
-arma::cube d_arma_matern_anisotropic3D(NumericVector covparms, NumericMatrix locs ){
+arma::cube d_matern_anisotropic3D(NumericVector covparms, NumericMatrix locs ){
 
     // covparms(0) = sigmasq
     // covparms(1) = L00
@@ -610,7 +614,7 @@ arma::cube d_arma_matern_anisotropic3D(NumericVector covparms, NumericMatrix loc
 
 
 // [[Rcpp::export]]
-arma::mat arma_exponential_anisotropic3D(NumericVector covparms, NumericMatrix locs ){
+arma::mat exponential_anisotropic3D(NumericVector covparms, NumericMatrix locs ){
     
     // covparms(0) = sigmasq
     // covparms(1) = L00
@@ -659,7 +663,7 @@ arma::mat arma_exponential_anisotropic3D(NumericVector covparms, NumericMatrix l
 }
 
 // [[Rcpp::export]]
-arma::cube d_arma_exponential_anisotropic3D(NumericVector covparms, NumericMatrix locs ){
+arma::cube d_exponential_anisotropic3D(NumericVector covparms, NumericMatrix locs ){
 
     // covparms(0) = sigmasq
     // covparms(1) = L00
@@ -728,7 +732,7 @@ arma::cube d_arma_exponential_anisotropic3D(NumericVector covparms, NumericMatri
 
 
 // [[Rcpp::export]]
-arma::mat arma_matern_spacetime(NumericVector covparms, NumericMatrix locs ){
+arma::mat matern_spacetime(NumericVector covparms, NumericMatrix locs ){
     
     // number of spatial dimensions
     int dim = locs.ncol() - 1;
@@ -750,13 +754,13 @@ arma::mat arma_matern_spacetime(NumericVector covparms, NumericMatrix locs ){
     newparms(1) = 1.0;
     newparms(2) = covparms(3);
     newparms(3) = covparms(4);
-    arma::mat covmat = arma_matern_isotropic( newparms, locs_scaled );
+    arma::mat covmat = matern_isotropic( newparms, locs_scaled );
 
     return covmat;
 }
 
 // [[Rcpp::export]]
-arma::cube d_arma_matern_spacetime(NumericVector covparms, NumericMatrix locs ){
+arma::cube d_matern_spacetime(NumericVector covparms, NumericMatrix locs ){
     
     // number of spatial dimensions
     int dim = locs.ncol() - 1;
@@ -832,7 +836,7 @@ arma::cube d_arma_matern_spacetime(NumericVector covparms, NumericMatrix locs ){
 
 
 // [[Rcpp::export]]
-arma::mat arma_matern_nonstat_var(NumericVector covparms, NumericMatrix Z ){
+arma::mat matern_nonstat_var(NumericVector covparms, NumericMatrix Z ){
     
     // this is a 2D covariance function!
     // first two columns of Z are spatial locations
@@ -887,7 +891,7 @@ arma::mat arma_matern_nonstat_var(NumericVector covparms, NumericMatrix Z ){
 }
 
 // [[Rcpp::export]]
-arma::cube d_arma_matern_nonstat_var(NumericVector covparms, NumericMatrix Z ){
+arma::cube d_matern_nonstat_var(NumericVector covparms, NumericMatrix Z ){
 
     int dim = 2;
     int n = Z.nrow();
@@ -977,7 +981,7 @@ arma::cube d_arma_matern_nonstat_var(NumericVector covparms, NumericMatrix Z ){
 //' and to date, no such distortions have been documented. Guinness and
 //' Fuentes (2016) argue that 3D embeddings produce reasonable models for data on spheres.
 // [[Rcpp::export]]
-arma::mat arma_matern_sphere(NumericVector covparms, NumericMatrix lonlat ){
+arma::mat matern_sphere(NumericVector covparms, NumericMatrix lonlat ){
 
     int n = lonlat.nrow();
     double lonrad;                                  // longitude
@@ -991,12 +995,12 @@ arma::mat arma_matern_sphere(NumericVector covparms, NumericMatrix lonlat ){
         xyz(i,2) = cos(latrad);
     }
 
-    arma::mat covmat = arma_matern_isotropic( covparms, xyz );
+    arma::mat covmat = matern_isotropic( covparms, xyz );
     return covmat;
 }
 
 // [[Rcpp::export]]
-arma::cube d_arma_matern_sphere(NumericVector covparms, NumericMatrix lonlat ){
+arma::cube d_matern_sphere(NumericVector covparms, NumericMatrix lonlat ){
 
     int n = lonlat.nrow();
     Rcpp::NumericMatrix xyz(n, 3);
@@ -1008,7 +1012,7 @@ arma::cube d_arma_matern_sphere(NumericVector covparms, NumericMatrix lonlat ){
         xyz(i,2) = cos(latrad);
     }
 
-    arma::cube dcovmat = d_arma_matern_isotropic( covparms, xyz );
+    arma::cube dcovmat = d_matern_isotropic( covparms, xyz );
     return dcovmat;
 }
 
@@ -1017,7 +1021,7 @@ arma::cube d_arma_matern_sphere(NumericVector covparms, NumericMatrix lonlat ){
 
 
 // [[Rcpp::export]]
-arma::mat arma_matern_spheretime(NumericVector covparms, NumericMatrix lonlattime ){
+arma::mat matern_spheretime(NumericVector covparms, NumericMatrix lonlattime ){
     
     int n = lonlattime.nrow();
     // matrix to hold (x,y,z,t)
@@ -1034,12 +1038,12 @@ arma::mat arma_matern_spheretime(NumericVector covparms, NumericMatrix lonlattim
     for(int i=0; i<n; i++){
         locs(i,3) = lonlattime(i,2);
     }
-    arma::mat covmat = arma_matern_spacetime( covparms, locs );
+    arma::mat covmat = matern_spacetime( covparms, locs );
     return covmat;
 }
 
 // [[Rcpp::export]]
-arma::cube d_arma_matern_spheretime(NumericVector covparms, NumericMatrix lonlattime){
+arma::cube d_matern_spheretime(NumericVector covparms, NumericMatrix lonlattime){
     
     int n = lonlattime.nrow();
     // matrix to hold (x,y,z,t)
@@ -1056,7 +1060,7 @@ arma::cube d_arma_matern_spheretime(NumericVector covparms, NumericMatrix lonlat
     for(int i=0; i<n; i++){
         locs(i,3) = lonlattime(i,2);
     }
-    arma::cube dcovmat = d_arma_matern_spacetime( covparms, locs );
+    arma::cube dcovmat = d_matern_spacetime( covparms, locs );
     return dcovmat;
 }
 
@@ -1064,7 +1068,7 @@ arma::cube d_arma_matern_spheretime(NumericVector covparms, NumericMatrix lonlat
 
 
 // [[Rcpp::export]]
-arma::mat arma_matern_sphere_warp(NumericVector covparms, NumericMatrix lonlat ){
+arma::mat matern_sphere_warp(NumericVector covparms, NumericMatrix lonlat ){
 
     int n = lonlat.nrow();
     int nisoparms = 4;
@@ -1095,12 +1099,12 @@ arma::mat arma_matern_sphere_warp(NumericVector covparms, NumericMatrix lonlat )
     }
     
     // compute covariances
-    arma::mat covmat = arma_matern_isotropic( isoparms, xyz );
+    arma::mat covmat = matern_isotropic( isoparms, xyz );
     return covmat;
 }
 
 // [[Rcpp::export]]
-arma::cube d_arma_matern_sphere_warp(NumericVector covparms, NumericMatrix lonlat ){
+arma::cube d_matern_sphere_warp(NumericVector covparms, NumericMatrix lonlat ){
 
     int n = lonlat.nrow();
     int nisoparms = 4;
@@ -1130,7 +1134,7 @@ arma::cube d_arma_matern_sphere_warp(NumericVector covparms, NumericMatrix lonla
         }
     }
 
-    arma::cube ddcov = d_arma_matern_isotropic( isoparms, xyz );
+    arma::cube ddcov = d_matern_isotropic( isoparms, xyz );
     arma::cube dcovmat(n,n,covparms.length());
     for(int i=0; i<nisoparms; i++){ dcovmat.slice(i) = ddcov.slice(i); }
     for(int j=0; j<nbasis; j++){
@@ -1166,7 +1170,7 @@ arma::cube d_arma_matern_sphere_warp(NumericVector covparms, NumericMatrix lonla
 
 
 // [[Rcpp::export]]
-arma::mat arma_matern_spheretime_warp(NumericVector covparms, NumericMatrix lonlattime ){
+arma::mat matern_spheretime_warp(NumericVector covparms, NumericMatrix lonlattime ){
 
     int n = lonlattime.nrow();
     int nisoparms = 5;
@@ -1195,12 +1199,12 @@ arma::mat arma_matern_spheretime_warp(NumericVector covparms, NumericMatrix lonl
     }}}
 
     // compute covariances
-    arma::mat covmat = arma_matern_spacetime( isoparms, xyzt );
+    arma::mat covmat = matern_spacetime( isoparms, xyzt );
     return covmat;
 }
 
 // [[Rcpp::export]]
-arma::cube d_arma_matern_spheretime_warp(NumericVector covparms, NumericMatrix lonlattime ){
+arma::cube d_matern_spheretime_warp(NumericVector covparms, NumericMatrix lonlattime ){
 
     int n = lonlattime.nrow();
     int nisoparms = 5;
@@ -1228,7 +1232,7 @@ arma::cube d_arma_matern_spheretime_warp(NumericVector covparms, NumericMatrix l
         xyzt(i,k) += covparms(nisoparms+j)*grad_basis(i,j,k);
     }}}
     
-    arma::cube ddcov = d_arma_matern_spacetime( isoparms, xyzt );
+    arma::cube ddcov = d_matern_spacetime( isoparms, xyzt );
     arma::cube dcovmat(n,n,covparms.length());
     for(int i=0; i<nisoparms; i++){ dcovmat.slice(i) = ddcov.slice(i); }
 
@@ -1280,7 +1284,7 @@ arma::cube d_arma_matern_spheretime_warp(NumericVector covparms, NumericMatrix l
 
 
 // [[Rcpp::export]]
-arma::mat arma_matern_spheretime_nonstatvar(NumericVector covparms, NumericMatrix lonlattimeZ ){
+arma::mat matern_spheretime_nonstatvar(NumericVector covparms, NumericMatrix lonlattimeZ ){
     
     int n = lonlattimeZ.nrow();
     int dim = 3;
@@ -1303,7 +1307,7 @@ arma::mat arma_matern_spheretime_nonstatvar(NumericVector covparms, NumericMatri
     for(int i=0; i<n; i++){
         locs(i,3) = lonlattimeZ(i,2);
     }
-    arma::mat covmat = arma_matern_spacetime( isoparms, locs );
+    arma::mat covmat = matern_spacetime( isoparms, locs );
     
     arma::mat logvarmat(n,n);
     for(int i1=0; i1<n; i1++){ for(int i2=0; i2<n; i2++){
@@ -1318,7 +1322,7 @@ arma::mat arma_matern_spheretime_nonstatvar(NumericVector covparms, NumericMatri
 }
 
 // [[Rcpp::export]]
-arma::cube d_arma_matern_spheretime_nonstatvar(NumericVector covparms, NumericMatrix lonlattimeZ){
+arma::cube d_matern_spheretime_nonstatvar(NumericVector covparms, NumericMatrix lonlattimeZ){
     
     int n = lonlattimeZ.nrow();
     int dim = 3;
@@ -1341,9 +1345,9 @@ arma::cube d_arma_matern_spheretime_nonstatvar(NumericVector covparms, NumericMa
     for(int i=0; i<n; i++){
         locs(i,3) = lonlattimeZ(i,2);
     }
-    arma::mat covmat = arma_matern_spacetime( isoparms, locs );
+    arma::mat covmat = matern_spacetime( isoparms, locs );
     
-    arma::cube ddiso = d_arma_matern_spacetime( isoparms, locs );
+    arma::cube ddiso = d_matern_spacetime( isoparms, locs );
     arma::cube dcovmat(n,n,covparms.length());
     for(int k=0; k<nisoparm; k++){ dcovmat.slice(k) = ddiso.slice(k); }
     for(int i1=0; i1<n; i1++){ for(int i2=0; i2<n; i2++){
@@ -1357,6 +1361,81 @@ arma::cube d_arma_matern_spheretime_nonstatvar(NumericVector covparms, NumericMa
 
 
 
+covfun_t get_covfun(std::string covfun_name_string)
+{
+    
+    covfun_t covstruct;
+    if( covfun_name_string.compare("matern_isotropic") == 0 )
+    { 
+        covstruct.p_covfun = &matern_isotropic; 
+        covstruct.p_d_covfun = &d_matern_isotropic;
+    } 
+    else if( covfun_name_string.compare("matern_anisotropic2D") == 0 )
+    { 
+        covstruct.p_covfun = &matern_anisotropic2D; 
+        covstruct.p_d_covfun = &d_matern_anisotropic2D;
+    } 
+    else if( covfun_name_string.compare("exponential_anisotropic3D") == 0 )
+    { 
+        covstruct.p_covfun = &exponential_anisotropic3D; 
+        covstruct.p_d_covfun = &d_exponential_anisotropic3D;
+    } 
+    else if( covfun_name_string.compare("matern_anisotropic3D") == 0 )
+    { 
+        covstruct.p_covfun = &matern_anisotropic3D; 
+        covstruct.p_d_covfun = &d_matern_anisotropic3D;
+    } 
+    else if( covfun_name_string.compare("matern_nonstat_var") == 0 )
+    { 
+        covstruct.p_covfun = &matern_nonstat_var; 
+        covstruct.p_d_covfun = &d_matern_nonstat_var;
+    } 
+    else if( covfun_name_string.compare("exponential_isotropic") == 0 )
+    { 
+        covstruct.p_covfun = &exponential_isotropic; 
+        covstruct.p_d_covfun = &d_exponential_isotropic;
+    }
+    else if( covfun_name_string.compare("matern_sphere") == 0 )
+    { 
+        covstruct.p_covfun = &matern_sphere; 
+        covstruct.p_d_covfun = &d_matern_sphere;
+    }
+    else if( covfun_name_string.compare("matern_sphere_warp") == 0 )
+    { 
+        covstruct.p_covfun = &matern_sphere_warp; 
+        covstruct.p_d_covfun = &d_matern_sphere_warp;
+    }
+    else if( covfun_name_string.compare("matern_spheretime_warp") == 0 )
+    { 
+        covstruct.p_covfun = &matern_spheretime_warp; 
+        covstruct.p_d_covfun = &d_matern_spheretime_warp;
+    }
+    else if( covfun_name_string.compare("matern_spheretime") == 0 )
+    { 
+        covstruct.p_covfun = &matern_spheretime; 
+        covstruct.p_d_covfun = &d_matern_spheretime;
+    }
+    else if( covfun_name_string.compare("matern_spheretime_nonstatvar") == 0 )
+    { 
+        covstruct.p_covfun = &matern_spheretime_nonstatvar; 
+        covstruct.p_d_covfun = &d_matern_spheretime_nonstatvar;
+    }
+    else if( covfun_name_string.compare("matern_spacetime") == 0 )
+    { 
+        covstruct.p_covfun = &matern_spacetime; 
+        covstruct.p_d_covfun = &d_matern_spacetime;
+    }
+    else if( covfun_name_string.compare("matern_scaledim") == 0 )
+    { 
+        covstruct.p_covfun = &matern_scaledim;
+        covstruct.p_d_covfun = &d_matern_scaledim;
+    }
+    else { // stop the program
+        Rcpp::Rcout << "Unrecognized Covariance Function Name \n";
+        assert(0);
+    }
+    return covstruct;
+}
 
 
 #endif

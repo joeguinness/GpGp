@@ -57,6 +57,8 @@ xyz[,3] <- cos(latrad)
 
 # subset of data for faster cran checks
 inds <- sample(n1,2000)
+# full analysis
+# inds <- 1:n1
 
 #NNarray <- find_ordered_nn(xyz,m=30)
 timing <- rep(NA,4)
@@ -64,28 +66,28 @@ timing <- rep(NA,4)
 # spatial isotropic
 t1 <- proc.time()
 fit1 <- fit_model(y = temp1[inds], X = X1[inds,], locs = lonlat1[inds,], 
-    covfun_name = "arma_matern_sphere", group = FALSE)
+    covfun_name = "matern_sphere", group = FALSE )
 timing[1] <- (proc.time() - t1)[3]
 
 
 # spacetime, isotropic in each
 t1 <- proc.time()
 fit2 <- fit_model(y = temp1[inds], X = X1[inds,], locs = lonlattime1[inds,], 
-    covfun_name = "arma_matern_spheretime", group = FALSE )
+    covfun_name = "matern_spheretime", group = FALSE )
 timing[2] <- (proc.time() - t1)[3]
 
 
 # spatial warping
 t1 <- proc.time()
 fit3 <- fit_model(y = temp1[inds], X = X1[inds,], locs = lonlat1[inds,], 
-    covfun_name = "arma_matern_sphere_warp", group = FALSE )
+    covfun_name = "matern_sphere_warp", group = FALSE )
 timing[3] <- (proc.time() - t1)[3]
 
 
 # spacetime, warping in space
 t1 <- proc.time()
 fit4 <- fit_model(y = temp1[inds], X = X1[inds,], locs = lonlattime1[inds,], 
-    covfun_name = "arma_matern_spheretime_warp", group = FALSE )
+    covfun_name = "matern_spheretime_warp", group = FALSE )
 timing[4] <- (proc.time() - t1)[3]
 
 # prediction locations and design matrix
@@ -97,14 +99,14 @@ n_pred <- nrow(locs_pred)
 locstime_pred <- cbind( locs_pred, rep(mediantime, n_pred) )
 X_pred <- as.matrix( cbind( rep(1,n_pred), locs_pred[,2], locs_pred[,2]^2 ) )
 # predictions
-pred <- predictions(fit4$covparms, "arma_matern_spheretime_warp", temp1,
+pred <- predictions(fit4$covparms, "matern_spheretime_warp", temp1,
     lonlattime1, locstime_pred, X1, X_pred, fit4$betahat, m = 40)
 # plot predictions
 par(mar=c(4,4,1,1))
 pred_array <- array( pred, c(length(longrid),length(latgrid)) )
 fields::image.plot(longrid,latgrid,pred_array)
 # conditional simulations
-sim <- cond_sim(fit4$covparms, "arma_matern_spheretime_warp", temp1,
+sim <- cond_sim(fit4$covparms, "matern_spheretime_warp", temp1,
     lonlattime1, locstime_pred, X1, X_pred, fit4$betahat, m = 40)
 # plot conditional simulations
 sim_array <- array( sim, c(length(longrid),length(latgrid)) )

@@ -67,18 +67,23 @@ X <- as.matrix( rep(1,length(windspeed)) )
 
 We fit two models here, both of which use the Mat\'ern covariance function. The first ignores the temporal dimension and treats the data as being collected simultaneously. This approach is sometimes appropriate for spatial-temporal data that do not change much over time. The second model includes the temporal component. We think the second model is more appropriate because windspeeds can change substantially over six days, and so our motivation for showing both models is to demonstrate the importance of considering the temporal component carefully.
 
-The two models take several minutes to fit on my system.
+The two models take about 40 seconds to fit on my system.
 
 ```{r}
 # fit to a subset of the data (for faster CRAN checks)
 # use 'inds <- 1:n' to fit to full dataset
 inds <- round( seq(1,n,length.out = 1500) ) 
+t1 <- proc.time()
 fit_space     <- fit_model(windspeed[inds], locs[inds,], X[inds,], 
-    covfun_name = "arma_matern_sphere", silent = TRUE)
+    covfun_name = "matern_sphere", silent = TRUE)
+t2 <- proc.time()
 fit_spacetime <- fit_model(windspeed[inds], locstime[inds,], X[inds,], 
-    covfun_name = "arma_matern_spheretime", silent = TRUE)
+    covfun_name = "matern_spheretime", silent = TRUE)
+t3 <- proc.time()
 fit_space
 fit_spacetime
+print(t2-t1)
+print(t3-t2)
 ```
 
 The first thing to note is that the space-time model gives a much higher loglikelihood. The fitted model objects contain an element `covparms`, which is a vector with the estimated variance, spatial range, temporal range (space-time model only), smoothness, and nugget parameters. The second covariance parameter in both models is the spatial range parameter, in units of radians (i.e. Earth radius = 1). The space-time model has a larger spatial range. This result stems from the fact that when the satellite crosses back over its own path, the measurements from the two paths may not coincide, even though they are close spatially. 
@@ -99,14 +104,14 @@ n_pred <- nrow(locs_pred)
 locstime_pred <- cbind( locs_pred, rep(mediantime, n_pred) )
 X_pred <- as.matrix( rep(1,n_pred) )
 # predictions
-pred <- predictions(fit_spacetime$covparms, "arma_matern_spheretime", windspeed,
+pred <- predictions(fit_spacetime$covparms, "matern_spheretime", windspeed,
     locstime, locstime_pred, X, X_pred, fit_spacetime$betahat, m = 40)
 # plot predictions
 par(mar=c(4,4,1,1))
 pred_array <- array( pred, c(length(longrid),length(latgrid)) )
 fields::image.plot(longrid,latgrid,pred_array)
 # conditional simulations
-sim <- cond_sim(fit_spacetime$covparms, "arma_matern_spheretime", windspeed,
+sim <- cond_sim(fit_spacetime$covparms, "matern_spheretime", windspeed,
     locstime, locstime_pred, X, X_pred, fit_spacetime$betahat, m = 40)
 # plot conditional simulations
 sim_array <- array( sim, c(length(longrid),length(latgrid)) )

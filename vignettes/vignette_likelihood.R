@@ -18,7 +18,7 @@ locs <- as.matrix(expand.grid(x1,x2))
 covparms <- c(variance = 4, range = 0.1, smoothness = 0.5, nugget = 0.1)
 
 # simulate some data
-y <- fast_Gp_sim(covparms, "matern_isotropic",locs,40)
+y <- fast_Gp_sim(covparms, "matern_isotropic",locs,20)
 
 # generate an ordering
 ord <- order_maxmin(locs)
@@ -28,7 +28,7 @@ locsord <- locs[ord,]
 yord <- y[ord]
 
 # find the ordered m nearest neighbors
-m <- 20
+m <- 30
 NNarray <- find_ordered_nn(locsord,m)
 
 # automatically group the observations
@@ -41,32 +41,21 @@ mean(num_cond)
 X <- matrix( rep(1,n), n, 1 )
 Xord <- X[ord,,drop=FALSE]
 
-# I think it works!
-system.time( llgh <- arma_vecchia_grad_hess(
-    covparms[c(1,2,4)],"arma_exponential_isotropic",yord,Xord,locsord,NNarray ) )
-
 # get ungrouped and grouped likelihood
-system.time( ll0 <- arma_vecchia_loglik(covparms,"arma_matern_isotropic",yord-llgh$betahat,locsord,NNarray ) )
-system.time( ll1 <- arma_vecchia_loglik(covparms[c(1,2,2,3,4)],"arma_matern_scaledim",yord,locsord,NNarray ) )
-system.time( ll2 <- arma_vecchia_loglik(covparms[c(1,2,4)],"arma_exponential_isotropic",yord,locsord,NNarray ) )
-system.time( ll3 <- vecchia_loglik(covparms, "matern_isotropic", yord, locsord, NNarray) )
-system.time( ll4 <- vecchia_loglik_grouped(covparms, "matern_isotropic", yord, locsord, NNlist) )
+system.time( ll1 <- vecchia_meanzero_loglik(covparms[c(1,2,4)],"exponential_isotropic",yord,locsord,NNarray ) )
+system.time( ll2 <- vecchia_profbeta_loglik(covparms[c(1,2,4)],"exponential_isotropic",yord,Xord,locsord,NNarray ) )
+system.time( ll3 <- vecchia_profbeta_loglik_grad_info(covparms[c(1,2,4)],"exponential_isotropic",yord,Xord,locsord,NNarray ) )
+
+system.time( ll1 <- vecchia_grouped_meanzero_loglik(covparms[c(1,2,4)],"exponential_isotropic",yord,locsord,NNlist ) )
+system.time( ll2 <- vecchia_grouped_profbeta_loglik(covparms[c(1,2,4)],"exponential_isotropic",yord,Xord,locsord,NNlist ) )
+system.time( ll3 <- vecchia_grouped_profbeta_loglik_grad_info(covparms[c(1,2,4)],"exponential_isotropic",yord,Xord,locsord,NNlist ) )
 
 # get entries of L^{-1}
-system.time( Linv1 <- vecchia_Linv(covparms, "matern_isotropic", locsord, NNarray) )
-system.time( Linv2 <- vecchia_Linv_grouped(covparms, "matern_isotropic", locsord, NNlist) )
+system.time( Linv1 <- vecchia_Linv(covparms[c(1,2,4)], "exponential_isotropic", locsord, NNarray) )
 
 # do a multiplication
 system.time( z1 <- Linv_mult(Linv1,yord,NNarray) )
-system.time( z2 <- Linv_mult_grouped(Linv2,yord,NNlist) )
 
-if( n < 6000 ){ # only do this if we can store the covariance matrix
-    covmat <- matern_isotropic(covparms,locsord)
-    cholmat <- t(chol(covmat))
-    z3 <- forwardsolve(cholmat,yord)
-    print( sd(z3-z1) )
-    print( sd(z3-z2) )
-}
 
 
 
