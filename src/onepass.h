@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <RcppArmadillo.h>
 #include "covmatrix_funs.h"
+
 //[[Rcpp::depends(RcppArmadillo)]]
 
 using namespace Rcpp;
