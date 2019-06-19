@@ -2,12 +2,15 @@
 % Please edit documentation in R/RcppExports.R
 \name{matern_isotropic}
 \alias{matern_isotropic}
+\alias{d_matern_isotropic}
 \title{Isotropic Matern covariance function}
 \usage{
 matern_isotropic(covparms, locs)
+
+d_matern_isotropic(covparms, locs)
 }
 \arguments{
-\item{covparms}{A vector giving positive-valued covariance parameters
+\item{covparms}{A vector with covariance parameters
 in the form (variance, range, smoothness, nugget)}
 
 \item{locs}{A matrix with \code{n} rows and \code{d} columns.
@@ -23,6 +26,11 @@ From a matrix of locations and covariance parameters of the form
 (variance, range, smoothness, nugget), return the square matrix of
 all pairwise covariances.
 }
+\section{Functions}{
+\itemize{
+\item \code{d_matern_isotropic}: Derivatives of isotropic Matern covariance
+}}
+
 \section{Parameterization}{
 
 The covariance parameter vector is (variance, range, smoothness, nugget)
@@ -30,7 +38,6 @@ The covariance parameter vector is (variance, range, smoothness, nugget)
 as
 \deqn{ M(x,y) = \sigma^2 2^{1-\nu}/\Gamma(\nu) (|| x - y ||/\alpha )^\nu K_\nu(|| x - y ||/\alpha ) }
 The nugget value \eqn{ \sigma^2 \tau^2 } is added to the diagonal of the covariance matrix.
-NOTE: the nugget is \eqn{ \sigma^2 \tau^2 }, not \eqn{ \tau^2 }. The reason for this choice
-is for simpler profiling of \eqn{ \sigma^2 }.
+NOTE: the nugget is \eqn{ \sigma^2 \tau^2 }, not \eqn{ \tau^2 }.
 }
 

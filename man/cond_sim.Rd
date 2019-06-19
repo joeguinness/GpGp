@@ -4,10 +4,14 @@
 \alias{cond_sim}
 \title{Conditional Simulation using Vecchia's approximation}
 \usage{
-cond_sim(covparms, covfun_name = "matern_isotropic", y_obs, locs_obs,
-  locs_pred, X_obs, X_pred, beta, m = 60, nsims = 1, reorder = TRUE)
+cond_sim(fit = NULL, covparms = fit$covparms,
+  covfun_name = fit$covfun_name, y_obs = fit$y, locs_obs = fit$locs,
+  X_obs = fit$X, beta = fit$betahat, locs_pred, X_pred, m = 60,
+  nsims = 1, reorder = TRUE)
 }
 \arguments{
+\item{fit}{GpGp_fit object, the result of \code{\link{fit_model}}}
+
 \item{covparms}{Covariance parameters}
 
 \item{covfun_name}{Name of covariance function}
@@ -16,13 +20,13 @@ cond_sim(covparms, covfun_name = "matern_isotropic", y_obs, locs_obs,
 
 \item{locs_obs}{observation locations}
 
-\item{locs_pred}{prediction locations}
-
 \item{X_obs}{Design matrix for observations}
 
-\item{X_pred}{Design matrix for predictions}
-
 \item{beta}{Linear mean parameters}
+
+\item{locs_pred}{prediction locations}
+
+\item{X_pred}{Design matrix for predictions}
 
 \item{m}{Number of nearest neighbors to use. Larger \code{m} gives
 better approximations.}
@@ -38,4 +42,10 @@ With the prediction locations ordered after the observation locations,
 an approximation for the inverse Cholesky of the covariance matrix
 is computed, and standard formulas are applied to obtain
 a conditional simulation.
+}
+\details{
+We can specify either a GpGp_fit object (the result of 
+\code{\link{fit_model}}), OR manually enter the covariance function and
+parameters, the observations, observation locations, and design matrix. We 
+must specify the prediction locations and the prediction design matrix.
 }

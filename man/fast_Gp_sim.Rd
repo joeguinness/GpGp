@@ -7,6 +7,16 @@
 fast_Gp_sim(covparms, covfun_name = "matern_isotropic", locs, m = 30)
 }
 \arguments{
+\item{covparms}{A vector of covariance parameters appropriate
+for the specified covariance function}
+
+\item{covfun_name}{See \code{\link{GpGp}} for information about covariance
+functions.}
+
+\item{locs}{matrix of locations. Row \code{i} of \code{locs} specifies the location
+of element \code{i} of \code{y}, and so the length of \code{y} should equal
+the number of rows of \code{locs}.}
+
 \item{m}{Number of nearest neighbors to use in approximation}
 }
 \value{

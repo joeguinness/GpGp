@@ -11,6 +11,11 @@ Linv_mult(Linv, z, NNarray)
 usually the output from \code{\link{vecchia_Linv}}.}
 
 \item{z}{the vector to be multiplied}
+
+\item{NNarray}{A matrix of indices, usually the output from \code{\link{find_ordered_nn}}.
+Row \code{i} contains the indices
+of the observations that observation \code{i} conditions on. By convention,
+the first element of row \code{i} is \code{i}.}
 }
 \value{
 the product of the sparse inverse Cholesky factor with a vector
