@@ -69,19 +69,19 @@ We fit two models here, both of which use the Mat\'ern covariance function. The 
 
 The two models take about 40 seconds to fit on my system.
 
-```{r}
+```{r, rows.print=10}
 # fit to a subset of the data (for faster CRAN checks)
 # use 'inds <- 1:n' to fit to full dataset
-inds <- round( seq(1,n,length.out = 1500) ) 
+inds <- round( seq(1,n,length.out = 3000) )
 t1 <- proc.time()
 fit_space     <- fit_model(windspeed[inds], locs[inds,], X[inds,], 
-    covfun_name = "matern_sphere", silent = TRUE)
+    covfun_name = "exponential_sphere", silent = TRUE)
 t2 <- proc.time()
 fit_spacetime <- fit_model(windspeed[inds], locstime[inds,], X[inds,], 
-    covfun_name = "matern_spheretime", silent = TRUE)
+    covfun_name = "exponential_spheretime", silent = TRUE)
 t3 <- proc.time()
-fit_space
-fit_spacetime
+summary(fit_space)
+summary(fit_spacetime)
 print(t2-t1)
 print(t3-t2)
 ```
@@ -104,15 +104,17 @@ n_pred <- nrow(locs_pred)
 locstime_pred <- cbind( locs_pred, rep(mediantime, n_pred) )
 X_pred <- as.matrix( rep(1,n_pred) )
 # predictions
-pred <- predictions(fit_spacetime$covparms, "matern_spheretime", windspeed,
-    locstime, locstime_pred, X, X_pred, fit_spacetime$betahat, m = 40)
+pred <- predictions(fit = fit_spacetime, 
+    y_obs = windspeed, locs_obs = locstime, X_obs = X,
+    locs_pred = locstime_pred, X_pred = X_pred, m = 80)
 # plot predictions
 par(mar=c(4,4,1,1))
 pred_array <- array( pred, c(length(longrid),length(latgrid)) )
 fields::image.plot(longrid,latgrid,pred_array)
 # conditional simulations
-sim <- cond_sim(fit_spacetime$covparms, "matern_spheretime", windspeed,
-    locstime, locstime_pred, X, X_pred, fit_spacetime$betahat, m = 40)
+sim <- cond_sim(fit = fit_spacetime, 
+    y_obs = windspeed, locs_obs = locstime, X_obs = X,
+    locs_pred = locstime_pred, X_pred = X_pred, m = 80)
 # plot conditional simulations
 sim_array <- array( sim, c(length(longrid),length(latgrid)) )
 fields::image.plot(longrid,latgrid,sim_array)
