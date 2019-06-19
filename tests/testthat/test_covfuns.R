@@ -1,6 +1,29 @@
 
 context("Covariance Functions")
 
+covfun_names <- c(
+    "matern_isotropic",
+    "exponential_isotropic",
+    "matern_scaledim", 
+    "exponential_scaledim", 
+    "matern_spacetime", 
+    "exponential_spacetime", 
+    "matern_anisotropic2D",
+    "exponential_anisotropic2D",
+    "matern_anisotropic3D",
+    "exponential_anisotropic3D",
+    "matern_nonstat_var",
+    "exponential_nonstat_var",
+    "matern_sphere",
+    "exponential_sphere",
+    "matern_spheretime",
+    "exponential_spheretime",
+    "matern_sphere_warp",
+    "exponential_sphere_warp",
+    "matern_spheretime_warp",
+    "exponential_spheretime_warp"
+)
+
 get_test_locs <- function(covfun_name,n){
     
     nside <- round(sqrt(n))
@@ -11,9 +34,17 @@ get_test_locs <- function(covfun_name,n){
         locs <- matrix(runif(3*n),n,3)           
     } else if(covfun_name=="matern_isotropic"){
         locs <- matrix(runif(2*n),n,2)
-    } else if(covfun_name=="matern_spacetime"){
+    } else if(covfun_name=="matern_scaledim"){
         locs <- matrix(runif(2*n),n,2)
+    } else if(covfun_name=="exponential_scaledim"){
+        locs <- matrix(runif(2*n),n,2)
+    } else if(covfun_name=="matern_spacetime"){
+        locs <- matrix(runif(3*n),n,3)
+    } else if(covfun_name=="exponential_spacetime"){
+        locs <- matrix(runif(3*n),n,3)
     } else if(covfun_name=="matern_anisotropic2D"){
+        locs <- matrix(runif(2*n),n,2)
+    } else if(covfun_name=="exponential_anisotropic2D"){
         locs <- matrix(runif(2*n),n,2)
     } else if(covfun_name=="exponential_anisotropic3D"){
         locs <- matrix(runif(3*n),n,3)           
@@ -21,13 +52,23 @@ get_test_locs <- function(covfun_name,n){
         locs <- matrix(runif(3*n),n,3)           
     } else if(covfun_name=="matern_nonstat_var"){
         locs <- matrix(runif(6*n),n,6)           
+    } else if(covfun_name=="exponential_nonstat_var"){
+        locs <- matrix(runif(6*n),n,6)           
     } else if(covfun_name=="matern_sphere"){
+        locs <- lonlat
+    } else if(covfun_name=="exponential_sphere"){
         locs <- lonlat
     } else if(covfun_name=="matern_sphere_warp"){
         locs <- lonlat
+    } else if(covfun_name=="exponential_sphere_warp"){
+        locs <- lonlat
     } else if(covfun_name=="matern_spheretime"){
         locs <- cbind(lonlat,runif(n))
+    } else if(covfun_name=="exponential_spheretime"){
+        locs <- cbind(lonlat,runif(n))
     } else if(covfun_name=="matern_spheretime_warp"){
+        locs <- cbind(lonlat,runif(n))
+    } else if(covfun_name=="exponential_spheretime_warp"){
         locs <- cbind(lonlat,runif(n))
     } else {
         stop("unrecognized covariance in testing function")
@@ -37,19 +78,6 @@ get_test_locs <- function(covfun_name,n){
 
 test_that("covariance functions return positive definite matrix", {
         
-    covfun_names <- c(
-        "exponential_isotropic",
-        "matern_isotropic",
-        "matern_spacetime", 
-        "matern_anisotropic2D",
-        "exponential_anisotropic3D",
-        "matern_anisotropic3D",
-        "matern_nonstat_var",
-        "matern_sphere",
-        "matern_sphere_warp",
-        "matern_spheretime_warp",
-        "matern_spheretime"
-    )
     
     n <- 100    
     for(j in 1:length(covfun_names)){
@@ -68,20 +96,6 @@ test_that("covariance functions return positive definite matrix", {
 
 test_that("covariance function derivatives match finite differencing", {
         
-    covfun_names <- c(
-        "exponential_isotropic",
-        "matern_isotropic",
-        "matern_spacetime", 
-        "matern_anisotropic2D",
-        "exponential_anisotropic3D",
-        "matern_anisotropic3D",
-        "matern_nonstat_var",
-        "matern_sphere",
-        "matern_sphere_warp",
-        "matern_spheretime_warp",
-        "matern_spheretime"
-    )
-    
     n <- 100    
     for(j in 1:length(covfun_names)){
         locs <- get_test_locs(covfun_names[j],n)
