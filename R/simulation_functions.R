@@ -6,7 +6,7 @@
 #' then the simulation is produced by solving a linear system
 #' with a vector of uncorrelated standard normals
 #' @param m Number of nearest neighbors to use in approximation
-#' @inheritParams vecchia_loglik
+#' @inheritParams vecchia_meanzero_loglik
 #' @return vector of simulated values
 #' @examples
 #' locs <- as.matrix( expand.grid( (1:100)/100, (1:100)/100 ) )
@@ -16,23 +16,19 @@
 fast_Gp_sim <- function( covparms, covfun_name = "matern_isotropic", locs, m = 30 ){
     
     # figure out if lonlat or not
-    if( covfun_name == "matern_sphere" || covfun_name == "matern_sphere_time" ){
-        lonlat <- TRUE
+    lonlat <- get_linkfun(covfun_name)$lonlat
+    space_time <- get_linkfun(covfun_name)$space_time
+    if(space_time){
+        st_scale <- covparms[2:3]
     } else {
-        lonlat <- FALSE
-    }
-    
-    if( covfun_name == "matern_space_time" ){
-        space_time <- TRUE
-    } else {
-        space_time <- FALSE
+        st_scale <- NULL
     }
 
     n <- nrow(locs)
     m <- min(m,n-1)
     ord <- order_maxmin(locs,lonlat=lonlat,space_time=space_time)
     locsord <- locs[ord,]
-    NNarray <- find_ordered_nn(locsord,m,lonlat=lonlat,space_time=space_time)
+    NNarray <- find_ordered_nn(locsord,m,lonlat=lonlat,st_scale=st_scale)
     Linv <- vecchia_Linv( covparms, covfun_name, locsord, NNarray )
     y <- fast_Gp_sim_Linv( Linv, NNarray )
     y[ord] <- y

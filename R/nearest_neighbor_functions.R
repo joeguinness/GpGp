@@ -41,6 +41,14 @@ find_ordered_nn_brute <- function( locs, m ){
 #' @param m Number of neighbors to return
 #' @inheritParams order_dist_to_point
 #' @inheritParams order_maxmin
+#' @param st_scale factor by which to scale the spatial and temporal coordinates
+#' for distance calculations. The function assumes that the last column of
+#' the locations is the temporal dimension, and the rest of the columns
+#' are spatial dimensions. The spatial dimensions are divided by \code{st_scale[1]},
+#' and the temporal dimension is divided by \code{st_scale[2]}, before distances are
+#' calculated. If \code{st_scale} is \code{NULL} a default scaling is used. We 
+#' recommend setting \code{st_scale} manually so that each observation gets
+#' neighbors that hail multiple directions in space and time.
 #' @return An matrix containing the indices of the neighbors. Row \code{i} of the
 #' returned matrix contains the indices of the nearest \code{m}
 #' locations to the \code{i}'th location. Indices are ordered within a
@@ -63,8 +71,7 @@ find_ordered_nn_brute <- function( locs, m ){
 #' points( locsord[NNarray[ind,2:(m+1)],1], 
 #'     locsord[NNarray[ind,2:(m+1)],2], col = "blue", cex = 1.5 )
 #' @export
-find_ordered_nn <- function(locs,m, lonlat = FALSE, 
-    space_time = FALSE, st_scale = NULL){
+find_ordered_nn <- function(locs,m, lonlat = FALSE, st_scale = NULL){
     
     # if locs is a vector, convert to matrix
     if( is.null(ncol(locs)) ){
@@ -89,7 +96,7 @@ find_ordered_nn <- function(locs,m, lonlat = FALSE,
         x <- sin(latrad)*cos(lonrad)
         y <- sin(latrad)*sin(lonrad)
         z <- cos(latrad)
-        if(space_time){
+        if(ncol(locs)==3){
             time <- locs[,3]
             locs <- cbind(x,y,z,time)
         } else {
@@ -98,18 +105,8 @@ find_ordered_nn <- function(locs,m, lonlat = FALSE,
     }
 
     
-    if(space_time){ 
+    if( !is.null(st_scale) ){ 
         d <- ncol(locs)-1
-        if( is.null(st_scale) ){
-            randinds <- sample(1:n, min(n,200))
-            dvec <- c(fields::rdist( locs[randinds,1:d,drop=FALSE] ))
-            dvec <- dvec[ dvec > 0]
-            med1 <- mean(dvec)
-            dvec <- c(fields::rdist( locs[randinds, d + 1, drop=FALSE] ))
-            dvec <- dvec[ dvec > 0]
-            med2 <- mean(dvec)
-            st_scale <- c(med1,med2)
-        }
         locs[ , 1:d] <- locs[ , 1:d]/st_scale[1]
         locs[ , d+1] <- locs[ , d+1]/st_scale[2]
     }

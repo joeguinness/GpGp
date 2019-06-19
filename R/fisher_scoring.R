@@ -24,13 +24,12 @@ condition_number <- function(info){
 
 
 
-
-# put link functions in fit_model, rather than here
 fisher_scoring <- function( likfun, start_parms, link, silent = FALSE, convtol = 1e-4 ){
     
     # link functions passed for printing purposes
     maxit <- 40
     
+    # function for checking wolfe conditions
     wolfe_check <- function(likobj0,likobj1,logparms,step,both){
         c1 <- 1e-4
         c2 <- 0.9
@@ -52,17 +51,19 @@ fisher_scoring <- function( likfun, start_parms, link, silent = FALSE, convtol =
     logparms <- start_parms
     likobj <- likfun(logparms)
     
+    # test likelihood object    
     if( !test_likelihood_object(likobj) ){
         logparms <- 0.1*logparms
         likobj <- likfun(logparms)
     }
     
-    # transform grad and info
+    # assign loglik, grad, and info
     loglik <- likobj$loglik        
     grad <- likobj$grad
     info <- likobj$info
-    # test this for regularity?
-    diag(info) <- diag(info) + 0.5*min(diag(info))
+    
+    # add a small amount of regularization
+    diag(info) <- diag(info) + 0.1*min(diag(info))
 
     # print some stuff out
     if(!silent){
@@ -78,7 +79,7 @@ fisher_scoring <- function( likfun, start_parms, link, silent = FALSE, convtol =
         
         likobj0 <- likobj
         
-        # if condition number large, then regularize
+        # if condition number of info matrix large, then regularize
         tol <- 1e-8
         if (condition_number(info) > 1 / tol) {
             if (!silent) cat("Cond # of info matrix > 1/tol \n")
@@ -89,30 +90,32 @@ fisher_scoring <- function( likfun, start_parms, link, silent = FALSE, convtol =
                 eiginfo$vectors %*% diag(eiginfo$values) %*% t(eiginfo$vectors)
         }
 
-        # calculate fisher step and criterion at new parameter
+        # calculate fisher step 
         step <- - solve(info, grad)
+        
+        # if step size large, then make it smaller
         if (mean(step^2) > 1) {
             if(!silent) cat("@@\n")
             step <- step/sqrt(mean(step^2))
         }
+        
+        # take step and calculate loglik, grad, and info
         newlogparms <- logparms + step
-        #if(!silent) cat("^^", round(step,4), "   ", round(link(newlogparms),4),"\n")
         likobj <- likfun(newlogparms)
         
         # check for Inf, NA, or NaN
         cnt <- 1
         while (!test_likelihood_object(likobj)) {
-            if (!silent) cat("inf or na or nan in likobj")
+            if (!silent) cat("inf or na or nan in likobj\n")
             step <- 0.5 * step
             newlogparms <- logparms + step
-            #if(!silent) cat("!!", round(step,4), "   ", round(link(newlogparms),4),"\n")
             likobj <- likfun(newlogparms)
-            if (cnt == 10) { stop("could not avoid inf, na or nan") }
+            if (cnt == 10) { stop("could not avoid inf, na or nan\n") }
         }
         
         # Check the wolfe conditions
         # if not satisfied, shrink fisher step
-        # after some interations, switch to gradient and shrink that
+        # after some iterations, switch to gradient
         cnt <- 1
         no_decrease <- FALSE
         both <- FALSE
@@ -128,7 +131,6 @@ fisher_scoring <- function( likfun, start_parms, link, silent = FALSE, convtol =
             if(!silent) cat("**\n") 
             if ( sqrt(sum(step^2)) < 1e-4 ){ no_decrease <- TRUE }  # maybe we should throw error here?
             newlogparms <- logparms + step
-            #if(!silent) cat("**", round(step,4), "   ", round(link(newlogparms),4),"\n")
             likobj <- likfun(newlogparms)
             cnt <- cnt + 1
         }
@@ -163,16 +165,13 @@ fisher_scoring <- function( likfun, start_parms, link, silent = FALSE, convtol =
     betacov <- solve(betahatinfo$betainfo)
     sebeta <- sqrt(diag(betacov))
     tbeta <- betahat/sebeta
-    #df <- length(y) - ncol(X) # assumes X is full rank!
-    #pbeta <- 2*( 1 - pt( abs(tbeta), df ) )
-    
+
     ret <- list(
         covparms = link(logparms), 
         betahat = betahat, 
         sebeta = sebeta,
         betacov = betacov,
         tbeta = tbeta,
-        #pbeta = pbeta,
         loglik = loglik,
         no_decrease = no_decrease,
         grad = likobj$grad

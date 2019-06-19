@@ -5,18 +5,38 @@
 #' as a leader in computational scalability and accuracy. This package includes
 #' implementations of the original approximation, as well as several
 #' updates to it, including the reordered and grouped versions of the 
-#' approximation outlined in Guinness (2018). 
+#' approximation outlined in Guinness (2018) and the Fisher scoring algorithm
+#' described in Guinness (2019). The package supports spatial
+#' models, spatial-temporal models, models on spheres, and some nonstationary models.
 #'
-#' @details The main functions of the package are \code{fit_model}, and \code{\link{predictions}}.
-#' \code{fit_model} returns maximum likelihood estimates for covariance parameters
-#' and linear mean parameters. The user is expected to store the response in a vector
-#' \code{y} and the locations--either spatial or spatial-temporal--in a matrix \code{locs},
-#' which contains in each row the spatial or spatial-temporal location of the 
-#' corresponding response. The user is also expected to select a covariance function
-#' and specify it with a string. Currently supported functions are \code{"matern_isotropic"}
-#' for spatial data, \code{"matern_sphere"} for spatial data over the globe, and 
-#' \code{"matern_sphere_time"} for spatial-temporal data over the globe. For the \code{sphere}
-#' the coordinates should be expressed in longitudes and latitudes. If there are 
+#' @details The main functions of the package are \code{\link{fit_model}}, 
+#' and \code{\link{predictions}}.
+#' \code{\link{fit_model}} returns estimates of covariance parameters
+#' and linear mean parameters. The user is expected to select a covariance function
+#' and specify it with a string. Currently supported covariance functions are 
+#' \itemize{
+#'     \item \code{\link{matern_isotropic}}
+#'     \item \code{\link{exponential_isotropic}}
+#'     \item \code{\link{matern_spacetime}}
+#'     \item \code{\link{exponential_spacetime}}
+#'     \item \code{\link{matern_scaledim}}
+#'     \item \code{\link{exponential_scaledim}}
+#'     \item \code{\link{matern_anisotropic2D}}
+#'     \item \code{\link{exponential_anisotropic2D}}
+#'     \item \code{\link{exponential_anisotropic3D}}
+#'     \item \code{\link{matern_nonstat_var}}
+#'     \item \code{\link{exponential_nonstat_var}}
+#'     \item \code{\link{matern_sphere}}
+#'     \item \code{\link{exponential_sphere}}
+#'     \item \code{\link{matern_spheretime}}
+#'     \item \code{\link{exponential_spheretime}}
+#'     \item \code{\link{matern_sphere_warp}}
+#'     \item \code{\link{exponential_sphere_warp}}
+#'     \item \code{\link{matern_spheretime_warp}}
+#'     \item \code{\link{exponential_spheretime_warp}}
+#' }
+#' 
+#' If there are 
 #' covariates, they can be expressed via a design matrix \code{X}, each row containing
 #' the covariates corresponding to the same row in \code{locs}. 
 #' 
