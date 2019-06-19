@@ -4,17 +4,17 @@
 \alias{cond_sim}
 \title{Conditional Simulation using Vecchia's approximation}
 \usage{
-cond_sim(fit = NULL, covparms = fit$covparms,
-  covfun_name = fit$covfun_name, y_obs = fit$y, locs_obs = fit$locs,
-  X_obs = fit$X, beta = fit$betahat, locs_pred, X_pred, m = 60,
-  nsims = 1, reorder = TRUE)
+cond_sim(fit = NULL, locs_pred, X_pred, y_obs = fit$y,
+  locs_obs = fit$locs, X_obs = fit$X, beta = fit$betahat,
+  covparms = fit$covparms, covfun_name = fit$covfun_name, m = 60,
+  reorder = TRUE, nsims = 1)
 }
 \arguments{
 \item{fit}{GpGp_fit object, the result of \code{\link{fit_model}}}
 
-\item{covparms}{Covariance parameters}
+\item{locs_pred}{prediction locations}
 
-\item{covfun_name}{Name of covariance function}
+\item{X_pred}{Design matrix for predictions}
 
 \item{y_obs}{Observations associated with locs_obs}
 
@@ -24,18 +24,18 @@ cond_sim(fit = NULL, covparms = fit$covparms,
 
 \item{beta}{Linear mean parameters}
 
-\item{locs_pred}{prediction locations}
+\item{covparms}{Covariance parameters}
 
-\item{X_pred}{Design matrix for predictions}
+\item{covfun_name}{Name of covariance function}
 
 \item{m}{Number of nearest neighbors to use. Larger \code{m} gives
 better approximations.}
 
-\item{nsims}{Number of conditional simulations to return.}
-
 \item{reorder}{TRUE/FALSE for whether reordering should be done. This should
 generally be kept at TRUE, unless testing out the effect of
 reordering.}
+
+\item{nsims}{Number of conditional simulations to return.}
 }
 \description{
 With the prediction locations ordered after the observation locations,

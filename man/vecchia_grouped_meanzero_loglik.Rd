@@ -28,7 +28,7 @@ a list containing
 }
 }
 \description{
-This function returns a grouped version of Vecchia's (1988) 
+This function returns a grouped version (Guinness, 2018) of Vecchia's (1988) 
 approximation to the Gaussian
 loglikelihood. The approximation modifies the ordered conditional
 specification of the joint density; rather than each term in the product

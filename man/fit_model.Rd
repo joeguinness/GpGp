@@ -31,7 +31,7 @@ compute the nearest neighbors. We recommend that the user
 not specify this unless there is a good reason to (e.g. if doing a comparison
 study where one wants to control \code{NNarray} across different approximations).}
 
-\item{start_parms}{Optinally specified starting values for parameters. If \code{NULL},
+\item{start_parms}{Optionally specified starting values for parameters. If \code{NULL},
 fit_model will select default starting values.}
 
 \item{silent}{TRUE/FALSE for whether to print some information during fitting.}
@@ -60,17 +60,18 @@ when \code{covfun_name} is a spatial-temporal covariance. See Argo vignette for 
 when the dot product between the step and the gradient is less than \code{convtol}.}
 }
 \value{
-A list object containing covariance parameter estimates,
-mean parameter estimates, and covariance matrix for mean parameter estimates.
+An object of class \code{GpGp_fit}, which is a list containing 
+covariance parameter estimates, regression coefficients, 
+covariance matrix for mean parameter estimates, as well as some other
+information relevant to the model fit.
 }
 \description{
 Given a response, set of locations, (optionally) a design matrix,
 and a specified covariance function, return the maximum
-approximate likelihood estimates, using Vecchia's
-likelihood approximation.
+Vecchia likelihood estimates, obtained with a Fisher scoring algorithm.
 }
 \details{
-The \code{fit_model} is a user-friendly model fitting function
+\code{fit_model} is a user-friendly model fitting function
 that automatically performs many of the auxiliary tasks needed for
 using Vecchia's approximation, including reordering, computing
 nearest neighbors, grouping, and optimization. The likelihoods use a small

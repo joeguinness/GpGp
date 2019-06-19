@@ -44,15 +44,12 @@
 #' \code{locs_pred} and a prediction design matrix \code{X_pred}.
 #' 
 #' The vignettes are intended to be helpful for getting a sense of how 
-#' these functions work. The windspeed
-#' vignette can be a guide for spatial and spatial-temporal data over the globe.
+#' these functions work. 
 #' 
-#' For Gaussian process researchers, the package also provides access to likelihood
-#' and profile likelihood functions, reordering functions, nearest neighbor-finding 
+#' For Gaussian process researchers, the package also provides access to functions for
+#' computing the likelihood, gradient, and Fisher information with respect
+#' to covariance parameters; reordering functions, nearest neighbor-finding 
 #' functions, grouping (partitioning) functions, and approximate simulation functions.
-#' We think that there is potential for improving the grouping algorithms, and 
-#' scope for improving the approximations by tailoring the choice of ordering 
-#' and the grouping algorithm to suit one another.
 #'
 #' @docType package
 #' @name GpGp

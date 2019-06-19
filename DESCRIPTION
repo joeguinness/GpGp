@@ -2,22 +2,24 @@ Package: GpGp
 Type: Package
 Title: Fast Gaussian Process Computation Using Vecchia's Approximation
 Version: 0.2.0
-Date: 2019-04-05
+Date: 2019-06-19
 Authors@R: c(
     person("Joseph", "Guinness", email = "joeguinness@gmail.com", role = c("aut", "cre")),
     person("Matthias", "Katzfuss", email = "katzfuss@gmail.com", role = "aut" ) )
 Maintainer: Joseph Guinness <joeguinness@gmail.com>
-Description: Functions for reordering
-    input locations, finding ordered nearest neighbors
-    (with help from 'FNN' package), grouping operations, 
-    approximate likelihood evaluations, profile likelihoods,
-    Gaussian process predictions, and conditional simulations.
+Description: Functions for fitting and doing predictions with
+    Gaussian process models using Vecchia's (1988) approximation. 
+    Package also includes functions for reordering input locations, 
+    finding ordered nearest neighbors (with help from 'FNN' package), 
+    grouping operations, and conditional simulations.
     Covariance functions for spatial and spatial-temporal data
     on Euclidean domains and spheres are provided. The original 
     approximation is due to Vecchia (1988) 
     <http://www.jstor.org/stable/2345768>, and the reordering and
-    grouping methods are from Guinness (2018)
+    grouping methods are from Guinness (2018) 
     <doi:10.1080/00401706.2018.1437476>.
+    Model fitting employs a Fisher scoring algorithm described
+    in Guinness (2019) <https://arxiv.org/abs/1905.08374>.
 Depends: R (>= 2.10)
 License: MIT + file LICENSE
 Imports:

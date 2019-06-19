@@ -24,7 +24,7 @@ sparse inverse Cholesky factor with a vector
 \description{
 Vecchia's approximation implies a sparse approximation to the
 inverse Cholesky factor of the covariance matrix. This function
-returns the result of multiplying that matrix by a vector.
+returns the result of multiplying the transpose of that matrix by a vector.
 }
 \examples{
 n <- 2000

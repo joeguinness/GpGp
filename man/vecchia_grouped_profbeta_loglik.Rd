@@ -35,7 +35,7 @@ The covariance
 matrix for \code{$betahat} is the inverse of \code{$betainfo}.
 }
 \description{
-This function returns a grouped version of Vecchia's (1988) 
+This function returns a grouped version (Guinness, 2018) of Vecchia's (1988) 
 approximation to the Gaussian
 loglikelihood and the profile likelihood estimate of the regression
 coefficients. The approximation modifies the ordered conditional
@@ -48,10 +48,12 @@ n1 <- 40
 n2 <- 40
 n <- n1*n2
 locs <- as.matrix( expand.grid( (1:n1)/n1, (1:n2)/n2 ) )
+X <- cbind(rep(1,n),locs[,2])
 covparms <- c(2, 0.2, 0.75, 0)
 y <- fast_Gp_sim(covparms, "matern_isotropic", locs, 50 )
 ord <- order_maxmin(locs)
 NNarray <- find_ordered_nn(locs,20)
 NNlist <- group_obs(NNarray)
-loglik <- vecchia_grouped_meanzero_loglik( covparms, "matern_isotropic", y, locs, NNlist )
+loglik <- vecchia_grouped_profbeta_loglik( 
+    covparms, "matern_isotropic", y, X, locs, NNlist )
 }

@@ -117,7 +117,7 @@ NumericVector L_mult(NumericMatrix Linv, NumericVector z,
 //'
 //' Vecchia's approximation implies a sparse approximation to the
 //' inverse Cholesky factor of the covariance matrix. This function
-//' returns the result of multiplying that matrix by a vector.
+//' returns the result of multiplying the transpose of that matrix by a vector.
 //' @param Linv Entries of the sparse inverse Cholesky factor,
 //' usually the output from \code{\link{vecchia_Linv}}.
 //' @param z the vector to be multiplied

@@ -10,7 +10,14 @@
 #' 
 #' @param locs matrix of locations
 #' @param m number of neighbors
-#' @return integer vector giving ordering
+#' @return An matrix containing the indices of the neighbors. Row \code{i} of the
+#' returned matrix contains the indices of the nearest \code{m}
+#' locations to the \code{i}'th location. Indices are ordered within a
+#' row to be increasing in distance. By convention, we consider a location
+#' to neighbor itself, so the first entry of row \code{i} is \code{i}, the
+#' second entry is the index of the nearest location, and so on. Because each
+#' location neighbors itself, the returned matrix has \code{m+1} columns.
+#' @export
 find_ordered_nn_brute <- function( locs, m ){
      # find the m+1 nearest neighbors to locs[j,] in locs[1:j,]
      # by convention, this includes locs[j,], which is distance 0
@@ -31,7 +38,7 @@ find_ordered_nn_brute <- function( locs, m ){
 
 #' Find ordered nearest neighbors.
 #'
-#' Given a matrix of reordered locations, find the \code{m} nearest neighbors
+#' Given a matrix of locations, find the \code{m} nearest neighbors
 #' to each location, subject to the neighbors coming
 #' previously in the ordering. The algorithm uses the kdtree
 #' algorithm in the FNN package, adapted to the setting
@@ -46,7 +53,7 @@ find_ordered_nn_brute <- function( locs, m ){
 #' the locations is the temporal dimension, and the rest of the columns
 #' are spatial dimensions. The spatial dimensions are divided by \code{st_scale[1]},
 #' and the temporal dimension is divided by \code{st_scale[2]}, before distances are
-#' calculated. If \code{st_scale} is \code{NULL} a default scaling is used. We 
+#' calculated. If \code{st_scale} is \code{NULL}, no scaling is used. We 
 #' recommend setting \code{st_scale} manually so that each observation gets
 #' neighbors that hail multiple directions in space and time.
 #' @return An matrix containing the indices of the neighbors. Row \code{i} of the

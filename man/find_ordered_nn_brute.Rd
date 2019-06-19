@@ -12,7 +12,13 @@ find_ordered_nn_brute(locs, m)
 \item{m}{number of neighbors}
 }
 \value{
-integer vector giving ordering
+An matrix containing the indices of the neighbors. Row \code{i} of the
+returned matrix contains the indices of the nearest \code{m}
+locations to the \code{i}'th location. Indices are ordered within a
+row to be increasing in distance. By convention, we consider a location
+to neighbor itself, so the first entry of row \code{i} is \code{i}, the
+second entry is the index of the nearest location, and so on. Because each
+location neighbors itself, the returned matrix has \code{m+1} columns.
 }
 \description{
 Naive brute force nearest neighbor finder

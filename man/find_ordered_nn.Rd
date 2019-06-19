@@ -21,7 +21,7 @@ for distance calculations. The function assumes that the last column of
 the locations is the temporal dimension, and the rest of the columns
 are spatial dimensions. The spatial dimensions are divided by \code{st_scale[1]},
 and the temporal dimension is divided by \code{st_scale[2]}, before distances are
-calculated. If \code{st_scale} is \code{NULL} a default scaling is used. We 
+calculated. If \code{st_scale} is \code{NULL}, no scaling is used. We 
 recommend setting \code{st_scale} manually so that each observation gets
 neighbors that hail multiple directions in space and time.}
 }
@@ -35,7 +35,7 @@ second entry is the index of the nearest location, and so on. Because each
 location neighbors itself, the returned matrix has \code{m+1} columns.
 }
 \description{
-Given a matrix of reordered locations, find the \code{m} nearest neighbors
+Given a matrix of locations, find the \code{m} nearest neighbors
 to each location, subject to the neighbors coming
 previously in the ordering. The algorithm uses the kdtree
 algorithm in the FNN package, adapted to the setting

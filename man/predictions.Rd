@@ -4,17 +4,17 @@
 \alias{predictions}
 \title{Compute Gaussian process predictions using Vecchia's approximations}
 \usage{
-predictions(fit = NULL, covparms = fit$covparms,
-  covfun_name = fit$covfun_name, y_obs = fit$y, locs_obs = fit$locs,
-  X_obs = fit$X, beta = fit$betahat, locs_pred, X_pred, m = 60,
+predictions(fit = NULL, locs_pred, X_pred, y_obs = fit$y,
+  locs_obs = fit$locs, X_obs = fit$X, beta = fit$betahat,
+  covparms = fit$covparms, covfun_name = fit$covfun_name, m = 60,
   reorder = TRUE)
 }
 \arguments{
 \item{fit}{GpGp_fit object, the result of \code{\link{fit_model}}}
 
-\item{covparms}{Covariance parameters}
+\item{locs_pred}{prediction locations}
 
-\item{covfun_name}{Name of covariance function}
+\item{X_pred}{Design matrix for predictions}
 
 \item{y_obs}{Observations associated with locs_obs}
 
@@ -24,9 +24,9 @@ predictions(fit = NULL, covparms = fit$covparms,
 
 \item{beta}{Linear mean parameters}
 
-\item{locs_pred}{prediction locations}
+\item{covparms}{Covariance parameters}
 
-\item{X_pred}{Design matrix for predictions}
+\item{covfun_name}{Name of covariance function}
 
 \item{m}{Number of nearest neighbors to use}
 

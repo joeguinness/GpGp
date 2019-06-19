@@ -26,10 +26,10 @@
 #' parameters, the observations, observation locations, and design matrix. We 
 #' must specify the prediction locations and the prediction design matrix.
 #' @export
-predictions <- function(fit = NULL, 
-    covparms = fit$covparms, covfun_name = fit$covfun_name, y_obs = fit$y, 
-    locs_obs = fit$locs, X_obs = fit$X, beta = fit$betahat,
-    locs_pred, X_pred, m = 60, reorder = TRUE){
+predictions <- function(fit = NULL, locs_pred, X_pred, 
+    y_obs = fit$y, locs_obs = fit$locs, X_obs = fit$X, beta = fit$betahat,    
+    covparms = fit$covparms, covfun_name = fit$covfun_name, 
+    m = 60, reorder = TRUE){
     
     n_obs <- nrow(locs_obs)
     n_pred <- nrow(locs_pred)
@@ -109,11 +109,11 @@ predictions <- function(fit = NULL,
 #' parameters, the observations, observation locations, and design matrix. We 
 #' must specify the prediction locations and the prediction design matrix.
 #' @export
-cond_sim <- function(fit = NULL, 
-    covparms = fit$covparms, covfun_name = fit$covfun_name, y_obs = fit$y, 
-    locs_obs = fit$locs, X_obs = fit$X, beta = fit$betahat,
-    locs_pred, X_pred, m = 60, nsims = 1, reorder = TRUE){
-    
+cond_sim <- function(fit = NULL, locs_pred, X_pred, 
+    y_obs = fit$y, locs_obs = fit$locs, X_obs = fit$X, beta = fit$betahat,    
+    covparms = fit$covparms, covfun_name = fit$covfun_name, 
+    m = 60, reorder = TRUE, nsims = 1 ){
+
     n_obs <- nrow(locs_obs)
     n_pred <- nrow(locs_pred)
     
