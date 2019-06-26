@@ -92,7 +92,7 @@ The space-time model knows that these measurements were taken at different time 
 
 # Predictions and Conditional Simulations
 
-The package also has functions for making predictions at unobserved spatial or spatial-temporal locations. For the wind data, we predict the entire wind field at a time point in the middle of the domain. The package is also capable of performing a conditional simulation, which can be thought of as attempt to reconstruct a realistic-looking wind field that is consistent with the observed data. Prediction maps tend to be too smooth, whereas conditional simulations ``add the noise back in.'' The noise should not be taken literally as the exact wind field, but instead as one plausible wind field, given the information in the data. Ensembles of several conditional simulations can serve as a useful tool for quantifying uncertainties in predictins, especially when the prediction of interest is a non-linear function of the unobserved data; for example, the number of pixels exceeding a particular value.
+The package also has functions for making predictions at unobserved spatial or spatial-temporal locations. For the wind data, we predict the entire wind field at a time point in the middle of the domain. The package is also capable of performing a conditional simulation, which can be thought of as attempt to reconstruct a realistic-looking wind field that is consistent with the observed data. Prediction maps tend to be too smooth, whereas conditional simulations ``add the noise back in.'' The noise should not be taken literally as the exact wind field, but instead as one plausible wind field that is consistent with the data. Ensembles of several conditional simulations can serve as a useful tool for quantifying uncertainties in predictoins, especially when the prediction of interest is a non-linear function of the unobserved data; for example, the number of pixels exceeding a particular value.
 
 ```{r, fig.width=8, fig.height=4}
 # prediction locations and design matrix
@@ -119,7 +119,3 @@ sim <- cond_sim(fit = fit_spacetime,
 sim_array <- array( sim, c(length(longrid),length(latgrid)) )
 fields::image.plot(longrid,latgrid,sim_array)
 ```
-
-## Additional Information
-
-The file `vignette_windspeed_code.R` in the vignettes directory of the source package (also available on [github](https://github.com/joeguinness/GpGp)), contains the above code, as well as a more detailed description of the behind-the-scenes operations that `fit_model` hides from the user. 
