@@ -1,9 +1,9 @@
 
 # analysis of argo data
 devtools::load_all()
-data("argo2016Jan2Mar")
-names(argo2016Jan2Mar)
-attach(argo2016Jan2Mar)
+data("argo2016")
+names(argo2016)
+attach(argo2016)
 n <- length(lon)
 
 # plot of data locations and times
@@ -11,101 +11,83 @@ par(mfrow=c(1,2))
 plot(lon,lat,pch=1,cex=0.3)
 hist(day,breaks=60)
 
-# interpolate temperature to chosen pressure level
-chosen_pres <- 100
-temp <- rep(NA,n)
-for(j in 1:n){
-    # get first pressure larger than chosen_pres
-    up <- which( c(pres_prof[[j]][[1]]) - chosen_pres >= 0 )[1]
-    lo <- up-1
-    # assumes that chosen pressure is between two pressures in dataset
-    if(is.na(up) || up==1){ 
-        warning(paste0("pressures in observation ",j," do not surround chosen_pres"))
-    } else {
-        pres_bounds <- c(pres_prof[[j]][[1]])[c(lo,up)]
-        temp_bounds <- c(temp_prof[[j]][[1]])[c(lo,up)]
-        temp[j] <- temp_bounds[1] + 
-            diff(temp_bounds)*(chosen_pres-pres_bounds[1])/diff(pres_bounds)
-    }
-}
-
-# filter to floats with temperature measurements at pressures surrounding
-# chosen_pres
-notna <- !is.na(temp)
-lon1 <- lon[notna]
-lat1 <- lat[notna]
-temp1 <- temp[notna]
-day1 <- day[notna]
-n1 <- length(lon1)
-
 # plot the data
-fields::quilt.plot(lon1,lat1,temp1,nx=200,ny=200)
+par(mfrow=c(1,1))
+fields::quilt.plot(lon,lat,temp100,nx=200,ny=200)
 
-lonlat1 <- cbind(lon1,lat1)
-lonlattime1 <- cbind(lonlat1,day1)
+# define locations
+lonlat <- cbind(lon,lat)
+lonlattime <- cbind(lonlat,day)
 
-X1 <- cbind(rep(1,n1),lat1,lat1^2)
+# define covariates (quadratic in latitude)
+X <- cbind(rep(1,n),lat,lat^2)
 
-xyz <- array(NA, c(nrow(lonlat1), 3) )
-lonrad <- lon1*2*pi/360
-latrad <- (lat1+90)*2*pi/360
-xyz[,1] <- sin(latrad)*cos(lonrad)
-xyz[,2] <- sin(latrad)*sin(lonrad)
-xyz[,3] <- cos(latrad)
-
-
-
-# subset of data for faster cran checks
-inds <- sample(n1,10000)
+# subset of data for faster results
+inds <- sample(n,10000)
 # full analysis
-#inds <- 1:n1
+#inds <- 1:n
 
-#NNarray <- find_ordered_nn(xyz,m=30)
+# use the 100-bar temperature data
+# also available: 150-bar and 200-bar
+temp <- temp100
+
+# store timing results
 timing <- rep(NA,4)
 
 # spatial isotropic
 t1 <- proc.time()
-fit1 <- fit_model(y = temp1[inds], X = X1[inds,], locs = lonlat1[inds,], 
+fit1 <- fit_model(y = temp[inds], X = X[inds,], locs = lonlat[inds,], 
     covfun_name = "exponential_sphere", group = FALSE )
 timing[1] <- (proc.time() - t1)[3]
 
 
 # spacetime, isotropic in each
 t1 <- proc.time()
-fit2 <- fit_model(y = temp1[inds], X = X1[inds,], locs = lonlattime1[inds,], 
+fit2 <- fit_model(y = temp[inds], X = X[inds,], locs = lonlattime[inds,], 
     covfun_name = "exponential_spheretime", group = FALSE, st_scale = c(0.2,16) )
 timing[2] <- (proc.time() - t1)[3]
 
 
 # spatial warping
 t1 <- proc.time()
-fit3 <- fit_model(y = temp1[inds], X = X1[inds,], locs = lonlat1[inds,], 
+fit3 <- fit_model(y = temp[inds], X = X[inds,], locs = lonlat[inds,], 
     covfun_name = "exponential_sphere_warp", group = FALSE )
 timing[3] <- (proc.time() - t1)[3]
 
 
 # spacetime, warping in space
 t1 <- proc.time()
-fit4 <- fit_model(y = temp1[inds], X = X1[inds,], locs = lonlattime1[inds,], 
+fit4 <- fit_model(y = temp[inds], X = X[inds,], locs = lonlattime[inds,], 
     covfun_name = "exponential_spheretime_warp", group = FALSE, st_scale = c(0.2,16) )
 timing[4] <- (proc.time() - t1)[3]
 
 # prediction locations and design matrix
-mediantime <- median(day1)
-latgrid <- seq( min(lat1), max(lat1), length.out = 60 )
+mediantime <- median(day)
+latgrid <- seq( min(lat), max(lat), length.out = 60 )
 longrid <- seq( 0, 360, length.out = 121)[1:120] # so no locations repeated
 locs_pred <- as.matrix( expand.grid(longrid,latgrid) )
 n_pred <- nrow(locs_pred)
 locstime_pred <- cbind( locs_pred, rep(mediantime, n_pred) )
 X_pred <- as.matrix( cbind( rep(1,n_pred), locs_pred[,2], locs_pred[,2]^2 ) )
-# predictions
+
+# predictions: this one uses only data in fit4 object (subset of all data)
 pred <- predictions( fit4, locs_pred = locstime_pred, X_pred = X_pred )
-# plot predictions
-par(mar=c(4,4,1,1))
+
+# this one uses all data: overrides y_obs = fit$y, locs_obs = fit$locs, etc.
+pred <- predictions( fit4, locs_pred = locstime_pred, X_pred = X_pred,
+    y_obs = temp, locs_obs = lonlattime, X_obs = X )
+
+# conditional simulations: only uses data in fit4 object
+sim <- cond_sim( fit4, locs_pred = locstime_pred, X_pred = X_pred )
+
+# uses all data
+sim <- cond_sim( fit4, locs_pred = locstime_pred, X_pred = X_pred,
+    y_obs = temp, locs_obs = lonlattime, X_obs = X )
+
+# plot predictions and cond sim
+par(mar=c(4,4,1,1),mfrow=c(1,2))
 pred_array <- array( pred, c(length(longrid),length(latgrid)) )
 fields::image.plot(longrid,latgrid,pred_array)
-# conditional simulations
-sim <- cond_sim( fit4, locs_pred = locstime_pred, X_pred = X_pred )
 # plot conditional simulations
 sim_array <- array( sim, c(length(longrid),length(latgrid)) )
 fields::image.plot(longrid,latgrid,sim_array)
