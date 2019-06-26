@@ -21,6 +21,10 @@
 #' @param reorder TRUE/FALSE for whether reordering should be done. This should
 #' generally be kept at TRUE, unless testing out the effect of
 #' reordering.
+#' @param st_scale amount by which to scale the spatial and temporal
+#' dimensions for the purpose of selecting neighbors. We recommend setting
+#' this manually when using a spatial-temporal covariance function. When 
+#' \code{lonlat = TRUE}, spatial scale is in radians (earth radius = 1).
 #' @details We can specify either a GpGp_fit object (the result of 
 #' \code{\link{fit_model}}), OR manually enter the covariance function and
 #' parameters, the observations, observation locations, and design matrix. We 
@@ -29,7 +33,7 @@
 predictions <- function(fit = NULL, locs_pred, X_pred, 
     y_obs = fit$y, locs_obs = fit$locs, X_obs = fit$X, beta = fit$betahat,    
     covparms = fit$covparms, covfun_name = fit$covfun_name, 
-    m = 60, reorder = TRUE){
+    m = 60, reorder = TRUE, st_scale = NULL){
     
     n_obs <- nrow(locs_obs)
     n_pred <- nrow(locs_pred)
@@ -66,7 +70,8 @@ predictions <- function(fit = NULL, locs_pred, X_pred,
     } else {
         dd <- ncol(locs_all)
     }
-    NNarray_all <- find_ordered_nn(locs_all[,1:dd,drop=FALSE],m=m,lonlat = lonlat)
+    #NNarray_all <- find_ordered_nn(locs_all[,1:dd,drop=FALSE],m=m,lonlat = lonlat)
+    NNarray_all <- find_ordered_nn(locs_all,m=m,lonlat = lonlat,st_scale=st_scale)
     
     # get entries of Linv for obs locations and pred locations
     Linv_all <- vecchia_Linv(covparms,covfun_name,locs_all,NNarray_all)
@@ -100,6 +105,10 @@ predictions <- function(fit = NULL, locs_pred, X_pred,
 #' @param beta Linear mean parameters
 #' @param m Number of nearest neighbors to use. Larger \code{m} gives
 #' better approximations.
+#' @param st_scale amount by which to scale the spatial and temporal
+#' dimensions for the purpose of selecting neighbors. We recommend setting
+#' this manually when using a spatial-temporal covariance function. When 
+#' \code{lonlat = TRUE}, spatial scale is in radians (earth radius = 1).
 #' @param nsims Number of conditional simulations to return.
 #' @param reorder TRUE/FALSE for whether reordering should be done. This should
 #' generally be kept at TRUE, unless testing out the effect of
@@ -112,7 +121,7 @@ predictions <- function(fit = NULL, locs_pred, X_pred,
 cond_sim <- function(fit = NULL, locs_pred, X_pred, 
     y_obs = fit$y, locs_obs = fit$locs, X_obs = fit$X, beta = fit$betahat,    
     covparms = fit$covparms, covfun_name = fit$covfun_name, 
-    m = 60, reorder = TRUE, nsims = 1 ){
+    m = 60, reorder = TRUE, st_scale = NULL, nsims = 1 ){
 
     n_obs <- nrow(locs_obs)
     n_pred <- nrow(locs_pred)
@@ -137,8 +146,9 @@ cond_sim <- function(fit = NULL, locs_pred, X_pred,
     lonlat <- get_linkfun(covfun_name)$lonlat
     
     # get nearest neighbor array (in space only)
-    NNarray_all <- find_ordered_nn(locs_all,m=m,lonlat = lonlat)
-    
+    #NNarray_all <- find_ordered_nn(locs_all,m=m,lonlat = lonlat)
+    NNarray_all <- find_ordered_nn(locs_all,m=m,lonlat = lonlat,st_scale=st_scale)
+
     # get entries of Linv for obs locations and pred locations
     Linv_all <- vecchia_Linv(covparms,covfun_name,locs_all,NNarray_all)
     
