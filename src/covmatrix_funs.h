@@ -6,7 +6,6 @@
 #include <RcppArmadillo.h>
 #include <iostream>
 #include <vector>
-#include <cassert>
 #include "basis.h"
 
 // covariance functions
@@ -131,7 +130,6 @@ covfun_t get_covfun(std::string covfun_name_string)
     }
     else { // stop the program
         Rcpp::Rcout << "Unrecognized Covariance Function Name \n";
-        assert(0);
     }
     return covstruct;
 }

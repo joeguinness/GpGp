@@ -3,7 +3,6 @@
 #include <math.h>
 #include <iostream>
 #include <vector>
-#include <cassert>
 #include "onepass.h"
 //[[Rcpp::depends(RcppArmadillo)]]
 
@@ -33,8 +32,8 @@ using namespace Rcpp;
 //' }
 //' The covariance matrix for \code{$betahat} is the inverse of \code{$betainfo}.
 //' @examples
-//' n1 <- 40
-//' n2 <- 40
+//' n1 <- 20
+//' n2 <- 20
 //' n <- n1*n2
 //' locs <- as.matrix( expand.grid( (1:n1)/n1, (1:n2)/n2 ) )
 //' X <- cbind(rep(1,n),locs[,2])
@@ -93,8 +92,8 @@ List vecchia_profbeta_loglik_grad_info(
 //' The covariance
 //' matrix for \code{$betahat} is the inverse of \code{$betainfo}.
 //' @examples
-//' n1 <- 40
-//' n2 <- 40
+//' n1 <- 20
+//' n2 <- 20
 //' n <- n1*n2
 //' locs <- as.matrix( expand.grid( (1:n1)/n1, (1:n2)/n2 ) )
 //' X <- cbind(rep(1,n),locs[,2])
@@ -156,8 +155,8 @@ List vecchia_profbeta_loglik(
 //'  \item \code{loglik}: the loglikelihood
 //' }
 //' @examples
-//' n1 <- 40
-//' n2 <- 40
+//' n1 <- 20
+//' n2 <- 20
 //' n <- n1*n2
 //' locs <- as.matrix( expand.grid( (1:n1)/n1, (1:n2)/n2 ) )
 //' covparms <- c(2, 0.2, 0.75, 0)
@@ -218,8 +217,8 @@ List vecchia_meanzero_loglik(
 //' The covariance
 //' matrix for \code{$betahat} is the inverse of \code{$betainfo}.
 //' @examples
-//' n1 <- 40
-//' n2 <- 40
+//' n1 <- 20
+//' n2 <- 20
 //' n <- n1*n2
 //' locs <- as.matrix( expand.grid( (1:n1)/n1, (1:n2)/n2 ) )
 //' X <- cbind(rep(1,n),locs[,2])
@@ -283,8 +282,8 @@ List vecchia_grouped_profbeta_loglik_grad_info(
 //' The covariance
 //' matrix for \code{$betahat} is the inverse of \code{$betainfo}.
 //' @examples
-//' n1 <- 40
-//' n2 <- 40
+//' n1 <- 20
+//' n2 <- 20
 //' n <- n1*n2
 //' locs <- as.matrix( expand.grid( (1:n1)/n1, (1:n2)/n2 ) )
 //' X <- cbind(rep(1,n),locs[,2])
@@ -348,8 +347,8 @@ List vecchia_grouped_profbeta_loglik(
 //'  \item \code{loglik}: the loglikelihood
 //' }
 //' @examples
-//' n1 <- 40
-//' n2 <- 40
+//' n1 <- 20
+//' n2 <- 20
 //' n <- n1*n2
 //' locs <- as.matrix( expand.grid( (1:n1)/n1, (1:n2)/n2 ) )
 //' covparms <- c(2, 0.2, 0.75, 0)

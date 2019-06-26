@@ -65,8 +65,9 @@
 #' covparms <- c(2,0.1,1/2,0)
 #' y <- 7 + fast_Gp_sim(covparms, "matern_isotropic", locs)
 #' X <- as.matrix( rep(1,n) )
-#' fit <- fit_model(y, locs, X, "matern_isotropic")
-#' fit
+#' ## not run
+#' # fit <- fit_model(y, locs, X, "matern_isotropic")
+#' # fit
 #'
 #'
 #' @export
@@ -226,20 +227,21 @@ fit_model <- function(y, locs, X = NULL, covfun_name = "matern_isotropic",
 
 #' Print summary of GpGp fit
 #' 
-#' @param fit Object of class "GpGp_fit", usually the return value from 
+#' @param object Object of class "GpGp_fit", usually the return value from 
 #' \code{\link{fit_model}}
+#' @param ... additional arguments, for compatability with S3 generic 'summary'
 #' @export
-summary.GpGp_fit <- function(fit){
-    cat(paste0("Covariance Function: ",fit$covfun_name,"\n\n"))
+summary.GpGp_fit <- function(object, ...){
+    cat(paste0("Covariance Function: ",object$covfun_name,"\n\n"))
     cat(paste0("Covariance Parameters: \n"))
-    cat(paste0(round(fit$covparms,4)),"\n\n")
-    cat(paste0("Loglikelihood: ",round(fit$loglik,4),"\n\n"))
-    X <- as.data.frame(fit$X)
+    cat(paste0(round(object$covparms,4)),"\n\n")
+    cat(paste0("Loglikelihood: ",round(object$loglik,4),"\n\n"))
+    X <- as.data.frame(object$X)
     df <- data.frame( 
         variable = colnames(X),
-        estimate = round(fit$betahat,4),
-        std_error = round(fit$sebeta,4),
-        t_stat = round(fit$tbeta,4)
+        estimate = round(object$betahat,4),
+        std_error = round(object$sebeta,4),
+        t_stat = round(object$tbeta,4)
     )
     rownames(df) <- c()
     cat("Linear Mean Parameters: \n")
@@ -248,7 +250,12 @@ summary.GpGp_fit <- function(fit){
     
 }    
     
-
+#' get default starting values of covariance parameters
+#' 
+#' @param y response
+#' @param X design matrix
+#' @param locs locations
+#' @param covfun_name string name of covariance function
 get_start_parms <- function(y,X,locs,covfun_name){
 
     fitlm <- stats::lm(y ~ X - 1 )
@@ -335,7 +342,7 @@ get_start_parms <- function(y,X,locs,covfun_name){
         start_parms <- c(start_var)
         for(j in 1:d){
             dmat <- fields::rdist(locs[randinds,j])
-            start_parms <- c(start_parms, median(dmat)/4 )
+            start_parms <- c(start_parms, stats::median(dmat)/4 )
         }
         start_parms <- c(start_parms, start_smooth, start_nug)
     }
@@ -344,7 +351,7 @@ get_start_parms <- function(y,X,locs,covfun_name){
         start_parms <- c(start_var)
         for(j in 1:d){
             dmat <- fields::rdist(locs[randinds,j])
-            start_parms <- c(start_parms, median(dmat)/4 )
+            start_parms <- c(start_parms, stats::median(dmat)/4 )
         }
         start_parms <- c(start_parms, start_nug)
     }
@@ -390,7 +397,9 @@ get_start_parms <- function(y,X,locs,covfun_name){
 }
 
 
-# starting values and covariance-specific settings
+#' get link function, whether locations are lonlat and space time
+#' 
+#' @param covfun_name string name of covariance function
 get_linkfun <- function(covfun_name){
 
     link <- exp
@@ -486,8 +495,10 @@ get_linkfun <- function(covfun_name){
 
 
 
-# penalty functions
-get_penalty <- function(y,X,locs,covfun_name, silent = FALSE){
+#' get penalty function
+#' 
+#' @inheritParams get_start_parms
+get_penalty <- function(y,X,locs,covfun_name){
 
     fitlm <- stats::lm(y ~ X - 1 )
     vv <- summary(fitlm)$sigma^2

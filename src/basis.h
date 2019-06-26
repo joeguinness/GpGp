@@ -11,7 +11,11 @@ using namespace Rcpp;
 using namespace arma;
 //[[Rcpp::depends(RcppArmadillo)]]
 
-
+//' compute gradient of spherical harmonics functions
+//' 
+//' @param xyz xyz coordinates of locations on sphere
+//' @param Lmax largest degree of spherical harmonics. 
+//' Current only Lmax=2 supported
 // [[Rcpp::export]]
 arma::cube sph_grad_xyz( NumericMatrix xyz, int Lmax ){
     

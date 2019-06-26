@@ -2,7 +2,6 @@
 #include <math.h>
 #include <iostream>
 #include <vector>
-#include <cassert>
 
 using namespace std;
 using namespace Rcpp;
@@ -177,7 +176,7 @@ NumericVector Linv_t_mult(NumericMatrix Linv, NumericVector z,
 //' NNarray <- find_ordered_nn(locs,20)
 //' Linv <- vecchia_Linv( covparms, "matern_isotropic", locs, NNarray )
 //' z1 <- rnorm(n)
-//' z2 <- L_t_mult(Linv, z2, NNarray)
+//' z2 <- L_t_mult(Linv, z1, NNarray)
 //' @export
 // [[Rcpp::export]]
 NumericVector L_t_mult(NumericMatrix Linv, NumericVector z,

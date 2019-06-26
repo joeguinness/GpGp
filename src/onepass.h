@@ -1,7 +1,6 @@
 #ifndef ONEPASS_H
 #define ONEPASS_H
 
-#include <assert.h>
 #include <RcppArmadillo.h>
 #include "covmatrix_funs.h"
 
@@ -544,7 +543,25 @@ void synthesize_grouped(
 }
 
 
-
+//' Entries of inverse Cholesky approximation
+//' 
+//' This function returns the entries of the inverse Cholesky
+//' factor of the covariance matrix implied by Vecchia's aproximation.
+//' For return matrix \code{Linv}, \code{Linv[i,]} contains 
+//' the non-zero entries of row \code{i} of
+//' the inverse Cholesky matrix. The columns of the non-zero entries
+//' are specified in \code{NNarray[i,]}.
+//' @inheritParams vecchia_meanzero_loglik
+//' @return matrix containing entries of inverse Cholesky
+//' @examples
+//' n1 <- 40
+//' n2 <- 40
+//' n <- n1*n2
+//' locs <- as.matrix( expand.grid( (1:n1)/n1, (1:n2)/n2 ) )
+//' covparms <- c(2, 0.2, 0.75, 0)
+//' NNarray <- find_ordered_nn(locs,20)
+//' Linv <- vecchia_Linv(covparms, "matern_isotropic", locs, NNarray)
+//' @export
 // [[Rcpp::export]]
 NumericMatrix vecchia_Linv(
     NumericVector covparms,

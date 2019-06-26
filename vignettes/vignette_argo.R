@@ -1,6 +1,8 @@
 
 # analysis of argo data
-devtools::load_all()
+# data provided by Mikael Kuusela
+# see https://doi.org/10.1098/rspa.2018.0400 for more details about data
+library("GpGp")
 data("argo2016")
 names(argo2016)
 attach(argo2016)
@@ -36,28 +38,28 @@ timing <- rep(NA,4)
 
 # spatial isotropic
 t1 <- proc.time()
-fit1 <- fit_model(y = temp[inds], X = X[inds,], locs = lonlat[inds,], 
+fit1 <- fit_model(y = temp[inds], X = X[inds,], locs = lonlat[inds,],
     covfun_name = "exponential_sphere", group = FALSE )
 timing[1] <- (proc.time() - t1)[3]
 
 
 # spacetime, isotropic in each
 t1 <- proc.time()
-fit2 <- fit_model(y = temp[inds], X = X[inds,], locs = lonlattime[inds,], 
+fit2 <- fit_model(y = temp[inds], X = X[inds,], locs = lonlattime[inds,],
     covfun_name = "exponential_spheretime", group = FALSE, st_scale = c(0.2,16) )
 timing[2] <- (proc.time() - t1)[3]
 
 
 # spatial warping
 t1 <- proc.time()
-fit3 <- fit_model(y = temp[inds], X = X[inds,], locs = lonlat[inds,], 
+fit3 <- fit_model(y = temp[inds], X = X[inds,], locs = lonlat[inds,],
     covfun_name = "exponential_sphere_warp", group = FALSE )
 timing[3] <- (proc.time() - t1)[3]
 
 
 # spacetime, warping in space
 t1 <- proc.time()
-fit4 <- fit_model(y = temp[inds], X = X[inds,], locs = lonlattime[inds,], 
+fit4 <- fit_model(y = temp[inds], X = X[inds,], locs = lonlattime[inds,],
     covfun_name = "exponential_spheretime_warp", group = FALSE, st_scale = c(0.2,16) )
 timing[4] <- (proc.time() - t1)[3]
 
@@ -91,5 +93,3 @@ fields::image.plot(longrid,latgrid,pred_array)
 # plot conditional simulations
 sim_array <- array( sim, c(length(longrid),length(latgrid)) )
 fields::image.plot(longrid,latgrid,sim_array)
-
-

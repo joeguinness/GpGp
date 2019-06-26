@@ -36,8 +36,8 @@ conditioning on all previous observations, each term conditions on
 a small subset of previous observations.
 }
 \examples{
-n1 <- 40
-n2 <- 40
+n1 <- 20
+n2 <- 20
 n <- n1*n2
 locs <- as.matrix( expand.grid( (1:n1)/n1, (1:n2)/n2 ) )
 covparms <- c(2, 0.2, 0.75, 0)

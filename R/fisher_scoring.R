@@ -1,5 +1,7 @@
 
-
+#' test likelihood object for NA or Inf values
+#' 
+#' @param likobj likelihood object
 test_likelihood_object <- function(likobj){
     
     pass <- TRUE
@@ -11,7 +13,9 @@ test_likelihood_object <- function(likobj){
 }
 
 
-
+#' compute condition number of matrix
+#' 
+#' @param info matrix
 condition_number <- function(info){
     # assumes that information matrix has finite numbers in it
     if(max(diag(info))/min(diag(info)) > 1e6){
@@ -23,7 +27,13 @@ condition_number <- function(info){
 }    
 
 
-
+#' Fisher scoring algorithm
+#' 
+#' @param likfun likelihood function, returns likelihood, gradient, and hessian
+#' @param start_parms starting values of parameters
+#' @param link link function for parameters (used for printing)
+#' @param silent TRUE/FALSE for suppressing output
+#' @param convtol convergence tolerance on step dot grad
 fisher_scoring <- function( likfun, start_parms, link, silent = FALSE, convtol = 1e-4 ){
     
     # link functions passed for printing purposes

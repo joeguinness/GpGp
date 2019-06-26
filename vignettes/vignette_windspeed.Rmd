@@ -23,6 +23,7 @@ The windspeed data in this vignette comes from the Jason-3 satellite and has bee
 We first load the GpGp library, read in the data, and asisgn some variables.
 
 ```{r}
+set.seed(1234) # for predictable behavior on CRAN checks
 library("GpGp")
 data(jason3)
 head(jason3)

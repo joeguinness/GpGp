@@ -34,5 +34,5 @@ covparms <- c(2, 0.2, 0.75, 0.1)
 NNarray <- find_ordered_nn(locs,20)
 Linv <- vecchia_Linv( covparms, "matern_isotropic", locs, NNarray )
 z1 <- rnorm(n)
-z2 <- L_t_mult(Linv, z2, NNarray)
+z2 <- L_t_mult(Linv, z1, NNarray)
 }
