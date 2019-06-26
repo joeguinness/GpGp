@@ -7,7 +7,7 @@
 predictions(fit = NULL, locs_pred, X_pred, y_obs = fit$y,
   locs_obs = fit$locs, X_obs = fit$X, beta = fit$betahat,
   covparms = fit$covparms, covfun_name = fit$covfun_name, m = 60,
-  reorder = TRUE)
+  reorder = TRUE, st_scale = NULL)
 }
 \arguments{
 \item{fit}{GpGp_fit object, the result of \code{\link{fit_model}}}
@@ -33,6 +33,11 @@ predictions(fit = NULL, locs_pred, X_pred, y_obs = fit$y,
 \item{reorder}{TRUE/FALSE for whether reordering should be done. This should
 generally be kept at TRUE, unless testing out the effect of
 reordering.}
+
+\item{st_scale}{amount by which to scale the spatial and temporal
+dimensions for the purpose of selecting neighbors. We recommend setting
+this manually when using a spatial-temporal covariance function. When 
+\code{lonlat = TRUE}, spatial scale is in radians (earth radius = 1).}
 }
 \description{
 With the prediction locations ordered after the observation locations,
