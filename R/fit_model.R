@@ -449,9 +449,9 @@ get_linkfun <- function(covfun_name){
     }
     if(covfun_name == "exponential_sphere_warp"){
         lonlat <- TRUE
-        link <- function(x){ c(exp(x[1:3]), x[5:length(x)]) }
+        link <- function(x){ c(exp(x[1:3]), x[4:length(x)]) }
         dlink <- function(x){c(exp(x[1:3]), rep(1,length(x)-3))}
-        invlink <- function(x){ c(log(x[1:3]),x[5:length(x)])}
+        invlink <- function(x){ c(log(x[1:3]),x[4:length(x)])}
     }
     if(covfun_name == "matern_spheretime_warp"){
         lonlat <- TRUE
