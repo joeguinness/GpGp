@@ -546,7 +546,7 @@ void synthesize_grouped(
 //' Entries of inverse Cholesky approximation
 //' 
 //' This function returns the entries of the inverse Cholesky
-//' factor of the covariance matrix implied by Vecchia's aproximation.
+//' factor of the covariance matrix implied by Vecchia's approximation.
 //' For return matrix \code{Linv}, \code{Linv[i,]} contains 
 //' the non-zero entries of row \code{i} of
 //' the inverse Cholesky matrix. The columns of the non-zero entries
