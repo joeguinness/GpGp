@@ -74,7 +74,7 @@ void compute_pieces(
         chol( cholmat, covmat, "lower" );
         
         // i1 is conditioning set, i2 is response        
-        arma::span i1 = span(0,bsize-2);
+        //arma::span i1 = span(0,bsize-2);
         arma::span i2 = span(bsize-1,bsize-1);
         
         // get last row of cholmat
@@ -86,7 +86,7 @@ void compute_pieces(
         }
         
         bool cond = bsize > 1;
-        double fac = 1.0;
+        //double fac = 1.0;
         
         // do solves with X and y
         arma::mat LiX0;
@@ -190,7 +190,7 @@ void compute_pieces_grouped(
     
 
     // data dimensions
-    int n = y.length();
+    //int n = y.length();
     //int m = NNarray.ncol();
     int p = X.ncol();
     int nparms = covparms.length();
@@ -276,7 +276,7 @@ void compute_pieces_grouped(
             choli2 = solve( trimatu(cholmat.t()), onemat );
         }
         bool cond = bsize > rsize;
-        double fac = 1.0;
+        //double fac = 1.0;
         
         // do solves with X and y
         arma::mat LiX0;
@@ -378,10 +378,10 @@ void synthesize(
 
     // data dimensions
     int n = y.length();
-    int m = NNarray.ncol();
+    //int m = NNarray.ncol();
     int p = X.ncol();
     int nparms = covparms.length();
-    int dim = locs.ncol();
+    //int dim = locs.ncol();
     
     // likelihood objects
     arma::mat XSX = arma::mat(p, p, fill::zeros);
@@ -572,7 +572,7 @@ NumericMatrix vecchia_Linv(
     // data dimensions
     int n = locs.nrow();
     int m = NNarray.ncol();
-    int nparms = covparms.length();
+    //int nparms = covparms.length();
     int dim = locs.ncol();
     NumericMatrix Linv(n,m);
     
@@ -583,7 +583,7 @@ NumericMatrix vecchia_Linv(
     // assign covariance fun and derivative based on covfun_name_string
     covfun_t covstruct = get_covfun(covfun_name_string);
     mat (*p_covfun)(NumericVector, NumericMatrix) = covstruct.p_covfun;
-    cube (*p_d_covfun)(NumericVector, NumericMatrix) = covstruct.p_d_covfun;
+    //cube (*p_d_covfun)(NumericVector, NumericMatrix) = covstruct.p_d_covfun;
 
     // loop over every observation    
     for(int i=0; i<n; i++){
