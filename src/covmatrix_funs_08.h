@@ -105,7 +105,7 @@ arma::cube d_matern_nonstat_var(NumericVector covparms, NumericMatrix Z ){
     int n = Z.nrow();
     int nbasis = Z.ncol() - dim;
     int nisoparm = 4;
-    double nugget = covparms( 0 )*covparms( 3 );
+    //double nugget = covparms( 0 )*covparms( 3 );
     double normcon = covparms(0)/(pow(2.0,covparms(2)-1.0)*Rf_gammafn(covparms(2)));
     double eps = 1e-8;
     double normconeps = 
@@ -254,7 +254,7 @@ arma::cube d_exponential_nonstat_var(NumericVector covparms, NumericMatrix Z ){
     int n = Z.nrow();
     int nbasis = Z.ncol() - dim;
     int nisoparm = 3;
-    double nugget = covparms( 0 )*covparms( 2 );
+    //double nugget = covparms( 0 )*covparms( 2 );
 
     // calculate derivatives
     arma::cube dcovmat = arma::cube(n,n,covparms.length(), fill::zeros);

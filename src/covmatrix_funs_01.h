@@ -77,7 +77,7 @@ arma::cube d_exponential_isotropic(NumericVector covparms, NumericMatrix locs ){
 
     int dim = locs.ncol();
     int n = locs.nrow();
-    double nugget = covparms( 0 )*covparms( 2 );
+    //double nugget = covparms( 0 )*covparms( 2 );
     // create scaled locations
     mat locs_scaled(n,dim);
     for(int j=0; j<dim; j++){ 
@@ -183,7 +183,7 @@ arma::cube d_matern_isotropic(NumericVector covparms, NumericMatrix locs ){
 
     int dim = locs.ncol();
     int n = locs.nrow();
-    double nugget = covparms( 0 )*covparms( 3 );
+    //double nugget = covparms( 0 )*covparms( 3 );
     double normcon = covparms(0)/(pow(2.0,covparms(2)-1.0)*Rf_gammafn(covparms(2)));
     double eps = 1e-8;
     double normconeps = 

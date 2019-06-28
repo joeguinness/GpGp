@@ -97,7 +97,7 @@ arma::cube d_matern_anisotropic2D(NumericVector covparms, NumericMatrix locs ){
     // overall variance = sigmasq*(1 + tausq) = sigmasq + nugget
 
     int n = locs.nrow();
-    double nugget = covparms( 0 )*covparms( 5 );
+    //double nugget = covparms( 0 )*covparms( 5 );
     double normcon = covparms(0)/(pow(2.0,covparms(4)-1.0)*Rf_gammafn(covparms(4)));
     double eps = 1e-8;
     double normconeps = 
@@ -243,7 +243,7 @@ arma::cube d_matern_anisotropic3D(NumericVector covparms, NumericMatrix locs ){
     // overall variance = sigmasq*(1 + tausq) = sigmasq + nugget
 
     int n = locs.nrow();
-    double nugget = covparms( 0 )*covparms( 8 );
+    //double nugget = covparms( 0 )*covparms( 8 );
     double smooth = covparms( 7 );
     double normcon = covparms(0)/(pow(2.0,smooth-1.0)*Rf_gammafn(smooth));
     double eps = 1e-8;
@@ -386,7 +386,7 @@ arma::cube d_exponential_anisotropic2D(NumericVector covparms, NumericMatrix loc
     // overall variance = sigmasq*(1 + tausq) = sigmasq + nugget
 
     int n = locs.nrow();
-    double nugget = covparms( 0 )*covparms( 4 );
+    //double nugget = covparms( 0 )*covparms( 4 );
 
     // calculate derivatives
     arma::cube dcovmat = arma::cube(n,n,covparms.length(), fill::zeros);

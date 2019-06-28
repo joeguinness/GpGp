@@ -458,7 +458,7 @@ arma::cube d_exponential_spacetime(NumericVector covparms, NumericMatrix locs ){
     // number of spatial dimensions
     int dim = locs.ncol() - 1;
     int n = locs.nrow();
-    double nugget = covparms( 0 )*covparms( 3 );
+    //double nugget = covparms( 0 )*covparms( 3 );
 
     // create scaled locations
     NumericMatrix locs_scaled(n,dim+1);
