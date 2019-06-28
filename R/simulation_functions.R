@@ -9,9 +9,9 @@
 #' @inheritParams vecchia_meanzero_loglik
 #' @return vector of simulated values
 #' @examples
-#' locs <- as.matrix( expand.grid( (1:100)/100, (1:100)/100 ) )
+#' locs <- as.matrix( expand.grid( (1:50)/50, (1:50)/50 ) )
 #' y <- fast_Gp_sim(c(4,0.2,0.5,0), "matern_isotropic",  locs, 30 )
-#' fields::image.plot( matrix(y,100,100) )
+#' fields::image.plot( matrix(y,50,50) )
 #' @export
 fast_Gp_sim <- function( covparms, covfun_name = "matern_isotropic", locs, m = 30 ){
     
