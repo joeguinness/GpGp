@@ -50,7 +50,7 @@ fast_Gp_sim <- function( covparms, covfun_name = "matern_isotropic", locs, m = 3
 #' these are computed within the function.
 #' @return vector of simulated values
 #' @examples
-#' locs <- as.matrix( expand.grid( (1:100)/100, (1:100)/100 ) )
+#' locs <- as.matrix( expand.grid( (1:50)/50, (1:50)/50 ) )
 #' ord <- order_maxmin(locs)
 #' locsord <- locs[ord,]
 #' m <- 10
@@ -59,7 +59,7 @@ fast_Gp_sim <- function( covparms, covfun_name = "matern_isotropic", locs, m = 3
 #' Linv <- vecchia_Linv( covparms, "matern_isotropic", locsord, NNarray )
 #' y <- fast_Gp_sim_Linv(Linv,NNarray)
 #' y[ord] <- y
-#' fields::image.plot( matrix(y,100,100) )
+#' fields::image.plot( matrix(y,50,50) )
 #' @export
 fast_Gp_sim_Linv <- function( Linv, NNarray, z = NULL ){
 
