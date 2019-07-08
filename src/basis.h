@@ -19,9 +19,7 @@ using namespace arma;
 // [[Rcpp::export]]
 arma::cube sph_grad_xyz( NumericMatrix xyz, int Lmax ){
     
-    // 5 basis functions are hard-coded here
-    // second argument not currently used
-    int nbasis = 5;
+    int nbasis = (Lmax+1)*(Lmax+1) - 4;
     int n = xyz.nrow();
     cube grad_basis = cube( n, nbasis, 3, fill::zeros );
     
