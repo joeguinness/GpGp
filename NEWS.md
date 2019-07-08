@@ -1,4 +1,8 @@
 
+# GpGp 0.2.1
+
+Bug fix for overloaded use of 'pow' function in 'basis.h'
+
 # GpGp 0.2.0
 
 This update includes an implementation of the Fisher Scoring
