@@ -173,12 +173,14 @@ List vecchia_meanzero_loglik(
     const NumericMatrix locs,
     IntegerMatrix NNarray ){
     
-    NumericMatrix X;
+    NumericMatrix X(1,1);
     NumericVector ll(1);
     NumericVector grad( covparms.length() );
     NumericVector betahat( X.ncol() );
+    //NumericVector betahat;
     NumericMatrix info( covparms.length(), covparms.length() );
     NumericMatrix betainfo( X.ncol(), X.ncol() );
+    //NumericMatrix betainfo;
 
     // this function calls arma_onepass_compute_pieces
     // then synthesizes the result into loglik, beta, grad, info, betainfo
@@ -366,19 +368,21 @@ List vecchia_grouped_meanzero_loglik(
     const NumericMatrix locs,
     List NNlist ){
     
-    NumericMatrix X;
+    NumericMatrix X(1,1);
     NumericVector ll(1);
     NumericVector grad( covparms.length() );
     NumericVector betahat( X.ncol() );
+    //NumericVector betahat;
     NumericMatrix info( covparms.length(), covparms.length() );
     NumericMatrix betainfo( X.ncol(), X.ncol() );
+    //NumericMatrix betainfo;
 
     // this function calls arma_onepass_compute_pieces
     // then synthesizes the result into loglik, beta, grad, info, betainfo
     // maybe the synthesize functions should take in an argument that
     // says which compute_pieces function to use
     synthesize_grouped(covparms, covfun_name, locs, NNlist, y, X,
-        &ll, &betahat, &grad, &info, &betainfo, true, false 
+        &ll, &betahat, &grad, &info, &betainfo, false, false 
     );
     
     
