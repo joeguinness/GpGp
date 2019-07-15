@@ -43,6 +43,11 @@ covfun_t get_covfun(std::string covfun_name_string)
         covstruct.p_covfun = &matern_anisotropic2D; 
         covstruct.p_d_covfun = &d_matern_anisotropic2D;
     } 
+    else if( covfun_name_string.compare("exponential_anisotropic2D") == 0 )
+    { 
+        covstruct.p_covfun = &exponential_anisotropic2D; 
+        covstruct.p_d_covfun = &d_exponential_anisotropic2D;
+    } 
     else if( covfun_name_string.compare("exponential_anisotropic3D") == 0 )
     { 
         covstruct.p_covfun = &exponential_anisotropic3D; 
