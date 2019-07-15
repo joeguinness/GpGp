@@ -30,21 +30,21 @@
 #' is used by default and is always recommended.
 #' @param reorder TRUE/FALSE indicating whether maxmin ordering should be used
 #' (TRUE) or whether no reordering should be done before fitting (FALSE). If you want
-#' to use a customized reordering, then manually reorder \code{y}, \code{locs}, and \code{X}, 
+#' to use a customized reordering, then manually reorder \code{y}, \code{locs}, and \code{X},
 #' and then set \code{reorder} to \code{FALSE}. A random reordering is used
 #' when \code{nrow(locs) > 1e5}.
 #' @param m_seq Sequence of values for number of neighbors. By default, a 10-neighbor
 #' approximation is maximized, then a 30-neighbor approximation is maximized using the
-#' 10 neighbor estimates as starting values. However, one can specify any sequence 
+#' 10 neighbor estimates as starting values. However, one can specify any sequence
 #' of numbers of neighbors, e.g. \code{m_seq = c(10,30,60,90)}.
 #' @param st_scale Scaling for spatial and temporal ranges. Only applicable for
 #' spatial-temporal models, where it is used in distance
 #' calculations when selecting neighbors. \code{st_scale} must be specified
-#' when \code{covfun_name} is a spatial-temporal covariance. See Argo vignette for an example. 
+#' when \code{covfun_name} is a spatial-temporal covariance. See Argo vignette for an example.
 #' @param convtol Tolerance for exiting the optimization. Fisher scoring is stopped
 #' when the dot product between the step and the gradient is less than \code{convtol}.
-#' @return An object of class \code{GpGp_fit}, which is a list containing 
-#' covariance parameter estimates, regression coefficients, 
+#' @return An object of class \code{GpGp_fit}, which is a list containing
+#' covariance parameter estimates, regression coefficients,
 #' covariance matrix for mean parameter estimates, as well as some other
 #' information relevant to the model fit.
 #' @details \code{fit_model} is a user-friendly model fitting function
@@ -71,7 +71,7 @@
 #'
 #'
 #' @export
-fit_model <- function(y, locs, X = NULL, covfun_name = "matern_isotropic", 
+fit_model <- function(y, locs, X = NULL, covfun_name = "matern_isotropic",
     NNarray = NULL, start_parms = NULL,
     silent = FALSE, group = TRUE, reorder = TRUE,
     m_seq = c(10,30), st_scale = NULL, convtol = 1e-4){
@@ -119,33 +119,36 @@ fit_model <- function(y, locs, X = NULL, covfun_name = "matern_isotropic",
     }
 
     # detect and remove missing values
-    not_missing <- apply( cbind(y,locs,X), 1, 
+    not_missing <- apply( cbind(y,locs,X), 1,
         function(x){
             if( sum(is.na(x) | is.infinite(x)) > 0 ){
                 return(FALSE)
             } else { return(TRUE) }
-        } 
+        }
     )
     if( sum(not_missing) < n ){
         y <- y[not_missing]
         locs <- locs[not_missing,,drop=FALSE]
         X <- X[not_missing,,drop=FALSE]
-        cat(paste0( n - sum(not_missing), 
+        cat(paste0( n - sum(not_missing),
             " observations removed due to missingness or Inf\n"))
     }
-    
+
+    # redefine n
+    n <- length(y)
+
     # get starting values for parameters
     if(is.null(start_parms)){
         start <- get_start_parms(y,X,locs,covfun_name)
         start_parms <- start$start_parms
     }
-    
+
     linkfuns <- get_linkfun(covfun_name)
     link <- linkfuns$link
     dlink <- linkfuns$dlink
     invlink <- linkfuns$invlink
     lonlat <- linkfuns$lonlat
-    if(lonlat){ 
+    if(lonlat){
         cat("Assuming first two columns of locs are (longitude,latidue) in degrees\n")
     }
     space_time <- linkfuns$space_time
@@ -174,7 +177,7 @@ fit_model <- function(y, locs, X = NULL, covfun_name = "matern_isotropic",
     # get neighbor array if not provided
     if( is.null(NNarray) ){
         if(!silent) cat("Finding nearest neighbors...")
-        NNarray <- find_ordered_nn(locsord, m=max(m_seq), lonlat = lonlat, 
+        NNarray <- find_ordered_nn(locsord, m=max(m_seq), lonlat = lonlat,
             st_scale = st_scale)
         if(!silent) cat("Done \n")
     }
@@ -183,7 +186,7 @@ fit_model <- function(y, locs, X = NULL, covfun_name = "matern_isotropic",
     for(i in 1:length(m_seq)){
         m <- m_seq[i]
         if(group){
-            
+
             NNlist <- group_obs(NNarray[,1:(m+1)])
             likfun <- function(logparms){
                 likobj <- vecchia_grouped_profbeta_loglik_grad_info(
@@ -195,9 +198,9 @@ fit_model <- function(y, locs, X = NULL, covfun_name = "matern_isotropic",
                     ddpen(link(logparms))*outer(dlink(logparms),dlink(logparms))
                 return(likobj)
             }
-            
+
         } else {
-            
+
             likfun <- function(logparms){
                 likobj <- vecchia_profbeta_loglik_grad_info(
                     link(logparms),covfun_name,yord,Xord,locsord,NNarray[,1:(m+1)])
@@ -208,14 +211,14 @@ fit_model <- function(y, locs, X = NULL, covfun_name = "matern_isotropic",
                     ddpen(link(logparms))*outer(dlink(logparms),dlink(logparms))
                 return(likobj)
             }
-            
+
         }
         fit <- fisher_scoring(likfun,invlink(start_parms),link,silent=silent,
             convtol = convtol)
         fit$loglik <- -fit$loglik - pen(fit$covparms)
         start_parms <- fit$covparms
     }
-    
+
     # return fit and information used for predictions
     fit$covfun_name <- covfun_name
     fit$y <- y
@@ -226,8 +229,8 @@ fit_model <- function(y, locs, X = NULL, covfun_name = "matern_isotropic",
 }
 
 #' Print summary of GpGp fit
-#' 
-#' @param object Object of class "GpGp_fit", usually the return value from 
+#'
+#' @param object Object of class "GpGp_fit", usually the return value from
 #' \code{\link{fit_model}}
 #' @param ... additional arguments, for compatability with S3 generic 'summary'
 #' @export
@@ -237,7 +240,7 @@ summary.GpGp_fit <- function(object, ...){
     cat(paste0(round(object$covparms,4)),"\n\n")
     cat(paste0("Loglikelihood: ",round(object$loglik,4),"\n\n"))
     X <- as.data.frame(object$X)
-    df <- data.frame( 
+    df <- data.frame(
         variable = colnames(X),
         estimate = round(object$betahat,4),
         std_error = round(object$sebeta,4),
@@ -247,11 +250,11 @@ summary.GpGp_fit <- function(object, ...){
     cat("Linear Mean Parameters: \n")
     print(df)
     cat("\n")
-    
-}    
-    
+
+}
+
 #' get default starting values of covariance parameters
-#' 
+#'
 #' @param y response
 #' @param X design matrix
 #' @param locs locations
@@ -398,7 +401,7 @@ get_start_parms <- function(y,X,locs,covfun_name){
 
 
 #' get link function, whether locations are lonlat and space time
-#' 
+#'
 #' @param covfun_name string name of covariance function
 get_linkfun <- function(covfun_name){
 
@@ -496,7 +499,7 @@ get_linkfun <- function(covfun_name){
 
 
 #' get penalty function
-#' 
+#'
 #' @inheritParams get_start_parms
 get_penalty <- function(y,X,locs,covfun_name){
 
