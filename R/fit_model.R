@@ -113,6 +113,7 @@ fit_model <- function(y, locs, X = NULL, covfun_name = "matern_isotropic",
               "matern_spacetime",
               "exponential_spacetime",
               "matern_scaledim",
+              "matern15_scaledim",
               "exponential_scaledim" ) )
     {
         stop("unrecognized covariance function name `covfun_name'.")
@@ -278,6 +279,10 @@ get_start_parms <- function(y,X,locs,covfun_name){
         start_range <- mean( dmat )/4
         start_parms <- c(start_var, start_range, start_smooth, start_nug)
     }
+    if(covfun_name == "matern15_isotropic"){
+        start_range <- mean( dmat )/4
+        start_parms <- c(start_var, start_range, start_nug)
+    }
     if(covfun_name == "matern_anisotropic2D"){
         start_range <- mean( dmat )/4
         start_parms <- c(start_var, 1/start_range, 0, 1/start_range,
@@ -350,6 +355,15 @@ get_start_parms <- function(y,X,locs,covfun_name){
         start_parms <- c(start_parms, start_smooth, start_nug)
     }
     if(covfun_name == "exponential_scaledim"){
+        d <- ncol(locs)
+        start_parms <- c(start_var)
+        for(j in 1:d){
+            dmat <- fields::rdist(locs[randinds,j])
+            start_parms <- c(start_parms, stats::median(dmat)/4 )
+        }
+        start_parms <- c(start_parms, start_nug)
+    }
+    if(covfun_name == "matern15_scaledim"){
         d <- ncol(locs)
         start_parms <- c(start_var)
         for(j in 1:d){

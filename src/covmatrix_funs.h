@@ -17,6 +17,7 @@
 #include "covmatrix_funs_06.h"
 #include "covmatrix_funs_07.h"
 #include "covmatrix_funs_08.h"
+#include "covmatrix_funs_09.h"
 
 using namespace Rcpp;
 using namespace arma;
@@ -37,6 +38,11 @@ covfun_t get_covfun(std::string covfun_name_string)
     { 
         covstruct.p_covfun = &matern_isotropic; 
         covstruct.p_d_covfun = &d_matern_isotropic;
+    } 
+    else if( covfun_name_string.compare("matern15_isotropic") == 0 )
+    { 
+        covstruct.p_covfun = &matern15_isotropic; 
+        covstruct.p_d_covfun = &d_matern15_isotropic;
     } 
     else if( covfun_name_string.compare("matern_anisotropic2D") == 0 )
     { 
@@ -127,6 +133,11 @@ covfun_t get_covfun(std::string covfun_name_string)
     { 
         covstruct.p_covfun = &matern_scaledim;
         covstruct.p_d_covfun = &d_matern_scaledim;
+    }
+    else if( covfun_name_string.compare("matern15_scaledim") == 0 )
+    { 
+        covstruct.p_covfun = &matern15_scaledim;
+        covstruct.p_d_covfun = &d_matern15_scaledim;
     }
     else if( covfun_name_string.compare("exponential_scaledim") == 0 )
     { 
