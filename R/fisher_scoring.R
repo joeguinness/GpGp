@@ -34,10 +34,8 @@ condition_number <- function(info){
 #' @param link link function for parameters (used for printing)
 #' @param silent TRUE/FALSE for suppressing output
 #' @param convtol convergence tolerance on step dot grad
-fisher_scoring <- function( likfun, start_parms, link, silent = FALSE, convtol = 1e-4 ){
-    
-    # link functions passed for printing purposes
-    maxit <- 40
+fisher_scoring <- function( likfun, start_parms, link, 
+    silent = FALSE, convtol = 1e-4, max_iter = 40 ){
     
     # function for checking wolfe conditions
     wolfe_check <- function(likobj0,likobj1,logparms,step,both){
@@ -85,7 +83,7 @@ fisher_scoring <- function( likfun, start_parms, link, silent = FALSE, convtol =
         cat("\n\n")
     }
     
-    for(j in 1:maxit){
+    for(j in 1:max_iter){
         
         likobj0 <- likobj
         

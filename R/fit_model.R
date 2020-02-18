@@ -24,6 +24,7 @@
 #' study where one wants to control \code{NNarray} across different approximations).
 #' @param start_parms Optionally specified starting values for parameters. If \code{NULL},
 #' fit_model will select default starting values.
+#' @param max_iter maximum number of Fisher scoring iterations
 #' @param silent TRUE/FALSE for whether to print some information during fitting.
 #' @param group TRUE/FALSE for whether to use the grouped version of
 #' the approximation (Guinness, 2018) or not.  The grouped version
@@ -72,9 +73,9 @@
 #'
 #' @export
 fit_model <- function(y, locs, X = NULL, covfun_name = "matern_isotropic",
-    NNarray = NULL, start_parms = NULL,
-    silent = FALSE, group = TRUE, reorder = TRUE,
-    m_seq = c(10,30), st_scale = NULL, convtol = 1e-4){
+    NNarray = NULL, start_parms = NULL, reorder = TRUE, group = TRUE,
+    m_seq = c(10,30), max_iter = 40, 
+    silent = FALSE, st_scale = NULL, convtol = 1e-4){
 
     n <- length(y)
 
@@ -215,7 +216,7 @@ fit_model <- function(y, locs, X = NULL, covfun_name = "matern_isotropic",
 
         }
         fit <- fisher_scoring(likfun,invlink(start_parms),link,silent=silent,
-            convtol = convtol)
+            convtol = convtol, max_iter = max_iter)
         fit$loglik <- -fit$loglik - pen(fit$covparms)
         start_parms <- fit$covparms
     }
@@ -228,6 +229,219 @@ fit_model <- function(y, locs, X = NULL, covfun_name = "matern_isotropic",
     class(fit) <- "GpGp_fit"
     return(fit)
 }
+
+
+#' @export
+fit_model2 <- function(y, locs, X = NULL, covfun_name = "matern_isotropic",
+    NNarray = NULL, start_parms = NULL, reorder = TRUE, group = TRUE,
+    m_seq = c(10,30), max_iter = 40, fixed_parms = NULL,
+    silent = FALSE, st_scale = NULL, convtol = 1e-4){
+
+    n <- length(y)
+
+    # check that length of observation vector same as
+    # number of locations
+    if( nrow(locs) != n ){
+        stop("length of observation vector y not equal
+              to the number of locations (rows in locs)")
+    }
+
+    # check if design matrix is specified
+    if( is.null(X) ){
+        if(!silent) cat("Design matrix not specified, using constant mean \n")
+        X <- rep(1,n)
+    }
+    X <- as.matrix(X)
+
+    # check if one of the allowed covariance functions is chosen
+    if( ! covfun_name %in%
+            c("exponential_isotropic",
+              "matern_isotropic",
+              "matern_anisotropic2D",
+              "exponential_anisotropic2D",
+              "exponential_anisotropic3D",
+              "matern_anisotropic3D",
+              "matern_nonstat_var",
+              "exponential_nonstat_var",
+              "matern_sphere",
+              "exponential_sphere",
+              "matern_sphere_warp",
+              "exponential_sphere_warp",
+              "matern_spheretime_warp",
+              "exponential_spheretime_warp",
+              "matern_spheretime",
+              "exponential_spheretime",
+              "matern_spacetime",
+              "exponential_spacetime",
+              "matern_scaledim",
+              "matern15_scaledim",
+              "exponential_scaledim" ) )
+    {
+        stop("unrecognized covariance function name `covfun_name'.")
+    }
+
+    # detect and remove missing values
+    not_missing <- apply( cbind(y,locs,X), 1,
+        function(x){
+            if( sum(is.na(x) | is.infinite(x)) > 0 ){
+                return(FALSE)
+            } else { return(TRUE) }
+        }
+    )
+    if( sum(not_missing) < n ){
+        y <- y[not_missing]
+        locs <- locs[not_missing,,drop=FALSE]
+        X <- X[not_missing,,drop=FALSE]
+        cat(paste0( n - sum(not_missing),
+            " observations removed due to missingness or Inf\n"))
+    }
+
+    # redefine n
+    n <- length(y)
+    
+    # check that start_parms is specified when fixed_parms is
+    if( is.null(fixed_parms) ){
+        if( is.null(start_parms) ){
+            start <- get_start_parms(y,X,locs,covfun_name)
+            start_parms <- start$start_parms
+        } else {
+            # check if start_parms has the right length
+            start <- get_start_parms(y,X,locs,covfun_name)
+            if(length(start_parms) != length(start$start_parms) ){
+                stop(paste0("start_parms not correct length for ",covfun_name))
+            }
+        }
+        # define the parameters we are not fixing
+        active <- rep(TRUE, length(start_parms) )
+    } else {
+        if( is.null(start_parms) ){
+            stop("start_parms must be specified whenever fixed_parms is")
+        }
+        # check if start_parms has the right length
+        start <- get_start_parms(y,X,locs,covfun_name)
+        if(length(start_parms) != length(start$start_parms) ){
+            stop(paste0("start parms not correct length for ",covfun_name))
+        }
+        # check whether fixed_parms has appropriate values
+        if( max( fixed_parms - floor(fixed_parms) ) > 0 ){
+            stop("fixed_parms must contain indices of parms you want to fix")
+        }
+        if( min( fixed_parms < 1 ) || max(fixed_parms) > length(start_parms) ){
+            stop("fixed_parms must be between 1 and number of parameters")
+        }
+        # define the parameters we are not fixing
+        active <- rep(TRUE, length(start_parms) )
+        active[fixed_parms] <- FALSE
+    }        
+    
+    # get link functions
+    linkfuns <- get_linkfun(covfun_name)
+    link <- linkfuns$link
+    dlink <- linkfuns$dlink
+    invlink <- linkfuns$invlink
+    invlink_startparms <- invlink(start_parms)
+    lonlat <- linkfuns$lonlat
+    if(lonlat){
+        cat("Assuming first two columns of locs are (longitude,latidue) in degrees\n")
+    }
+    space_time <- linkfuns$space_time
+
+    penalty <- get_penalty(y,X,locs,covfun_name)
+    pen <- penalty$pen
+    dpen <- penalty$dpen
+    ddpen <- penalty$ddpen
+    if( !is.null(fixed_parms) ){
+        # turn the penalties off
+        pen <- function(x){ 0 }
+        dpen <- function(x){ rep(0,length(x)) }
+        ddpen <- function(x){ matrix(0,length(x),length(x)) }
+    }
+
+    # get an ordering and reorder everything
+    if(reorder){
+        if(!silent) cat("Reordering...")
+        if( n < 1e5 ){  # maxmin ordering if n < 100000
+            ord <- order_maxmin(locs, lonlat = lonlat, space_time = space_time)
+        } else {        # otherwise random order
+            ord <- sample(n)
+        }
+        if(!silent) cat("Done \n")
+    } else {
+        ord <- 1:n
+    }
+    yord <- y[ord]
+    locsord <- locs[ord,,drop=FALSE]
+    Xord <- as.matrix( X[ord,,drop=FALSE] )
+
+    # get neighbor array if not provided
+    if( is.null(NNarray) ){
+        if(!silent) cat("Finding nearest neighbors...")
+        NNarray <- find_ordered_nn(locsord, m=max(m_seq), lonlat = lonlat,
+            st_scale = st_scale)
+        if(!silent) cat("Done \n")
+    }
+
+    # refine the estimates for m in m_seq
+    for(i in 1:length(m_seq)){
+        m <- m_seq[i]
+        if(group){
+
+            NNlist <- group_obs(NNarray[,1:(m+1)])
+            likfun <- function(logparms){
+                
+                lp <- rep(NA,length(start_parms))
+                lp[active] <- logparms
+                lp[!active] <- invlink_startparms[!active]
+                
+                likobj <- vecchia_grouped_profbeta_loglik_grad_info(
+                    link(lp),covfun_name,yord,Xord,locsord,NNlist)
+                likobj$loglik <- -likobj$loglik - pen(link(lp))
+                likobj$grad <- -c(likobj$grad)*dlink(lp) -
+                    dpen(link(lp))*dlink(lp)
+                likobj$info <- likobj$info*outer(dlink(lp),dlink(lp)) -
+                    ddpen(link(lp))*outer(dlink(lp),dlink(lp))
+                likobj$grad <- likobj$grad[active]
+                likobj$info <- likobj$info[active,active]
+                return(likobj)
+                
+            }
+
+        } else {
+
+            likfun <- function(logparms){
+
+                lp <- rep(NA,length(start_parms))
+                lp[active] <- logparms
+                lp[!active] <- invlink_startparms[!active]
+                
+                likobj <- vecchia_profbeta_loglik_grad_info(
+                    link(lp),covfun_name,yord,Xord,locsord,NNarray[,1:(m+1)])
+                likobj$loglik <- -likobj$loglik - pen(link(lp))
+                likobj$grad <- -c(likobj$grad)*dlink(lp) -
+                    dpen(link(lp))*dlink(lp)
+                likobj$info <- likobj$info*outer(dlink(lp),dlink(lp)) -
+                    ddpen(link(lp))*outer(dlink(lp),dlink(lp))
+                likobj$grad <- likobj$grad[active]
+                likobj$info <- likobj$info[active,active]
+                return(likobj)
+            }
+        }
+        fit <- fisher_scoring(likfun,invlink(start_parms)[active],
+            link,silent=silent, convtol = convtol, max_iter = max_iter)
+        fit$loglik <- -fit$loglik - pen(fit$covparms)
+        start_parms[active] <- fit$covparms
+        invlink_startparms <- invlink(start_parms)
+    }
+
+    # return fit and information used for predictions
+    fit$covfun_name <- covfun_name
+    fit$y <- y
+    fit$locs <- locs
+    fit$X <- X
+    class(fit) <- "GpGp_fit"
+    return(fit)
+}
+
 
 #' Print summary of GpGp fit
 #'
