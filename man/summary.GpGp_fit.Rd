@@ -7,7 +7,7 @@
 \method{summary}{GpGp_fit}(object, ...)
 }
 \arguments{
-\item{object}{Object of class "GpGp_fit", usually the return value from 
+\item{object}{Object of class "GpGp_fit", usually the return value from
 \code{\link{fit_model}}}
 
 \item{...}{additional arguments, for compatability with S3 generic 'summary'}

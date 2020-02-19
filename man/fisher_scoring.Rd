@@ -5,7 +5,7 @@
 \title{Fisher scoring algorithm}
 \usage{
 fisher_scoring(likfun, start_parms, link, silent = FALSE,
-  convtol = 1e-04)
+  convtol = 1e-04, max_iter = 40)
 }
 \arguments{
 \item{likfun}{likelihood function, returns likelihood, gradient, and hessian}

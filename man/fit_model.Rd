@@ -5,9 +5,9 @@
 \title{Estimate mean and covariance parameters}
 \usage{
 fit_model(y, locs, X = NULL, covfun_name = "matern_isotropic",
-  NNarray = NULL, start_parms = NULL, silent = FALSE, group = TRUE,
-  reorder = TRUE, m_seq = c(10, 30), st_scale = NULL,
-  convtol = 1e-04)
+  NNarray = NULL, start_parms = NULL, reorder = TRUE, group = TRUE,
+  m_seq = c(10, 30), max_iter = 40, silent = FALSE,
+  st_scale = NULL, convtol = 1e-04)
 }
 \arguments{
 \item{y}{response vector}
@@ -34,22 +34,24 @@ study where one wants to control \code{NNarray} across different approximations)
 \item{start_parms}{Optionally specified starting values for parameters. If \code{NULL},
 fit_model will select default starting values.}
 
-\item{silent}{TRUE/FALSE for whether to print some information during fitting.}
+\item{reorder}{TRUE/FALSE indicating whether maxmin ordering should be used
+(TRUE) or whether no reordering should be done before fitting (FALSE). If you want
+to use a customized reordering, then manually reorder \code{y}, \code{locs}, and \code{X},
+and then set \code{reorder} to \code{FALSE}. A random reordering is used
+when \code{nrow(locs) > 1e5}.}
 
 \item{group}{TRUE/FALSE for whether to use the grouped version of
 the approximation (Guinness, 2018) or not.  The grouped version
 is used by default and is always recommended.}
 
-\item{reorder}{TRUE/FALSE indicating whether maxmin ordering should be used
-(TRUE) or whether no reordering should be done before fitting (FALSE). If you want
-to use a customized reordering, then manually reorder \code{y}, \code{locs}, and \code{X}, 
-and then set \code{reorder} to \code{FALSE}. A random reordering is used
-when \code{nrow(locs) > 1e5}.}
-
 \item{m_seq}{Sequence of values for number of neighbors. By default, a 10-neighbor
 approximation is maximized, then a 30-neighbor approximation is maximized using the
-10 neighbor estimates as starting values. However, one can specify any sequence 
+10 neighbor estimates as starting values. However, one can specify any sequence
 of numbers of neighbors, e.g. \code{m_seq = c(10,30,60,90)}.}
+
+\item{max_iter}{maximum number of Fisher scoring iterations}
+
+\item{silent}{TRUE/FALSE for whether to print some information during fitting.}
 
 \item{st_scale}{Scaling for spatial and temporal ranges. Only applicable for
 spatial-temporal models, where it is used in distance
@@ -60,8 +62,8 @@ when \code{covfun_name} is a spatial-temporal covariance. See Argo vignette for 
 when the dot product between the step and the gradient is less than \code{convtol}.}
 }
 \value{
-An object of class \code{GpGp_fit}, which is a list containing 
-covariance parameter estimates, regression coefficients, 
+An object of class \code{GpGp_fit}, which is a list containing
+covariance parameter estimates, regression coefficients,
 covariance matrix for mean parameter estimates, as well as some other
 information relevant to the model fit.
 }
