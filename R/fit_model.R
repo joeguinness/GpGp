@@ -257,6 +257,7 @@ fit_model2 <- function(y, locs, X = NULL, covfun_name = "matern_isotropic",
     if( ! covfun_name %in%
             c("exponential_isotropic",
               "matern_isotropic",
+              "matern15_isotropic",
               "matern_anisotropic2D",
               "exponential_anisotropic2D",
               "exponential_anisotropic3D",
@@ -355,7 +356,7 @@ fit_model2 <- function(y, locs, X = NULL, covfun_name = "matern_isotropic",
         #ddpen <- function(x){ matrix(0,length(x),length(x)) }
     #}
     
-    penalty <- get_penalty(y,X,locs,covfun_name) 
+    if( is.null(penalty) ){ <- get_penalty(y,X,locs,covfun_name) }
     pen <- penalty$pen
     dpen <- penalty$dpen
     ddpen <- penalty$ddpen
@@ -438,6 +439,7 @@ fit_model2 <- function(y, locs, X = NULL, covfun_name = "matern_isotropic",
 
     # return fit and information used for predictions
     fit$covfun_name <- covfun_name
+    fit$covparms <- start_parms
     fit$y <- y
     fit$locs <- locs
     fit$X <- X
