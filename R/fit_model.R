@@ -234,7 +234,7 @@ fit_model <- function(y, locs, X = NULL, covfun_name = "matern_isotropic",
 #' @export
 fit_model2 <- function(y, locs, X = NULL, covfun_name = "matern_isotropic",
     NNarray = NULL, start_parms = NULL, reorder = TRUE, group = TRUE,
-    m_seq = c(10,30), max_iter = 40, fixed_parms = NULL,
+    m_seq = c(10,30), max_iter = 40, fixed_parms = NULL, penalty = NULL,
     silent = FALSE, st_scale = NULL, convtol = 1e-4){
 
     n <- length(y)
@@ -346,16 +346,19 @@ fit_model2 <- function(y, locs, X = NULL, covfun_name = "matern_isotropic",
     }
     space_time <- linkfuns$space_time
 
-    penalty <- get_penalty(y,X,locs,covfun_name)
+    #if( !is.null(fixed_parms) && is.null(penalty) ){
+    #    stop("You must specify a penalty if you fix some parameters")
+        # turn the penalties off
+        #penalty <- list()
+        #penalty$pen <- function(x){ 0 }
+        #dpen <- function(x){ rep(0,length(x)) }
+        #ddpen <- function(x){ matrix(0,length(x),length(x)) }
+    #}
+    
+    penalty <- get_penalty(y,X,locs,covfun_name) 
     pen <- penalty$pen
     dpen <- penalty$dpen
     ddpen <- penalty$ddpen
-    if( !is.null(fixed_parms) ){
-        # turn the penalties off
-        pen <- function(x){ 0 }
-        dpen <- function(x){ rep(0,length(x)) }
-        ddpen <- function(x){ matrix(0,length(x),length(x)) }
-    }
 
     # get an ordering and reorder everything
     if(reorder){
@@ -426,10 +429,10 @@ fit_model2 <- function(y, locs, X = NULL, covfun_name = "matern_isotropic",
                 return(likobj)
             }
         }
-        fit <- fisher_scoring(likfun,invlink(start_parms)[active],
-            link,silent=silent, convtol = convtol, max_iter = max_iter)
-        fit$loglik <- -fit$loglik - pen(fit$covparms)
+        fit <- fisher_scoring( likfun,invlink(start_parms)[active],
+            link,silent=silent, convtol = convtol, max_iter = max_iter )
         start_parms[active] <- fit$covparms
+        fit$loglik <- -fit$loglik - pen(start_parms)
         invlink_startparms <- invlink(start_parms)
     }
 
@@ -780,6 +783,11 @@ get_penalty <- function(y,X,locs,covfun_name){
          dpen <- function(x){  dpen_nug(x,3) +  dpen_var(x,1)  }
         ddpen <- function(x){  ddpen_nug(x,3) + ddpen_var(x,1) }
     }
+    if(covfun_name == "matern15_isotropic"){
+          pen <- function(x){  pen_nug(x,3) +   pen_var(x,1)   }
+         dpen <- function(x){  dpen_nug(x,3) +  dpen_var(x,1)  }
+        ddpen <- function(x){  ddpen_nug(x,3) + ddpen_var(x,1) }
+    }
     if(covfun_name == "matern_isotropic"){
           pen <- function(x){  pen_nug(x,4) +   pen_sm(x,3) +   pen_var(x,1)   }
          dpen <- function(x){  dpen_nug(x,4) +  dpen_sm(x,3) +  dpen_var(x,1)  }
@@ -842,6 +850,12 @@ get_penalty <- function(y,X,locs,covfun_name){
         ddpen <- function(x){ ddpen_nug(x,d+3) + ddpen_sm(x,d+2) + ddpen_var(x,1) }
     }
     if(covfun_name == "exponential_scaledim"){
+        d <- ncol(locs)
+          pen <- function(x){  pen_nug(x,d+2)  +   pen_var(x,1)   }
+         dpen <- function(x){ dpen_nug(x,d+2)  +  dpen_var(x,1)  }
+        ddpen <- function(x){ ddpen_nug(x,d+2) + ddpen_var(x,1) }
+    }
+    if(covfun_name == "matern15_scaledim"){
         d <- ncol(locs)
           pen <- function(x){  pen_nug(x,d+2)  +   pen_var(x,1)   }
          dpen <- function(x){ dpen_nug(x,d+2)  +  dpen_var(x,1)  }
