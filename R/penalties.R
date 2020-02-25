@@ -43,12 +43,28 @@ ddpen_lo <- function(x,tt,aa){ -tt*expit(-x+aa)/(1+exp(-x+aa)) }
 #' @param x argument to penalty
 #' @param tt scale parameter of penalty
 #' @param aa location parameter of penalty
-pen_loglo <- function(x,tt,aa){ pen_lo(log(x),tt,aa) }
+pen_loglo <- function(x,tt,aa){ 
+    if(x==0){ return(0.0) 
+    } else { 
+        return( pen_lo(log(x),tt,aa) )
+    }
+}
 
 #' @rdname pen_loglo
-dpen_loglo <- function(x,tt,aa){ dpen_lo(log(x),tt,aa)/x }
+dpen_loglo <- function(x,tt,aa){ 
+    if( x==0 ){
+        return(0.0) 
+    } else {
+        return( dpen_lo(log(x),tt,aa)/x )
+    }
+}
+
 
 #' @rdname pen_loglo
 ddpen_loglo <- function(x,tt,aa){ 
-    ddpen_lo(log(x),tt,aa)/x^2 - dpen_lo(log(x),tt,aa)/x^2 
+    if( x==0 ){
+        return( 0.0 )
+    } else {
+        return( ddpen_lo(log(x),tt,aa)/x^2 - dpen_lo(log(x),tt,aa)/x^2 )
+    }
 }
