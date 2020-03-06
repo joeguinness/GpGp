@@ -356,7 +356,7 @@ fit_model2 <- function(y, locs, X = NULL, covfun_name = "matern_isotropic",
         #ddpen <- function(x){ matrix(0,length(x),length(x)) }
     #}
     
-    if( is.null(penalty) ){ <- get_penalty(y,X,locs,covfun_name) }
+    if( is.null(penalty) ){ penalty <- get_penalty(y,X,locs,covfun_name) }
     pen <- penalty$pen
     dpen <- penalty$dpen
     ddpen <- penalty$ddpen
