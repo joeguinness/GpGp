@@ -5,8 +5,10 @@ covfun_names <- c(
     "matern_isotropic",
     "exponential_isotropic",
     "matern15_isotropic",
+    "matern25_isotropic",
     "matern_scaledim", 
     "matern15_scaledim", 
+    "matern25_scaledim", 
     "exponential_scaledim", 
     "matern_spacetime", 
     "exponential_spacetime", 
@@ -38,9 +40,13 @@ get_test_locs <- function(covfun_name,n){
         locs <- matrix(runif(2*n),n,2)
     } else if(covfun_name=="matern15_isotropic"){
         locs <- matrix(runif(2*n),n,2)
+    } else if(covfun_name=="matern25_isotropic"){
+        locs <- matrix(runif(2*n),n,2)
     } else if(covfun_name=="matern_scaledim"){
         locs <- matrix(runif(2*n),n,2)
     } else if(covfun_name=="matern15_scaledim"){
+        locs <- matrix(runif(3*n),n,3)
+    } else if(covfun_name=="matern25_scaledim"){
         locs <- matrix(runif(3*n),n,3)
     } else if(covfun_name=="exponential_scaledim"){
         locs <- matrix(runif(2*n),n,2)

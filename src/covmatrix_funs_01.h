@@ -298,7 +298,8 @@ arma::mat matern15_isotropic(NumericVector covparms, NumericMatrix locs ){
     return covmat;
 }
 
-//' @describeIn exponential_isotropic Derivatives of isotropic exponential covariance
+//' @describeIn exponential_isotropic Derivatives of isotropic 
+//' matern covariance with smoothness 1.5
 // [[Rcpp::export]]
 arma::cube d_matern15_isotropic(NumericVector covparms, NumericMatrix locs ){
 

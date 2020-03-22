@@ -546,6 +546,54 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// matern25_isotropic
+arma::mat matern25_isotropic(NumericVector covparms, NumericMatrix locs);
+RcppExport SEXP _GpGp_matern25_isotropic(SEXP covparmsSEXP, SEXP locsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type covparms(covparmsSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type locs(locsSEXP);
+    rcpp_result_gen = Rcpp::wrap(matern25_isotropic(covparms, locs));
+    return rcpp_result_gen;
+END_RCPP
+}
+// d_matern25_isotropic
+arma::cube d_matern25_isotropic(NumericVector covparms, NumericMatrix locs);
+RcppExport SEXP _GpGp_d_matern25_isotropic(SEXP covparmsSEXP, SEXP locsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type covparms(covparmsSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type locs(locsSEXP);
+    rcpp_result_gen = Rcpp::wrap(d_matern25_isotropic(covparms, locs));
+    return rcpp_result_gen;
+END_RCPP
+}
+// matern25_scaledim
+arma::mat matern25_scaledim(NumericVector covparms, NumericMatrix locs);
+RcppExport SEXP _GpGp_matern25_scaledim(SEXP covparmsSEXP, SEXP locsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type covparms(covparmsSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type locs(locsSEXP);
+    rcpp_result_gen = Rcpp::wrap(matern25_scaledim(covparms, locs));
+    return rcpp_result_gen;
+END_RCPP
+}
+// d_matern25_scaledim
+arma::cube d_matern25_scaledim(NumericVector covparms, NumericMatrix locs);
+RcppExport SEXP _GpGp_d_matern25_scaledim(SEXP covparmsSEXP, SEXP locsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type covparms(covparmsSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type locs(locsSEXP);
+    rcpp_result_gen = Rcpp::wrap(d_matern25_scaledim(covparms, locs));
+    return rcpp_result_gen;
+END_RCPP
+}
 // Linv_mult
 NumericVector Linv_mult(NumericMatrix Linv, NumericVector z, IntegerMatrix NNarray);
 RcppExport SEXP _GpGp_Linv_mult(SEXP LinvSEXP, SEXP zSEXP, SEXP NNarraySEXP) {
@@ -753,6 +801,10 @@ static const R_CallMethodDef CallEntries[] = {
     {"_GpGp_d_exponential_nonstat_var", (DL_FUNC) &_GpGp_d_exponential_nonstat_var, 2},
     {"_GpGp_matern15_scaledim", (DL_FUNC) &_GpGp_matern15_scaledim, 2},
     {"_GpGp_d_matern15_scaledim", (DL_FUNC) &_GpGp_d_matern15_scaledim, 2},
+    {"_GpGp_matern25_isotropic", (DL_FUNC) &_GpGp_matern25_isotropic, 2},
+    {"_GpGp_d_matern25_isotropic", (DL_FUNC) &_GpGp_d_matern25_isotropic, 2},
+    {"_GpGp_matern25_scaledim", (DL_FUNC) &_GpGp_matern25_scaledim, 2},
+    {"_GpGp_d_matern25_scaledim", (DL_FUNC) &_GpGp_d_matern25_scaledim, 2},
     {"_GpGp_Linv_mult", (DL_FUNC) &_GpGp_Linv_mult, 3},
     {"_GpGp_L_mult", (DL_FUNC) &_GpGp_L_mult, 3},
     {"_GpGp_Linv_t_mult", (DL_FUNC) &_GpGp_Linv_t_mult, 3},

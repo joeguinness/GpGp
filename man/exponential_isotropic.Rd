@@ -4,6 +4,7 @@
 \alias{exponential_isotropic}
 \alias{d_exponential_isotropic}
 \alias{d_matern15_isotropic}
+\alias{d_matern25_isotropic}
 \title{Isotropic exponential covariance function}
 \usage{
 exponential_isotropic(covparms, locs)
@@ -11,6 +12,8 @@ exponential_isotropic(covparms, locs)
 d_exponential_isotropic(covparms, locs)
 
 d_matern15_isotropic(covparms, locs)
+
+d_matern25_isotropic(covparms, locs)
 }
 \arguments{
 \item{covparms}{A vector with covariance parameters
@@ -33,7 +36,11 @@ all pairwise covariances.
 \itemize{
 \item \code{d_exponential_isotropic}: Derivatives of isotropic exponential covariance
 
-\item \code{d_matern15_isotropic}: Derivatives of isotropic exponential covariance
+\item \code{d_matern15_isotropic}: Derivatives of isotropic 
+matern covariance with smoothness 1.5
+
+\item \code{d_matern25_isotropic}: Derivatives of isotropic
+matern covariance function with smoothness 2.5
 }}
 
 \section{Parameterization}{
