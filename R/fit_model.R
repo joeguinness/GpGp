@@ -99,6 +99,8 @@ fit_model <- function(y, locs, X = NULL, covfun_name = "matern_isotropic",
               "matern_isotropic",
               "matern15_isotropic",
               "matern25_isotropic",
+              "matern35_isotropic",
+              "matern45_isotropic",
               "matern_anisotropic2D",
               "exponential_anisotropic2D",
               "exponential_anisotropic3D",
@@ -118,6 +120,8 @@ fit_model <- function(y, locs, X = NULL, covfun_name = "matern_isotropic",
               "matern_scaledim",
               "matern15_scaledim",
               "matern25_scaledim",
+              "matern35_scaledim",
+              "matern45_scaledim",
               "exponential_scaledim" ) )
     {
         stop("unrecognized covariance function name `covfun_name'.")
@@ -262,6 +266,8 @@ fit_model2 <- function(y, locs, X = NULL, covfun_name = "matern_isotropic",
               "matern_isotropic",
               "matern15_isotropic",
               "matern25_isotropic",
+              "matern35_isotropic",
+              "matern45_isotropic",
               "matern_anisotropic2D",
               "exponential_anisotropic2D",
               "exponential_anisotropic3D",
@@ -281,6 +287,8 @@ fit_model2 <- function(y, locs, X = NULL, covfun_name = "matern_isotropic",
               "matern_scaledim",
               "matern15_scaledim",
               "matern25_scaledim",
+              "matern35_scaledim",
+              "matern45_scaledim",
               "exponential_scaledim" ) )
     {
         stop("unrecognized covariance function name `covfun_name'.")
@@ -511,6 +519,14 @@ get_start_parms <- function(y,X,locs,covfun_name){
         start_range <- mean( dmat )/4
         start_parms <- c(start_var, start_range, start_nug)
     }
+    if(covfun_name == "matern35_isotropic"){
+        start_range <- mean( dmat )/4
+        start_parms <- c(start_var, start_range, start_nug)
+    }
+    if(covfun_name == "matern45_isotropic"){
+        start_range <- mean( dmat )/4
+        start_parms <- c(start_var, start_range, start_nug)
+    }
     if(covfun_name == "matern_anisotropic2D"){
         start_range <- mean( dmat )/4
         start_parms <- c(start_var, 1/start_range, 0, 1/start_range,
@@ -591,16 +607,10 @@ get_start_parms <- function(y,X,locs,covfun_name){
         }
         start_parms <- c(start_parms, start_nug)
     }
-    if(covfun_name == "matern15_scaledim"){
-        d <- ncol(locs)
-        start_parms <- c(start_var)
-        for(j in 1:d){
-            dmat <- fields::rdist(locs[randinds,j])
-            start_parms <- c(start_parms, stats::median(dmat)/4 )
-        }
-        start_parms <- c(start_parms, start_nug)
-    }
-    if(covfun_name == "matern25_scaledim"){
+    if(covfun_name %in% 
+            c("matern15_scaledim","matern25_scaledim",
+                "matern35_scaledim","matern45_scaledim")
+    ){
         d <- ncol(locs)
         start_parms <- c(start_var)
         for(j in 1:d){
@@ -803,12 +813,8 @@ get_penalty <- function(y,X,locs,covfun_name){
          dpen <- function(x){  dpen_nug(x,3) +  dpen_var(x,1)  }
         ddpen <- function(x){  ddpen_nug(x,3) + ddpen_var(x,1) }
     }
-    if(covfun_name == "matern15_isotropic"){
-          pen <- function(x){  pen_nug(x,3) +   pen_var(x,1)   }
-         dpen <- function(x){  dpen_nug(x,3) +  dpen_var(x,1)  }
-        ddpen <- function(x){  ddpen_nug(x,3) + ddpen_var(x,1) }
-    }
-    if(covfun_name == "matern25_isotropic"){
+    if(covfun_name %in% c("matern15_isotropic","matern25_isotropic",
+        "matern35_isotropic","matern45_isotropic")){
           pen <- function(x){  pen_nug(x,3) +   pen_var(x,1)   }
          dpen <- function(x){  dpen_nug(x,3) +  dpen_var(x,1)  }
         ddpen <- function(x){  ddpen_nug(x,3) + ddpen_var(x,1) }
@@ -880,13 +886,9 @@ get_penalty <- function(y,X,locs,covfun_name){
          dpen <- function(x){ dpen_nug(x,d+2)  +  dpen_var(x,1)  }
         ddpen <- function(x){ ddpen_nug(x,d+2) + ddpen_var(x,1) }
     }
-    if(covfun_name == "matern15_scaledim"){
-        d <- ncol(locs)
-          pen <- function(x){  pen_nug(x,d+2)  +   pen_var(x,1)   }
-         dpen <- function(x){ dpen_nug(x,d+2)  +  dpen_var(x,1)  }
-        ddpen <- function(x){ ddpen_nug(x,d+2) + ddpen_var(x,1) }
-    }
-    if(covfun_name == "matern25_scaledim"){
+    if(covfun_name %in% c("matern15_scaledim","matern25_scaledim",
+        "matern35_scaledim","matern45_scaledim")
+    ){
         d <- ncol(locs)
           pen <- function(x){  pen_nug(x,d+2)  +   pen_var(x,1)   }
          dpen <- function(x){ dpen_nug(x,d+2)  +  dpen_var(x,1)  }

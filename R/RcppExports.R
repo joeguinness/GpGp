@@ -730,6 +730,124 @@ d_matern25_scaledim <- function(covparms, locs) {
     .Call('_GpGp_d_matern25_scaledim', PACKAGE = 'GpGp', covparms, locs)
 }
 
+#' Isotropic Matern covariance function, smoothness = 3.5
+#'
+#' From a matrix of locations and covariance parameters of the form
+#' (variance, range, nugget), return the square matrix of
+#' all pairwise covariances.
+#' @param locs A matrix with \code{n} rows and \code{d} columns.
+#' Each row of locs is a point in R^d.
+#' @param covparms A vector with covariance parameters
+#' in the form (variance, range, nugget)
+#' @return A matrix with \code{n} rows and \code{n} columns, with the i,j entry
+#' containing the covariance between observations at \code{locs[i,]} and
+#' \code{locs[j,]}.
+#' @section Parameterization:
+#' The covariance parameter vector is (variance, range, nugget)
+#' = \eqn{(\sigma^2,\alpha,\tau^2)}, and the covariance function is parameterized
+#' as
+#' \deqn{ M(x,y) = \sigma^2 ( \sum_{j=0}^3 c_j || x - y ||^j/ \alpha^j ) exp( - || x - y ||/ \alpha )}
+#' where c_0 = 1, c_1 = 1, c_2 = 2/5, c_3 = 1/15. 
+#' The nugget value \eqn{ \sigma^2 \tau^2 } is added to the diagonal of the covariance matrix.
+#' NOTE: the nugget is \eqn{ \sigma^2 \tau^2 }, not \eqn{ \tau^2 }. 
+matern35_isotropic <- function(covparms, locs) {
+    .Call('_GpGp_matern35_isotropic', PACKAGE = 'GpGp', covparms, locs)
+}
+
+#' @describeIn matern35_isotropic Derivatives of isotropic
+#' matern covariance function with smoothness 3.5
+d_matern35_isotropic <- function(covparms, locs) {
+    .Call('_GpGp_d_matern35_isotropic', PACKAGE = 'GpGp', covparms, locs)
+}
+
+#' Matern covariance function, smoothess = 3.5, different range parameter for each dimension
+#'
+#' From a matrix of locations and covariance parameters of the form
+#' (variance, range_1, ..., range_d, nugget), return the square matrix of
+#' all pairwise covariances.
+#' @param locs A matrix with \code{n} rows and \code{d} columns.
+#' Each row of locs is a point in R^d.
+#' @param covparms A vector with covariance parameters
+#' in the form (variance, range_1, ..., range_d, nugget)
+#' @return A matrix with \code{n} rows and \code{n} columns, with the i,j entry
+#' containing the covariance between observations at \code{locs[i,]} and
+#' \code{locs[j,]}.
+#' @section Parameterization:
+#' The covariance parameter vector is (variance, range_1, ..., range_d, nugget).
+#' The covariance function is parameterized as
+#' \deqn{ M(x,y) = \sigma^2 ( \sum_{j=0}^3 c_j || D^{-1}(x - y) ||^j  ) exp( - || D^{-1}(x - y) || ) }
+#' where c_0 = 1, c_1 = 1, c_2 = 2/5, c_3 = 1/15.
+#' where D is a diagonal matrix with (range_1, ..., range_d) on the diagonals.
+#' The nugget value \eqn{ \sigma^2 \tau^2 } is added to the diagonal of the covariance matrix.
+#' NOTE: the nugget is \eqn{ \sigma^2 \tau^2 }, not \eqn{ \tau^2 }. 
+matern35_scaledim <- function(covparms, locs) {
+    .Call('_GpGp_matern35_scaledim', PACKAGE = 'GpGp', covparms, locs)
+}
+
+#' @describeIn matern35_scaledim Derivatives with respect to parameters
+d_matern35_scaledim <- function(covparms, locs) {
+    .Call('_GpGp_d_matern35_scaledim', PACKAGE = 'GpGp', covparms, locs)
+}
+
+#' Isotropic Matern covariance function, smoothness = 4.5
+#'
+#' From a matrix of locations and covariance parameters of the form
+#' (variance, range, nugget), return the square matrix of
+#' all pairwise covariances.
+#' @param locs A matrix with \code{n} rows and \code{d} columns.
+#' Each row of locs is a point in R^d.
+#' @param covparms A vector with covariance parameters
+#' in the form (variance, range, nugget)
+#' @return A matrix with \code{n} rows and \code{n} columns, with the i,j entry
+#' containing the covariance between observations at \code{locs[i,]} and
+#' \code{locs[j,]}.
+#' @section Parameterization:
+#' The covariance parameter vector is (variance, range, nugget)
+#' = \eqn{(\sigma^2,\alpha,\tau^2)}, and the covariance function is parameterized
+#' as
+#' \deqn{ M(x,y) = \sigma^2 ( \sum_{j=0}^4 c_j || x - y ||^j/ \alpha^j ) exp( - || x - y ||/ \alpha )}
+#' where c_0 = 1, c_1 = 1, c_2 = 3/7, c_3 = 2/21, c_4 = 1/105. 
+#' The nugget value \eqn{ \sigma^2 \tau^2 } is added to the diagonal of the covariance matrix.
+#' NOTE: the nugget is \eqn{ \sigma^2 \tau^2 }, not \eqn{ \tau^2 }. 
+matern45_isotropic <- function(covparms, locs) {
+    .Call('_GpGp_matern45_isotropic', PACKAGE = 'GpGp', covparms, locs)
+}
+
+#' @describeIn matern35_isotropic Derivatives of isotropic
+#' matern covariance function with smoothness 3.5
+d_matern45_isotropic <- function(covparms, locs) {
+    .Call('_GpGp_d_matern45_isotropic', PACKAGE = 'GpGp', covparms, locs)
+}
+
+#' Matern covariance function, smoothess = 3.5, different range parameter for each dimension
+#'
+#' From a matrix of locations and covariance parameters of the form
+#' (variance, range_1, ..., range_d, nugget), return the square matrix of
+#' all pairwise covariances.
+#' @param locs A matrix with \code{n} rows and \code{d} columns.
+#' Each row of locs is a point in R^d.
+#' @param covparms A vector with covariance parameters
+#' in the form (variance, range_1, ..., range_d, nugget)
+#' @return A matrix with \code{n} rows and \code{n} columns, with the i,j entry
+#' containing the covariance between observations at \code{locs[i,]} and
+#' \code{locs[j,]}.
+#' @section Parameterization:
+#' The covariance parameter vector is (variance, range_1, ..., range_d, nugget).
+#' The covariance function is parameterized as
+#' \deqn{ M(x,y) = \sigma^2 ( \sum_{j=0}^4 c_j || D^{-1}(x - y) ||^j  ) exp( - || D^{-1}(x - y) || ) }
+#' where c_0 = 1, c_1 = 1, c_2 = 3/7, c_3 = 2/21, c_4 = 1/105. 
+#' where D is a diagonal matrix with (range_1, ..., range_d) on the diagonals.
+#' The nugget value \eqn{ \sigma^2 \tau^2 } is added to the diagonal of the covariance matrix.
+#' NOTE: the nugget is \eqn{ \sigma^2 \tau^2 }, not \eqn{ \tau^2 }. 
+matern45_scaledim <- function(covparms, locs) {
+    .Call('_GpGp_matern45_scaledim', PACKAGE = 'GpGp', covparms, locs)
+}
+
+#' @describeIn matern35_scaledim Derivatives with respect to parameters
+d_matern45_scaledim <- function(covparms, locs) {
+    .Call('_GpGp_d_matern45_scaledim', PACKAGE = 'GpGp', covparms, locs)
+}
+
 #' Multiply approximate inverse Cholesky by a vector
 #'
 #' Vecchia's approximation implies a sparse approximation to the

@@ -19,6 +19,8 @@
 #include "covmatrix_funs_08.h"
 #include "covmatrix_funs_09.h"
 #include "covmatrix_funs_10.h"
+#include "covmatrix_funs_11.h"
+#include "covmatrix_funs_12.h"
 
 using namespace Rcpp;
 using namespace arma;
@@ -46,6 +48,16 @@ covfun_t get_covfun(std::string covfun_name_string)
         covstruct.p_d_covfun = &d_matern15_isotropic;
     } 
     else if( covfun_name_string.compare("matern25_isotropic") == 0 )
+    { 
+        covstruct.p_covfun = &matern25_isotropic; 
+        covstruct.p_d_covfun = &d_matern25_isotropic;
+    } 
+    else if( covfun_name_string.compare("matern35_isotropic") == 0 )
+    { 
+        covstruct.p_covfun = &matern25_isotropic; 
+        covstruct.p_d_covfun = &d_matern25_isotropic;
+    } 
+    else if( covfun_name_string.compare("matern45_isotropic") == 0 )
     { 
         covstruct.p_covfun = &matern25_isotropic; 
         covstruct.p_d_covfun = &d_matern25_isotropic;
@@ -146,6 +158,16 @@ covfun_t get_covfun(std::string covfun_name_string)
         covstruct.p_d_covfun = &d_matern15_scaledim;
     }
     else if( covfun_name_string.compare("matern25_scaledim") == 0 )
+    { 
+        covstruct.p_covfun = &matern15_scaledim;
+        covstruct.p_d_covfun = &d_matern15_scaledim;
+    }
+    else if( covfun_name_string.compare("matern35_scaledim") == 0 )
+    { 
+        covstruct.p_covfun = &matern15_scaledim;
+        covstruct.p_d_covfun = &d_matern15_scaledim;
+    }
+    else if( covfun_name_string.compare("matern45_scaledim") == 0 )
     { 
         covstruct.p_covfun = &matern15_scaledim;
         covstruct.p_d_covfun = &d_matern15_scaledim;
