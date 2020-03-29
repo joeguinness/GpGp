@@ -54,13 +54,13 @@ covfun_t get_covfun(std::string covfun_name_string)
     } 
     else if( covfun_name_string.compare("matern35_isotropic") == 0 )
     { 
-        covstruct.p_covfun = &matern25_isotropic; 
-        covstruct.p_d_covfun = &d_matern25_isotropic;
+        covstruct.p_covfun = &matern35_isotropic; 
+        covstruct.p_d_covfun = &d_matern35_isotropic;
     } 
     else if( covfun_name_string.compare("matern45_isotropic") == 0 )
     { 
-        covstruct.p_covfun = &matern25_isotropic; 
-        covstruct.p_d_covfun = &d_matern25_isotropic;
+        covstruct.p_covfun = &matern45_isotropic; 
+        covstruct.p_d_covfun = &d_matern45_isotropic;
     } 
     else if( covfun_name_string.compare("matern_anisotropic2D") == 0 )
     { 
@@ -159,18 +159,18 @@ covfun_t get_covfun(std::string covfun_name_string)
     }
     else if( covfun_name_string.compare("matern25_scaledim") == 0 )
     { 
-        covstruct.p_covfun = &matern15_scaledim;
-        covstruct.p_d_covfun = &d_matern15_scaledim;
+        covstruct.p_covfun = &matern25_scaledim;
+        covstruct.p_d_covfun = &d_matern25_scaledim;
     }
     else if( covfun_name_string.compare("matern35_scaledim") == 0 )
     { 
-        covstruct.p_covfun = &matern15_scaledim;
-        covstruct.p_d_covfun = &d_matern15_scaledim;
+        covstruct.p_covfun = &matern35_scaledim;
+        covstruct.p_d_covfun = &d_matern35_scaledim;
     }
     else if( covfun_name_string.compare("matern45_scaledim") == 0 )
     { 
-        covstruct.p_covfun = &matern15_scaledim;
-        covstruct.p_d_covfun = &d_matern15_scaledim;
+        covstruct.p_covfun = &matern45_scaledim;
+        covstruct.p_d_covfun = &d_matern45_scaledim;
     }
     else if( covfun_name_string.compare("exponential_scaledim") == 0 )
     { 
