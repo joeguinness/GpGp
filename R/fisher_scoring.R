@@ -91,11 +91,12 @@ fisher_scoring <- function( likfun, start_parms, link,
         tol <- 1e-8
         if (condition_number(info) > 1 / tol) {
             if (!silent) cat("Cond # of info matrix > 1/tol \n")
-            eiginfo <- eigen(info)
-            whichsmall <- which( eiginfo$values / max(eiginfo$values) < tol )
-            eiginfo$values[whichsmall] <- tol*max(eiginfo$values)
-            info <-
-                eiginfo$vectors %*% diag(eiginfo$values) %*% t(eiginfo$vectors)
+            info <- 0.5*max(likobj0$info)*diag(nrow(likobj0$info))
+            #eiginfo <- eigen(info)
+            #whichsmall <- which( eiginfo$values / max(eiginfo$values) < tol )
+            #eiginfo$values[whichsmall] <- tol*max(eiginfo$values)
+            #info <-
+            #    eiginfo$vectors %*% diag(eiginfo$values) %*% t(eiginfo$vectors)
         }
 
         # calculate fisher step 
