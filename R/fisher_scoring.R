@@ -41,7 +41,7 @@ fisher_scoring <- function( likfun, start_parms, link,
     wolfe_check <- function(likobj0,likobj1,logparms,step,both){
         c1 <- 1e-4
         c2 <- 0.9
-        tol <- 1e-6
+        tol <- 0.1
         ll0 <- likobj0$loglik
         gr0 <- likobj0$grad
         ll1 <- likobj1$loglik
@@ -88,15 +88,10 @@ fisher_scoring <- function( likfun, start_parms, link,
         likobj0 <- likobj
         
         # if condition number of info matrix large, then regularize
-        tol <- 1e-8
+        tol <- 1e-4
         if (condition_number(info) > 1 / tol) {
             if (!silent) cat("Cond # of info matrix > 1/tol \n")
-            info <- 0.5*max(likobj0$info)*diag(nrow(likobj0$info))
-            #eiginfo <- eigen(info)
-            #whichsmall <- which( eiginfo$values / max(eiginfo$values) < tol )
-            #eiginfo$values[whichsmall] <- tol*max(eiginfo$values)
-            #info <-
-            #    eiginfo$vectors %*% diag(eiginfo$values) %*% t(eiginfo$vectors)
+            info <- 1.0*max(likobj0$info)*diag(nrow(likobj0$info))
         }
 
         # calculate fisher step 
@@ -104,7 +99,7 @@ fisher_scoring <- function( likfun, start_parms, link,
         
         # if step size large, then make it smaller
         if (mean(step^2) > 1) {
-            if(!silent) cat("@@\n")
+            if(!silent) cat("##\n")
             step <- step/sqrt(mean(step^2))
         }
         
@@ -128,20 +123,17 @@ fisher_scoring <- function( likfun, start_parms, link,
         cnt <- 1
         no_decrease <- FALSE
         both <- FALSE
+        mult <- 1.0
         while (!wolfe_check(likobj0,likobj,logparms,newlogparms-logparms,both) &&
                 !no_decrease ){
-            mult <- 0.5 
-            step <- mult * step
-            if (cnt == 6) { # switch to gradient
-                if(!silent) cat("**\n") 
-                step <- - 0.1*grad/sqrt(sum(grad^2)) 
-                both <- FALSE
-            }
+            info <- 1/mult*max(likobj$info)*diag(nrow(likobj0$info))
+            step <- -solve(info,grad)
             if(!silent) cat("**\n") 
             if ( sqrt(sum(step^2)) < 1e-4 ){ no_decrease <- TRUE }  # maybe we should throw error here?
             newlogparms <- logparms + step
             likobj <- likfun(newlogparms)
             cnt <- cnt + 1
+            mult <- mult*0.5
         }
         stepgrad <- c(crossprod(step,grad))
         
