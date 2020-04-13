@@ -969,8 +969,8 @@ L_t_mult <- function(Linv, z, NNarray) {
 #' NNarray <- find_ordered_nn(locs,20)
 #' Linv <- vecchia_Linv(covparms, "matern_isotropic", locs, NNarray)
 #' @export
-vecchia_Linv <- function(covparms, covfun_name, locs, NNarray) {
-    .Call('_GpGp_vecchia_Linv', PACKAGE = 'GpGp', covparms, covfun_name, locs, NNarray)
+vecchia_Linv <- function(covparms, covfun_name, locs, NNarray, start_ind = 1L) {
+    .Call('_GpGp_vecchia_Linv', PACKAGE = 'GpGp', covparms, covfun_name, locs, NNarray, start_ind)
 }
 
 #' Vecchia's loglikelihood, gradient, and Fisher information

@@ -567,7 +567,8 @@ NumericMatrix vecchia_Linv(
     NumericVector covparms,
     StringVector covfun_name,
     const NumericMatrix locs,
-    IntegerMatrix NNarray ){
+    IntegerMatrix NNarray, 
+    int start_ind = 1){
     
     // data dimensions
     int n = locs.nrow();
@@ -586,7 +587,7 @@ NumericMatrix vecchia_Linv(
     //cube (*p_d_covfun)(NumericVector, NumericMatrix) = covstruct.p_d_covfun;
 
     // loop over every observation    
-    for(int i=0; i<n; i++){
+    for(int i=start_ind-1; i<n; i++){
     
         Rcpp::checkUserInterrupt();
         int bsize = std::min(i+1,m);

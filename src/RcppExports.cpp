@@ -743,8 +743,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // vecchia_Linv
-NumericMatrix vecchia_Linv(NumericVector covparms, StringVector covfun_name, const NumericMatrix locs, IntegerMatrix NNarray);
-RcppExport SEXP _GpGp_vecchia_Linv(SEXP covparmsSEXP, SEXP covfun_nameSEXP, SEXP locsSEXP, SEXP NNarraySEXP) {
+NumericMatrix vecchia_Linv(NumericVector covparms, StringVector covfun_name, const NumericMatrix locs, IntegerMatrix NNarray, int start_ind);
+RcppExport SEXP _GpGp_vecchia_Linv(SEXP covparmsSEXP, SEXP covfun_nameSEXP, SEXP locsSEXP, SEXP NNarraySEXP, SEXP start_indSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -752,7 +752,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< StringVector >::type covfun_name(covfun_nameSEXP);
     Rcpp::traits::input_parameter< const NumericMatrix >::type locs(locsSEXP);
     Rcpp::traits::input_parameter< IntegerMatrix >::type NNarray(NNarraySEXP);
-    rcpp_result_gen = Rcpp::wrap(vecchia_Linv(covparms, covfun_name, locs, NNarray));
+    Rcpp::traits::input_parameter< int >::type start_ind(start_indSEXP);
+    rcpp_result_gen = Rcpp::wrap(vecchia_Linv(covparms, covfun_name, locs, NNarray, start_ind));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -913,7 +914,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_GpGp_L_mult", (DL_FUNC) &_GpGp_L_mult, 3},
     {"_GpGp_Linv_t_mult", (DL_FUNC) &_GpGp_Linv_t_mult, 3},
     {"_GpGp_L_t_mult", (DL_FUNC) &_GpGp_L_t_mult, 3},
-    {"_GpGp_vecchia_Linv", (DL_FUNC) &_GpGp_vecchia_Linv, 4},
+    {"_GpGp_vecchia_Linv", (DL_FUNC) &_GpGp_vecchia_Linv, 5},
     {"_GpGp_vecchia_profbeta_loglik_grad_info", (DL_FUNC) &_GpGp_vecchia_profbeta_loglik_grad_info, 6},
     {"_GpGp_vecchia_profbeta_loglik", (DL_FUNC) &_GpGp_vecchia_profbeta_loglik, 6},
     {"_GpGp_vecchia_meanzero_loglik", (DL_FUNC) &_GpGp_vecchia_meanzero_loglik, 5},
