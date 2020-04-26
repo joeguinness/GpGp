@@ -6,8 +6,8 @@
 \usage{
 fit_model(y, locs, X = NULL, covfun_name = "matern_isotropic",
   NNarray = NULL, start_parms = NULL, reorder = TRUE, group = TRUE,
-  m_seq = c(10, 30), max_iter = 40, silent = FALSE,
-  st_scale = NULL, convtol = 1e-04)
+  m_seq = c(10, 30), max_iter = 40, fixed_parms = NULL,
+  silent = FALSE, st_scale = NULL, convtol = 1e-04)
 }
 \arguments{
 \item{y}{response vector}
@@ -50,6 +50,15 @@ approximation is maximized, then a 30-neighbor approximation is maximized using 
 of numbers of neighbors, e.g. \code{m_seq = c(10,30,60,90)}.}
 
 \item{max_iter}{maximum number of Fisher scoring iterations}
+
+\item{fixed_parms}{Indices of covariance parameters you would like to fix
+at specific values. If you decide to fix any parameters, you must specify
+their values in \code{start_parms}, along with the starting values for
+all other parameters. For example, to fix the nugget at zero in 
+\code{exponential_isotropic}, set \code{fixed_parms} to \code{c(3)}, and set
+\code{start_parms} to \code{c(4.7,3.1,0)}. The
+last element of \code{start_parms} (the nugget parameter) is set to zero,
+while the starting values for the other two parameters are 4.7 and 3.1.}
 
 \item{silent}{TRUE/FALSE for whether to print some information during fitting.}
 

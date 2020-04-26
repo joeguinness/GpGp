@@ -552,6 +552,8 @@ void synthesize_grouped(
 //' the inverse Cholesky matrix. The columns of the non-zero entries
 //' are specified in \code{NNarray[i,]}.
 //' @inheritParams vecchia_meanzero_loglik
+//' @param start_ind Compute entries of Linv only for rows \code{start_ind}
+//' until the last row. 
 //' @return matrix containing entries of inverse Cholesky
 //' @examples
 //' n1 <- 40

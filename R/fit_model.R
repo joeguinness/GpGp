@@ -7,22 +7,26 @@
 #' Vecchia likelihood estimates, obtained with a Fisher scoring algorithm.
 #'
 #' @param y response vector
-#' @param locs matrix of locations. Each row is a single spatial or spatial-temporal
+#' @param locs matrix of locations. Each row is a single 
+#' spatial or spatial-temporal
 #' location. If using one of the covariance functions for data on a sphere,
 #' the first column should be longitudes (-180,180) and the second column
-#' should be latitudes (-90,90). If using a spatial-temporal covariance function,
+#' should be latitudes (-90,90). 
+#' If using a spatial-temporal covariance function,
 #' the last column should contain the times.
 #' @param X design matrix. Each row contains covariates for the corresponding
 #' observation in \code{y}. If not specified, the function sets \code{X} to be a
 #' matrix with a single column of ones, that is, a constant mean function.
-#' @param covfun_name string name of a covariance function. See \code{\link{GpGp}}
-#' for information about supported covariance funtions.
-#' @param NNarray Optionally specified array of nearest neighbor indices, usually
-#' from the output of \code{\link{find_ordered_nn}}. If \code{NULL}, fit_model will
-#' compute the nearest neighbors. We recommend that the user
+#' @param covfun_name string name of a covariance function. 
+#' See \code{\link{GpGp}} for information about supported covariance funtions.
+#' @param NNarray Optionally specified array of nearest neighbor indices, 
+#' usually from the output of \code{\link{find_ordered_nn}}. If \code{NULL}, 
+#' fit_model will compute the nearest neighbors. We recommend that the user
 #' not specify this unless there is a good reason to (e.g. if doing a comparison
-#' study where one wants to control \code{NNarray} across different approximations).
-#' @param start_parms Optionally specified starting values for parameters. If \code{NULL},
+#' study where one wants to control 
+#' \code{NNarray} across different approximations).
+#' @param start_parms Optionally specified starting values for parameters. 
+#' If \code{NULL},
 #' fit_model will select default starting values.
 #' @param max_iter maximum number of Fisher scoring iterations
 #' @param silent TRUE/FALSE for whether to print some information during fitting.
@@ -30,20 +34,36 @@
 #' the approximation (Guinness, 2018) or not.  The grouped version
 #' is used by default and is always recommended.
 #' @param reorder TRUE/FALSE indicating whether maxmin ordering should be used
-#' (TRUE) or whether no reordering should be done before fitting (FALSE). If you want
-#' to use a customized reordering, then manually reorder \code{y}, \code{locs}, and \code{X},
+#' (TRUE) or whether no reordering should be done before fitting (FALSE). 
+#' If you want
+#' to use a customized reordering, then manually reorder \code{y}, \code{locs}, 
+#' and \code{X},
 #' and then set \code{reorder} to \code{FALSE}. A random reordering is used
 #' when \code{nrow(locs) > 1e5}.
-#' @param m_seq Sequence of values for number of neighbors. By default, a 10-neighbor
-#' approximation is maximized, then a 30-neighbor approximation is maximized using the
-#' 10 neighbor estimates as starting values. However, one can specify any sequence
+#' @param m_seq Sequence of values for number of neighbors. By default, 
+#' a 10-neighbor
+#' approximation is maximized, then a 30-neighbor approximation is 
+#' maximized using the
+#' 10 neighbor estimates as starting values. 
+#' However, one can specify any sequence
 #' of numbers of neighbors, e.g. \code{m_seq = c(10,30,60,90)}.
+#' @param fixed_parms Indices of covariance parameters you would like to fix
+#' at specific values. If you decide to fix any parameters, you must specify
+#' their values in \code{start_parms}, along with the starting values for
+#' all other parameters. For example, to fix the nugget at zero in 
+#' \code{exponential_isotropic}, set \code{fixed_parms} to \code{c(3)}, and set
+#' \code{start_parms} to \code{c(4.7,3.1,0)}. The
+#' last element of \code{start_parms} (the nugget parameter) is set to zero,
+#' while the starting values for the other two parameters are 4.7 and 3.1.
 #' @param st_scale Scaling for spatial and temporal ranges. Only applicable for
 #' spatial-temporal models, where it is used in distance
 #' calculations when selecting neighbors. \code{st_scale} must be specified
-#' when \code{covfun_name} is a spatial-temporal covariance. See Argo vignette for an example.
-#' @param convtol Tolerance for exiting the optimization. Fisher scoring is stopped
-#' when the dot product between the step and the gradient is less than \code{convtol}.
+#' when \code{covfun_name} is a spatial-temporal covariance. 
+#' See Argo vignette for an example.
+#' @param convtol Tolerance for exiting the optimization. 
+#' Fisher scoring is stopped
+#' when the dot product between the step and the gradient 
+#' is less than \code{convtol}.
 #' @return An object of class \code{GpGp_fit}, which is a list containing
 #' covariance parameter estimates, regression coefficients,
 #' covariance matrix for mean parameter estimates, as well as some other
@@ -52,11 +72,13 @@
 #' that automatically performs many of the auxiliary tasks needed for
 #' using Vecchia's approximation, including reordering, computing
 #' nearest neighbors, grouping, and optimization. The likelihoods use a small
-#' penalty on small nuggets, large spatial variances, and small smoothness parameter.
+#' penalty on small nuggets, large spatial variances, 
+#' and small smoothness parameter.
 #'
-#' The Jason-3 windspeed vignette and the Argo temperature vignette are useful sources for a
-#' use-cases of the \code{fit_model} function for data on sphere. The example below
-#' shows a very small example with a simulated dataset in 2d.
+#' The Jason-3 windspeed vignette and the Argo temperature 
+#' vignette are useful sources for a
+#' use-cases of the \code{fit_model} function for data on sphere. 
+#' The example below shows a very small example with a simulated dataset in 2d.
 #'
 #' @examples
 #' n1 <- 20
@@ -74,174 +96,7 @@
 #' @export
 fit_model <- function(y, locs, X = NULL, covfun_name = "matern_isotropic",
     NNarray = NULL, start_parms = NULL, reorder = TRUE, group = TRUE,
-    m_seq = c(10,30), max_iter = 40, 
-    silent = FALSE, st_scale = NULL, convtol = 1e-4){
-
-    n <- length(y)
-
-    # check that length of observation vector same as
-    # number of locations
-    if( nrow(locs) != n ){
-        stop("length of observation vector y not equal
-              to the number of locations (rows in locs)")
-    }
-
-    # check if design matrix is specified
-    if( is.null(X) ){
-        if(!silent) cat("Design matrix not specified, using constant mean \n")
-        X <- rep(1,n)
-    }
-    X <- as.matrix(X)
-
-    # check if one of the allowed covariance functions is chosen
-    if( ! covfun_name %in%
-            c("exponential_isotropic",
-              "matern_isotropic",
-              "matern15_isotropic",
-              "matern25_isotropic",
-              "matern35_isotropic",
-              "matern45_isotropic",
-              "matern_anisotropic2D",
-              "exponential_anisotropic2D",
-              "exponential_anisotropic3D",
-              "matern_anisotropic3D",
-              "matern_nonstat_var",
-              "exponential_nonstat_var",
-              "matern_sphere",
-              "exponential_sphere",
-              "matern_sphere_warp",
-              "exponential_sphere_warp",
-              "matern_spheretime_warp",
-              "exponential_spheretime_warp",
-              "matern_spheretime",
-              "exponential_spheretime",
-              "matern_spacetime",
-              "exponential_spacetime",
-              "matern_scaledim",
-              "matern15_scaledim",
-              "matern25_scaledim",
-              "matern35_scaledim",
-              "matern45_scaledim",
-              "exponential_scaledim" ) )
-    {
-        stop("unrecognized covariance function name `covfun_name'.")
-    }
-
-    # detect and remove missing values
-    not_missing <- apply( cbind(y,locs,X), 1,
-        function(x){
-            if( sum(is.na(x) | is.infinite(x)) > 0 ){
-                return(FALSE)
-            } else { return(TRUE) }
-        }
-    )
-    if( sum(not_missing) < n ){
-        y <- y[not_missing]
-        locs <- locs[not_missing,,drop=FALSE]
-        X <- X[not_missing,,drop=FALSE]
-        cat(paste0( n - sum(not_missing),
-            " observations removed due to missingness or Inf\n"))
-    }
-
-    # redefine n
-    n <- length(y)
-
-    # get starting values for parameters
-    if(is.null(start_parms)){
-        start <- get_start_parms(y,X,locs,covfun_name)
-        start_parms <- start$start_parms
-    }
-
-    linkfuns <- get_linkfun(covfun_name)
-    link <- linkfuns$link
-    dlink <- linkfuns$dlink
-    invlink <- linkfuns$invlink
-    lonlat <- linkfuns$lonlat
-    if(lonlat){
-        cat("Assuming first two columns of locs are (longitude,latidue) in degrees\n")
-    }
-    space_time <- linkfuns$space_time
-
-    penalty <- get_penalty(y,X,locs,covfun_name)
-    pen <- penalty$pen
-    dpen <- penalty$dpen
-    ddpen <- penalty$ddpen
-
-    # get an ordering and reorder everything
-    if(reorder){
-        if(!silent) cat("Reordering...")
-        if( n < 1e5 ){  # maxmin ordering if n < 100000
-            ord <- order_maxmin(locs, lonlat = lonlat, space_time = space_time)
-        } else {        # otherwise random order
-            ord <- sample(n)
-        }
-        if(!silent) cat("Done \n")
-    } else {
-        ord <- 1:n
-    }
-    yord <- y[ord]
-    locsord <- locs[ord,,drop=FALSE]
-    Xord <- as.matrix( X[ord,,drop=FALSE] )
-
-    # get neighbor array if not provided
-    if( is.null(NNarray) ){
-        if(!silent) cat("Finding nearest neighbors...")
-        NNarray <- find_ordered_nn(locsord, m=max(m_seq), lonlat = lonlat,
-            st_scale = st_scale)
-        if(!silent) cat("Done \n")
-    }
-
-    # refine the estimates for m in m_seq
-    for(i in 1:length(m_seq)){
-        m <- m_seq[i]
-        if(group){
-
-            NNlist <- group_obs(NNarray[,1:(m+1)])
-            likfun <- function(logparms){
-                likobj <- vecchia_grouped_profbeta_loglik_grad_info(
-                    link(logparms),covfun_name,yord,Xord,locsord,NNlist)
-                likobj$loglik <- -likobj$loglik - pen(link(logparms))
-                likobj$grad <- -c(likobj$grad)*dlink(logparms) -
-                    dpen(link(logparms))*dlink(logparms)
-                likobj$info <- likobj$info*outer(dlink(logparms),dlink(logparms)) -
-                    ddpen(link(logparms))*outer(dlink(logparms),dlink(logparms))
-                return(likobj)
-            }
-
-        } else {
-
-            likfun <- function(logparms){
-                likobj <- vecchia_profbeta_loglik_grad_info(
-                    link(logparms),covfun_name,yord,Xord,locsord,NNarray[,1:(m+1)])
-                likobj$loglik <- -( likobj$loglik + pen(link(logparms)) )
-                likobj$grad <- -( c(likobj$grad)*dlink(logparms) +
-                    dpen(link(logparms))*dlink(logparms) )
-                likobj$info <- likobj$info*outer(dlink(logparms),dlink(logparms)) -
-                    ddpen(link(logparms))*outer(dlink(logparms),dlink(logparms))
-                return(likobj)
-            }
-
-        }
-        fit <- fisher_scoring(likfun,invlink(start_parms),link,silent=silent,
-            convtol = convtol, max_iter = max_iter)
-        fit$loglik <- -fit$loglik - pen(fit$covparms)
-        start_parms <- fit$covparms
-    }
-
-    # return fit and information used for predictions
-    fit$covfun_name <- covfun_name
-    fit$y <- y
-    fit$locs <- locs
-    fit$X <- X
-    class(fit) <- "GpGp_fit"
-    return(fit)
-}
-
-
-#' @export
-fit_model2 <- function(y, locs, X = NULL, covfun_name = "matern_isotropic",
-    NNarray = NULL, start_parms = NULL, reorder = TRUE, group = TRUE,
-    m_seq = c(10,30), max_iter = 40, fixed_parms = NULL, penalty = NULL,
+    m_seq = c(10,30), max_iter = 40, fixed_parms = NULL,
     silent = FALSE, st_scale = NULL, convtol = 1e-4){
 
     n <- length(y)
@@ -346,8 +201,8 @@ fit_model2 <- function(y, locs, X = NULL, covfun_name = "matern_isotropic",
         # define the parameters we are not fixing
         active <- rep(TRUE, length(start_parms) )
         active[fixed_parms] <- FALSE
-    }        
-    
+    } 
+
     # get link functions
     linkfuns <- get_linkfun(covfun_name)
     link <- linkfuns$link
@@ -356,20 +211,11 @@ fit_model2 <- function(y, locs, X = NULL, covfun_name = "matern_isotropic",
     invlink_startparms <- invlink(start_parms)
     lonlat <- linkfuns$lonlat
     if(lonlat){
-        cat("Assuming first two columns of locs are (longitude,latidue) in degrees\n")
+    cat("Assuming columns 1 and 2 of locs are (longitude,latidue) in degrees\n")
     }
     space_time <- linkfuns$space_time
 
-    #if( !is.null(fixed_parms) && is.null(penalty) ){
-    #    stop("You must specify a penalty if you fix some parameters")
-        # turn the penalties off
-        #penalty <- list()
-        #penalty$pen <- function(x){ 0 }
-        #dpen <- function(x){ rep(0,length(x)) }
-        #ddpen <- function(x){ matrix(0,length(x),length(x)) }
-    #}
-    
-    if( is.null(penalty) ){ penalty <- get_penalty(y,X,locs,covfun_name) }
+    penalty <- get_penalty(y,X,locs,covfun_name) 
     pen <- penalty$pen
     dpen <- penalty$dpen
     ddpen <- penalty$ddpen
@@ -398,7 +244,7 @@ fit_model2 <- function(y, locs, X = NULL, covfun_name = "matern_isotropic",
         if(!silent) cat("Done \n")
     }
 
-    # refine the estimates for m in m_seq
+    # refine the estimates using m in m_seq
     for(i in 1:length(m_seq)){
         m <- m_seq[i]
         if(group){
@@ -445,20 +291,27 @@ fit_model2 <- function(y, locs, X = NULL, covfun_name = "matern_isotropic",
         }
         fit <- fisher_scoring( likfun,invlink(start_parms)[active],
             link,silent=silent, convtol = convtol, max_iter = max_iter )
-        start_parms[active] <- fit$covparms
+        invlink_startparms[active] <- fit$logparms
+        #start_parms[active] <- fit$covparms
+        start_parms <- link(invlink_startparms)
         fit$loglik <- -fit$loglik - pen(start_parms)
         invlink_startparms <- invlink(start_parms)
     }
 
     # return fit and information used for predictions
     fit$covfun_name <- covfun_name
-    fit$covparms <- start_parms
+    #fit$covparms <- start_parms
+    lp <- rep(NA,length(start_parms))
+    lp[active] <- fit$logparms
+    lp[!active] <- invlink_startparms[!active]
+    fit$covparms <- link(lp)
     fit$y <- y
     fit$locs <- locs
     fit$X <- X
     class(fit) <- "GpGp_fit"
     return(fit)
 }
+
 
 
 #' Print summary of GpGp fit
@@ -534,7 +387,7 @@ get_start_parms <- function(y,X,locs,covfun_name){
     }
     if(covfun_name == "exponential_anisotropic2D"){
         start_range <- mean( dmat )/4
-        start_parms <- c(start_var, 1/start_range, 0, 1/start_range,start_nug)
+        start_parms <- c(start_var, 1/start_range, 0, 1/start_range, start_nug)
     }
     if(covfun_name == "exponential_anisotropic3D"){
         dmat <- fields::rdist(locs[randinds,1,drop=FALSE])
@@ -673,7 +526,7 @@ get_linkfun <- function(covfun_name){
     space_time <- FALSE
 
     if(covfun_name == "matern_anisotropic2D"){
-        link <- function(x){    c( exp(x[1:2]), x[3], exp(x[4:6]) )  }
+        link <- function(x){    c( exp(x[1:2]), x[3], exp(x[4:6]) ) }
         dlink <- function(x){   c( exp(x[1:2]), 1.0,  exp(x[4:6]) ) }
         ddlink <- function(x){  c( exp(x[1:2]), 0.0,  exp(x[4:6]) ) }
         invlink <- function(x){ c( log(x[1:2]), x[3], log(x[4:6]) ) }
@@ -701,10 +554,10 @@ get_linkfun <- function(covfun_name){
         { c( log(x[1:2]), x[3], log(x[4]), x[5:6], log(x[7:9]) ) }
     }
     if(covfun_name == "matern_nonstat_var"){
-        link <- function(x){    c( exp(x[1:3]), exp(x[4]), x[5:length(x)]     ) }
-        dlink <- function(x){   c( exp(x[1:3]), exp(x[4]), rep(1,length(x)-4) ) }
-        ddlink <- function(x){  c( exp(x[1:3]), exp(x[4]), rep(0,length(x)-4) ) }
-        invlink <- function(x){ c( log(x[1:3]), log(x[4]), x[5:length(x)]     ) }
+        link <- function(x){    c( exp(x[1:3]), exp(x[4]), x[5:length(x)]     )}
+        dlink <- function(x){   c( exp(x[1:3]), exp(x[4]), rep(1,length(x)-4) )}
+        ddlink <- function(x){  c( exp(x[1:3]), exp(x[4]), rep(0,length(x)-4) )}
+        invlink <- function(x){ c( log(x[1:3]), log(x[4]), x[5:length(x)]     )}
     }
     if(covfun_name == "exponential_nonstat_var"){
         link <- function(x){    c( exp(x[1:3]), x[4:length(x)]     ) }
@@ -876,9 +729,9 @@ get_penalty <- function(y,X,locs,covfun_name){
     }
     if(covfun_name == "matern_scaledim"){
         d <- ncol(locs)
-          pen <- function(x){  pen_nug(x,d+3) +   pen_sm(x,d+2) +   pen_var(x,1)   }
-         dpen <- function(x){ dpen_nug(x,d+3) +  dpen_sm(x,d+2) +  dpen_var(x,1)  }
-        ddpen <- function(x){ ddpen_nug(x,d+3) + ddpen_sm(x,d+2) + ddpen_var(x,1) }
+          pen <- function(x){  pen_nug(x,d+3) +   pen_sm(x,d+2) +   pen_var(x,1)}
+         dpen <- function(x){ dpen_nug(x,d+3) +  dpen_sm(x,d+2) +  dpen_var(x,1)}
+        ddpen <- function(x){ ddpen_nug(x,d+3) + ddpen_sm(x,d+2) + ddpen_var(x,1)}
     }
     if(covfun_name == "exponential_scaledim"){
         d <- ncol(locs)

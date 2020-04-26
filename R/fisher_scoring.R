@@ -169,6 +169,7 @@ fisher_scoring <- function( likfun, start_parms, link,
 
     ret <- list(
         covparms = link(logparms), 
+        logparms = logparms,
         betahat = betahat, 
         sebeta = sebeta,
         betacov = betacov,

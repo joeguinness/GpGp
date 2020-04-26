@@ -4,7 +4,7 @@
 \alias{vecchia_Linv}
 \title{Entries of inverse Cholesky approximation}
 \usage{
-vecchia_Linv(covparms, covfun_name, locs, NNarray)
+vecchia_Linv(covparms, covfun_name, locs, NNarray, start_ind = 1L)
 }
 \arguments{
 \item{covparms}{A vector of covariance parameters appropriate
