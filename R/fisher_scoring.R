@@ -94,8 +94,8 @@ fisher_scoring <- function( likfun, start_parms, link,
             if (!silent) cat("Cond # of info matrix > 1/tol \n")
             # add a small amount to the diagonal of info
             # and add a small amount of noise to the gradient
-            diag(likobj0$info) <- 1.2*diag(likobj0$info) + 1e-3
-            likobj0$grad <- likobj0$grad + 1e-3*stats::rnorm(length(likobj0$grad))
+            diag(info) <- 1.2*diag(info) + 1e-3
+            grad <- grad + 1e-3*stats::rnorm(length(grad))
         }
 
         # make 'step_inc' times a full fisher step
