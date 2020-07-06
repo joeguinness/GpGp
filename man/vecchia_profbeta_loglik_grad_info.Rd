@@ -4,8 +4,7 @@
 \alias{vecchia_profbeta_loglik_grad_info}
 \title{Vecchia's loglikelihood, gradient, and Fisher information}
 \usage{
-vecchia_profbeta_loglik_grad_info(covparms, covfun_name, y, X, locs,
-  NNarray)
+vecchia_profbeta_loglik_grad_info(covparms, covfun_name, y, X, locs, NNarray)
 }
 \arguments{
 \item{covparms}{A vector of covariance parameters appropriate

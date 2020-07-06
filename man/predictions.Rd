@@ -4,10 +4,20 @@
 \alias{predictions}
 \title{Compute Gaussian process predictions using Vecchia's approximations}
 \usage{
-predictions(fit = NULL, locs_pred, X_pred, y_obs = fit$y,
-  locs_obs = fit$locs, X_obs = fit$X, beta = fit$betahat,
-  covparms = fit$covparms, covfun_name = fit$covfun_name, m = 60,
-  reorder = TRUE, st_scale = NULL)
+predictions(
+  fit = NULL,
+  locs_pred,
+  X_pred,
+  y_obs = fit$y,
+  locs_obs = fit$locs,
+  X_obs = fit$X,
+  beta = fit$betahat,
+  covparms = fit$covparms,
+  covfun_name = fit$covfun_name,
+  m = 60,
+  reorder = TRUE,
+  st_scale = NULL
+)
 }
 \arguments{
 \item{fit}{GpGp_fit object, the result of \code{\link{fit_model}}}

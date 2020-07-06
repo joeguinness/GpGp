@@ -4,39 +4,57 @@
 \alias{fit_model}
 \title{Estimate mean and covariance parameters}
 \usage{
-fit_model(y, locs, X = NULL, covfun_name = "matern_isotropic",
-  NNarray = NULL, start_parms = NULL, reorder = TRUE, group = TRUE,
-  m_seq = c(10, 30), max_iter = 40, fixed_parms = NULL,
-  silent = FALSE, st_scale = NULL, convtol = 1e-04)
+fit_model(
+  y,
+  locs,
+  X = NULL,
+  covfun_name = "matern_isotropic",
+  NNarray = NULL,
+  start_parms = NULL,
+  reorder = TRUE,
+  group = TRUE,
+  m_seq = c(10, 30),
+  max_iter = 40,
+  fixed_parms = NULL,
+  silent = FALSE,
+  st_scale = NULL,
+  convtol = 1e-04
+)
 }
 \arguments{
 \item{y}{response vector}
 
-\item{locs}{matrix of locations. Each row is a single spatial or spatial-temporal
+\item{locs}{matrix of locations. Each row is a single 
+spatial or spatial-temporal
 location. If using one of the covariance functions for data on a sphere,
 the first column should be longitudes (-180,180) and the second column
-should be latitudes (-90,90). If using a spatial-temporal covariance function,
+should be latitudes (-90,90). 
+If using a spatial-temporal covariance function,
 the last column should contain the times.}
 
 \item{X}{design matrix. Each row contains covariates for the corresponding
 observation in \code{y}. If not specified, the function sets \code{X} to be a
 matrix with a single column of ones, that is, a constant mean function.}
 
-\item{covfun_name}{string name of a covariance function. See \code{\link{GpGp}}
-for information about supported covariance funtions.}
+\item{covfun_name}{string name of a covariance function. 
+See \code{\link{GpGp}} for information about supported covariance funtions.}
 
-\item{NNarray}{Optionally specified array of nearest neighbor indices, usually
-from the output of \code{\link{find_ordered_nn}}. If \code{NULL}, fit_model will
-compute the nearest neighbors. We recommend that the user
+\item{NNarray}{Optionally specified array of nearest neighbor indices, 
+usually from the output of \code{\link{find_ordered_nn}}. If \code{NULL}, 
+fit_model will compute the nearest neighbors. We recommend that the user
 not specify this unless there is a good reason to (e.g. if doing a comparison
-study where one wants to control \code{NNarray} across different approximations).}
+study where one wants to control 
+\code{NNarray} across different approximations).}
 
-\item{start_parms}{Optionally specified starting values for parameters. If \code{NULL},
+\item{start_parms}{Optionally specified starting values for parameters. 
+If \code{NULL},
 fit_model will select default starting values.}
 
 \item{reorder}{TRUE/FALSE indicating whether maxmin ordering should be used
-(TRUE) or whether no reordering should be done before fitting (FALSE). If you want
-to use a customized reordering, then manually reorder \code{y}, \code{locs}, and \code{X},
+(TRUE) or whether no reordering should be done before fitting (FALSE). 
+If you want
+to use a customized reordering, then manually reorder \code{y}, \code{locs}, 
+and \code{X},
 and then set \code{reorder} to \code{FALSE}. A random reordering is used
 when \code{nrow(locs) > 1e5}.}
 
@@ -44,9 +62,12 @@ when \code{nrow(locs) > 1e5}.}
 the approximation (Guinness, 2018) or not.  The grouped version
 is used by default and is always recommended.}
 
-\item{m_seq}{Sequence of values for number of neighbors. By default, a 10-neighbor
-approximation is maximized, then a 30-neighbor approximation is maximized using the
-10 neighbor estimates as starting values. However, one can specify any sequence
+\item{m_seq}{Sequence of values for number of neighbors. By default, 
+a 10-neighbor
+approximation is maximized, then a 30-neighbor approximation is 
+maximized using the
+10 neighbor estimates as starting values. 
+However, one can specify any sequence
 of numbers of neighbors, e.g. \code{m_seq = c(10,30,60,90)}.}
 
 \item{max_iter}{maximum number of Fisher scoring iterations}
@@ -65,10 +86,13 @@ while the starting values for the other two parameters are 4.7 and 3.1.}
 \item{st_scale}{Scaling for spatial and temporal ranges. Only applicable for
 spatial-temporal models, where it is used in distance
 calculations when selecting neighbors. \code{st_scale} must be specified
-when \code{covfun_name} is a spatial-temporal covariance. See Argo vignette for an example.}
+when \code{covfun_name} is a spatial-temporal covariance. 
+See Argo vignette for an example.}
 
-\item{convtol}{Tolerance for exiting the optimization. Fisher scoring is stopped
-when the dot product between the step and the gradient is less than \code{convtol}.}
+\item{convtol}{Tolerance for exiting the optimization. 
+Fisher scoring is stopped
+when the dot product between the step and the gradient 
+is less than \code{convtol}.}
 }
 \value{
 An object of class \code{GpGp_fit}, which is a list containing
@@ -86,11 +110,13 @@ Vecchia likelihood estimates, obtained with a Fisher scoring algorithm.
 that automatically performs many of the auxiliary tasks needed for
 using Vecchia's approximation, including reordering, computing
 nearest neighbors, grouping, and optimization. The likelihoods use a small
-penalty on small nuggets, large spatial variances, and small smoothness parameter.
+penalty on small nuggets, large spatial variances, 
+and small smoothness parameter.
 
-The Jason-3 windspeed vignette and the Argo temperature vignette are useful sources for a
-use-cases of the \code{fit_model} function for data on sphere. The example below
-shows a very small example with a simulated dataset in 2d.
+The Jason-3 windspeed vignette and the Argo temperature 
+vignette are useful sources for a
+use-cases of the \code{fit_model} function for data on sphere. 
+The example below shows a very small example with a simulated dataset in 2d.
 }
 \examples{
 n1 <- 20

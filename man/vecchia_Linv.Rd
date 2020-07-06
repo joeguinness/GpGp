@@ -21,6 +21,9 @@ the number of rows of \code{locs}.}
 Row \code{i} contains the indices
 of the observations that observation \code{i} conditions on. By convention,
 the first element of row \code{i} is \code{i}.}
+
+\item{start_ind}{Compute entries of Linv only for rows \code{start_ind}
+until the last row.}
 }
 \value{
 matrix containing entries of inverse Cholesky

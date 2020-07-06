@@ -4,8 +4,14 @@
 \alias{fisher_scoring}
 \title{Fisher scoring algorithm}
 \usage{
-fisher_scoring(likfun, start_parms, link, silent = FALSE,
-  convtol = 1e-04, max_iter = 40)
+fisher_scoring(
+  likfun,
+  start_parms,
+  link,
+  silent = FALSE,
+  convtol = 1e-04,
+  max_iter = 40
+)
 }
 \arguments{
 \item{likfun}{likelihood function, returns likelihood, gradient, and hessian}
@@ -17,6 +23,8 @@ fisher_scoring(likfun, start_parms, link, silent = FALSE,
 \item{silent}{TRUE/FALSE for suppressing output}
 
 \item{convtol}{convergence tolerance on step dot grad}
+
+\item{max_iter}{maximum number of Fisher scoring iterations}
 }
 \description{
 Fisher scoring algorithm
