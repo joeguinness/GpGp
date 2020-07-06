@@ -33,5 +33,5 @@ Suggests:
     maps,
     maptools
 LinkingTo: Rcpp, RcppArmadillo
-RoxygenNote: 6.1.0
+RoxygenNote: 7.0.0
 LazyData: true
