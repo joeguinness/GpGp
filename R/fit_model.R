@@ -107,6 +107,7 @@ fit_model <- function(y, locs, X = NULL, covfun_name = "matern_isotropic",
         stop("length of observation vector y not equal
               to the number of locations (rows in locs)")
     }
+    locs <- as.matrix(locs)
 
     # check if design matrix is specified
     if( is.null(X) ){
