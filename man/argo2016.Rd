@@ -4,7 +4,8 @@
 \name{argo2016}
 \alias{argo2016}
 \title{Ocean temperatures from Argo profiling floats}
-\format{A data frame with 32436 rows and 6 columns
+\format{
+A data frame with 32436 rows and 6 columns
 \describe{
   \item{lon}{longitude in degrees between 0 and 360}
   \item{lat}{latitude in degrees between -90 and 90}
@@ -12,7 +13,8 @@
   \item{temp100}{Temperature at 100 dbars (roughly 100 meters)}
   \item{temp150}{Temperature at 150 dbars (roughly 150 meters)}
   \item{temp200}{Temperature at 200 dbars (roughly 200 meters)}
-}}
+}
+}
 \source{
 Mikael Kuusela. Argo program: \url{http://www.argo.ucsd.edu/}
 }

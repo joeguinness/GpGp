@@ -4,13 +4,15 @@
 \name{jason3}
 \alias{jason3}
 \title{Windspeed measurements from Jason-3 Satellite}
-\format{A data frame with 18973 rows and 4 columns
+\format{
+A data frame with 18973 rows and 4 columns
 \describe{
   \item{windspeed}{wind speed, in maters per second}
   \item{lon}{longitude in degrees between 0 and 360}
   \item{lat}{latitude in degrees between -90 and 90}
   \item{time}{time in seconds from midnight August 4}
-}}
+}
+}
 \source{
 \url{https://www.nodc.noaa.gov/SatelliteData/jason/}
 }
