@@ -34,7 +34,6 @@ condition_number <- function(info){
 #' @param link link function for parameters (used for printing)
 #' @param silent TRUE/FALSE for suppressing output
 #' @param convtol convergence tolerance on step dot grad
-#' @param max_iter maximum number of Fisher scoring iterations
 fisher_scoring <- function( likfun, start_parms, link, 
     silent = FALSE, convtol = 1e-4, max_iter = 40 ){
     
@@ -42,7 +41,7 @@ fisher_scoring <- function( likfun, start_parms, link,
     wolfe_check <- function(likobj0,likobj1,logparms,step,both){
         c1 <- 1e-4
         c2 <- 0.9
-        tol <- 10.0
+        tol <- 0.1
         ll0 <- likobj0$loglik
         gr0 <- likobj0$grad
         ll1 <- likobj1$loglik
@@ -73,7 +72,7 @@ fisher_scoring <- function( likfun, start_parms, link,
     
     # add a small amount of regularization
     diag(info) <- diag(info) + 0.1*min(diag(info))
-    
+
     # print some stuff out
     if(!silent){
         cat(paste0("Iter ",0,": \n"))
@@ -92,24 +91,16 @@ fisher_scoring <- function( likfun, start_parms, link,
         tol <- 1e-4
         if (condition_number(info) > 1 / tol) {
             if (!silent) cat("Cond # of info matrix > 1/tol \n")
-            # add a small amount to the diagonal of info
-            # and add a small amount of noise to the gradient
-            diag(info) <- 1.2*diag(info) + 1e-3
-            grad <- grad + 1e-3*stats::rnorm(length(grad))
+            info <- 1.0*max(likobj0$info)*diag(nrow(likobj0$info))
         }
 
-        # make 'step_inc' times a full fisher step
-        step_inc <- 0.9
-
         # calculate fisher step 
-        step <- - step_inc * solve(info, grad)
+        step <- - solve(info, grad)
         
         # if step size large, then make it smaller
-        max_size <- 2
-        if( j < 4 ){ max_size <- 0.5 } 
-        if (mean(step^2) > max_size) {
+        if (mean(step^2) > 1) {
             if(!silent) cat("##\n")
-            step <- sqrt(max_size)*step/sqrt(mean(step^2))
+            step <- step/sqrt(mean(step^2))
         }
         
         # take step and calculate loglik, grad, and info
@@ -132,10 +123,11 @@ fisher_scoring <- function( likfun, start_parms, link,
         cnt <- 1
         no_decrease <- FALSE
         both <- FALSE
-        mult <- 0.5
+        mult <- 1.0
         while (!wolfe_check(likobj0,likobj,logparms,newlogparms-logparms,both) &&
                 !no_decrease ){
-            step <- -mult*solve(info,grad)
+            info <- 1/mult*max(likobj$info)*diag(nrow(likobj0$info))
+            step <- -solve(info,grad)
             if(!silent) cat("**\n") 
             if ( sqrt(sum(step^2)) < 1e-4 ){ no_decrease <- TRUE }  # maybe we should throw error here?
             newlogparms <- logparms + step
