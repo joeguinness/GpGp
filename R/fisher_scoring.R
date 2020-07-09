@@ -34,6 +34,7 @@ condition_number <- function(info){
 #' @param link link function for parameters (used for printing)
 #' @param silent TRUE/FALSE for suppressing output
 #' @param convtol convergence tolerance on step dot grad
+#' @param max_iter maximum number of Fisher scoring iterations
 fisher_scoring <- function( likfun, start_parms, link, 
     silent = FALSE, convtol = 1e-4, max_iter = 40 ){
     
