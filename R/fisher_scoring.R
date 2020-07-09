@@ -87,7 +87,8 @@ fisher_scoring <- function( likfun, start_parms, link,
         
         likobj0 <- likobj
         
-        # if condition number of info matrix large, then regularize
+        # if condition number of info matrix large, 
+        # then gradient descent
         tol <- 1e-4
         if (condition_number(info) > 1 / tol) {
             if (!silent) cat("Cond # of info matrix > 1/tol \n")
