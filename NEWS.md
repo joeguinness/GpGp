@@ -1,4 +1,23 @@
 
+# GpGp 0.2.2
+
+Fixed bug in "fit_model" when missing values are present.
+Updated behavior of Fisher scoring algorithm when information matrix ill-conditioned
+Allow user to fix a subset of parameters in "fit_model"
+Allow user to specify maximum number of iterations in "fit_model"
+New faster computational algorithm for predictions
+Several new covariance functions, including
+
+  matern15_isotropic
+  matern25_isotropic
+  matern35_isotropic
+  matern45_isotropic
+  matern15_scaledim  
+  matern25_scaledim  
+  matern35_scaledim  
+  matern45_scaledim
+  
+
 # GpGp 0.2.1
 
 Bug fix for overloaded use of 'pow' function in 'basis.h'
