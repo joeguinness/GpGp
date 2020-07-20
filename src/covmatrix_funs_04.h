@@ -37,12 +37,12 @@ using namespace arma;
 //' and to date, no such distortions have been documented. Guinness and
 //' Fuentes (2016) argue that 3D embeddings produce reasonable models for data on spheres.
 // [[Rcpp::export]]
-arma::mat matern_sphere(NumericVector covparms, NumericMatrix lonlat ){
+arma::mat matern_sphere(arma::vec covparms, arma::mat lonlat ){
 
-    int n = lonlat.nrow();
+    int n = lonlat.n_rows;
     double lonrad;                                  // longitude
     double latrad;                                  // latitude
-    Rcpp::NumericMatrix xyz(n, 3);
+    Rcpp::arma::mat xyz(n, 3);
     for(int i = 0; i < n; i++){
         lonrad = 2*M_PI*lonlat(i,0)/360;
         latrad = 2*M_PI*(lonlat(i,1)+90)/360;
@@ -57,10 +57,10 @@ arma::mat matern_sphere(NumericVector covparms, NumericMatrix lonlat ){
 
 //' @describeIn matern_sphere Derivatives with respect to parameters
 // [[Rcpp::export]]
-arma::cube d_matern_sphere(NumericVector covparms, NumericMatrix lonlat ){
+arma::cube d_matern_sphere(arma::vec covparms, arma::mat lonlat ){
 
-    int n = lonlat.nrow();
-    Rcpp::NumericMatrix xyz(n, 3);
+    int n = lonlat.n_rows;
+    Rcpp::arma::mat xyz(n, 3);
     for(int i = 0; i < n; i++){
         double lonrad = 2*M_PI*lonlat(i,0)/360;
         double latrad = 2*M_PI*(lonlat(i,1)+90)/360;
@@ -97,12 +97,12 @@ arma::cube d_matern_sphere(NumericVector covparms, NumericMatrix lonlat ){
 //' and to date, no such distortions have been documented. Guinness and
 //' Fuentes (2016) argue that 3D embeddings produce reasonable models for data on spheres.
 // [[Rcpp::export]]
-arma::mat exponential_sphere(NumericVector covparms, NumericMatrix lonlat ){
+arma::mat exponential_sphere(arma::vec covparms, arma::mat lonlat ){
 
-    int n = lonlat.nrow();
+    int n = lonlat.n_rows;
     double lonrad;                                  // longitude
     double latrad;                                  // latitude
-    Rcpp::NumericMatrix xyz(n, 3);
+    Rcpp::arma::mat xyz(n, 3);
     for(int i = 0; i < n; i++){
         lonrad = 2*M_PI*lonlat(i,0)/360;
         latrad = 2*M_PI*(lonlat(i,1)+90)/360;
@@ -117,10 +117,10 @@ arma::mat exponential_sphere(NumericVector covparms, NumericMatrix lonlat ){
 
 //' @describeIn exponential_sphere Derivatives with respect to parameters
 // [[Rcpp::export]]
-arma::cube d_exponential_sphere(NumericVector covparms, NumericMatrix lonlat ){
+arma::cube d_exponential_sphere(arma::vec covparms, arma::mat lonlat ){
 
-    int n = lonlat.nrow();
-    Rcpp::NumericMatrix xyz(n, 3);
+    int n = lonlat.n_rows;
+    Rcpp::arma::mat xyz(n, 3);
     for(int i = 0; i < n; i++){
         double lonrad = 2*M_PI*lonlat(i,0)/360;
         double latrad = 2*M_PI*(lonlat(i,1)+90)/360;

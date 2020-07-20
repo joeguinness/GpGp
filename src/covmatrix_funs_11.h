@@ -36,10 +36,10 @@ using namespace arma;
 //' The nugget value \eqn{ \sigma^2 \tau^2 } is added to the diagonal of the covariance matrix.
 //' NOTE: the nugget is \eqn{ \sigma^2 \tau^2 }, not \eqn{ \tau^2 }. 
 // [[Rcpp::export]]
-arma::mat matern35_isotropic(NumericVector covparms, NumericMatrix locs ){
+arma::mat matern35_isotropic(arma::vec covparms, arma::mat locs ){
 
-    int dim = locs.ncol();
-    int n = locs.nrow();
+    int dim = locs.n_cols;
+    int n = locs.n_rows;
     double nugget = covparms( 0 )*covparms( 2 );
     // create scaled locations
     mat locs_scaled(n,dim);
@@ -80,10 +80,10 @@ arma::mat matern35_isotropic(NumericVector covparms, NumericMatrix locs ){
 //' @describeIn matern35_isotropic Derivatives of isotropic
 //' matern covariance function with smoothness 3.5
 // [[Rcpp::export]]
-arma::cube d_matern35_isotropic(NumericVector covparms, NumericMatrix locs ){
+arma::cube d_matern35_isotropic(arma::vec covparms, arma::mat locs ){
 
-    int dim = locs.ncol();
-    int n = locs.nrow();
+    int dim = locs.n_cols;
+    int n = locs.n_rows;
     //double nugget = covparms( 0 )*covparms( 2 );
     // create scaled locations
     mat locs_scaled(n,dim);
@@ -93,7 +93,7 @@ arma::cube d_matern35_isotropic(NumericVector covparms, NumericMatrix locs ){
         }
     }
     // calculate derivatives
-    arma::cube dcovmat = arma::cube(n,n,covparms.length(), fill::zeros);
+    arma::cube dcovmat = arma::cube(n,n,covparms.n_elem, fill::zeros);
     double a0 = 1.0;
     double a1 = 1.0;
     double a2 = 2.0/5.0;
@@ -115,7 +115,7 @@ arma::cube d_matern35_isotropic(NumericVector covparms, NumericMatrix locs ){
             dcovmat(i1,i2,0) += covparms(2);
             dcovmat(i1,i2,2) += covparms(0); 
         } else { // fill in opposite entry
-            for(int j=0; j<covparms.length(); j++){
+            for(int j=0; j<covparms.n_elem; j++){
                 dcovmat(i2,i1,j) = dcovmat(i1,i2,j);
             }
         }
@@ -146,15 +146,15 @@ arma::cube d_matern35_isotropic(NumericVector covparms, NumericMatrix locs ){
 //' The nugget value \eqn{ \sigma^2 \tau^2 } is added to the diagonal of the covariance matrix.
 //' NOTE: the nugget is \eqn{ \sigma^2 \tau^2 }, not \eqn{ \tau^2 }. 
 // [[Rcpp::export]]
-arma::mat matern35_scaledim(NumericVector covparms, NumericMatrix locs ){
+arma::mat matern35_scaledim(arma::vec covparms, arma::mat locs ){
 
-    int dim = locs.ncol();
+    int dim = locs.n_cols;
 
-    if( covparms.length() - 2 != dim ){
+    if( covparms.n_elem - 2 != dim ){
         stop("length of covparms does not match dim of locs");
     }
             
-    int n = locs.nrow();
+    int n = locs.n_rows;
     double nugget = covparms( 0 )*covparms( dim + 1 );
 
     // create scaled locations
@@ -197,14 +197,14 @@ arma::mat matern35_scaledim(NumericVector covparms, NumericMatrix locs ){
 
 //' @describeIn matern35_scaledim Derivatives with respect to parameters
 // [[Rcpp::export]]
-arma::cube d_matern35_scaledim(NumericVector covparms, NumericMatrix locs ){
+arma::cube d_matern35_scaledim(arma::vec covparms, arma::mat locs ){
 
-    int dim = locs.ncol();
-    if( covparms.length() - 2 != dim ){
+    int dim = locs.n_cols;
+    if( covparms.n_elem - 2 != dim ){
         stop("length of covparms does not match dim of locs");
     }
             
-    int n = locs.nrow();
+    int n = locs.n_rows;
     double nugget = covparms( 0 )*covparms( dim + 1 );
 
     // create scaled locations
@@ -216,7 +216,7 @@ arma::cube d_matern35_scaledim(NumericVector covparms, NumericMatrix locs ){
     }
 
     // calculate derivatives
-    arma::cube dcovmat = arma::cube(n,n,covparms.length(), fill::zeros);
+    arma::cube dcovmat = arma::cube(n,n,covparms.n_elem, fill::zeros);
     double a0 = 1.0;
     double a1 = 1.0;
     double a2 = 2.0/5.0;
@@ -250,7 +250,7 @@ arma::cube d_matern35_scaledim(NumericVector covparms, NumericMatrix locs ){
             dcovmat(i1,i2,0) += covparms(dim+1);
             dcovmat(i1,i2,dim+1) += covparms(0); 
         } else { // fill in opposite entry
-            for(int j=0; j<covparms.length(); j++){
+            for(int j=0; j<covparms.n_elem; j++){
                 dcovmat(i2,i1,j) = dcovmat(i1,i2,j);
             }
         }

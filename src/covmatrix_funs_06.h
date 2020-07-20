@@ -37,16 +37,16 @@ using namespace arma;
 //' Vecchia's Approximation") for details.
 //' The warped locations are input into \code{matern_isotropic}. 
 // [[Rcpp::export]]
-arma::mat matern_sphere_warp(NumericVector covparms, NumericMatrix lonlat ){
+arma::mat matern_sphere_warp(arma::vec covparms, arma::mat lonlat ){
 
-    int n = lonlat.nrow();
+    int n = lonlat.n_rows;
     int nisoparms = 4;
-    NumericVector isoparms(nisoparms);
+    arma::vec isoparms(nisoparms);
     for(int i=0; i<nisoparms; i++){ isoparms(i) = covparms(i); }
-    int nbasis = covparms.length() - nisoparms;
+    int nbasis = covparms.n_elem - nisoparms;
     int Lmax = pow( nbasis + 4, 0.5 ) - 1;
     
-    Rcpp::NumericMatrix xyz(n, 3);
+    Rcpp::arma::mat xyz(n, 3);
     for(int i = 0; i < n; i++){
         double lonrad = 2*M_PI*lonlat(i,0)/360;
         double latrad = 2*M_PI*(lonlat(i,1)+90)/360;
@@ -74,16 +74,16 @@ arma::mat matern_sphere_warp(NumericVector covparms, NumericMatrix lonlat ){
 
 //' @describeIn matern_sphere_warp Derivatives with respect to parameters.
 // [[Rcpp::export]]
-arma::cube d_matern_sphere_warp(NumericVector covparms, NumericMatrix lonlat ){
+arma::cube d_matern_sphere_warp(arma::vec covparms, arma::mat lonlat ){
 
-    int n = lonlat.nrow();
+    int n = lonlat.n_rows;
     int nisoparms = 4;
-    NumericVector isoparms(nisoparms);
+    arma::vec isoparms(nisoparms);
     for(int i=0; i<nisoparms; i++){ isoparms(i) = covparms(i); }
-    int nbasis = covparms.length() - nisoparms;
+    int nbasis = covparms.n_elem - nisoparms;
     int Lmax = pow( nbasis + 4, 0.5 ) - 1;
     
-    Rcpp::NumericMatrix xyz(n, 3);
+    Rcpp::arma::mat xyz(n, 3);
     for(int i = 0; i < n; i++){
         double lonrad = 2*M_PI*lonlat(i,0)/360;
         double latrad = 2*M_PI*(lonlat(i,1)+90)/360;
@@ -105,7 +105,7 @@ arma::cube d_matern_sphere_warp(NumericVector covparms, NumericMatrix lonlat ){
     }
 
     arma::cube ddcov = d_matern_isotropic( isoparms, xyz );
-    arma::cube dcovmat(n,n,covparms.length());
+    arma::cube dcovmat(n,n,covparms.n_elem);
     for(int i=0; i<nisoparms; i++){ dcovmat.slice(i) = ddcov.slice(i); }
     for(int j=0; j<nbasis; j++){
         for(int i1=0; i1<n; i1++){ for(int i2=i1; i2<n; i2++){
@@ -159,16 +159,16 @@ arma::cube d_matern_sphere_warp(NumericVector covparms, NumericMatrix lonlat ){
 //' Vecchia's Approximation") for details.
 //' The warped locations are input into \code{exponential_isotropic}. 
 // [[Rcpp::export]]
-arma::mat exponential_sphere_warp(NumericVector covparms, NumericMatrix lonlat ){
+arma::mat exponential_sphere_warp(arma::vec covparms, arma::mat lonlat ){
 
-    int n = lonlat.nrow();
+    int n = lonlat.n_rows;
     int nisoparms = 3;
-    NumericVector isoparms(nisoparms);
+    arma::vec isoparms(nisoparms);
     for(int i=0; i<nisoparms; i++){ isoparms(i) = covparms(i); }
-    int nbasis = covparms.length() - nisoparms;
+    int nbasis = covparms.n_elem - nisoparms;
     int Lmax = pow( nbasis + 4, 0.5 ) - 1;
     
-    Rcpp::NumericMatrix xyz(n, 3);
+    Rcpp::arma::mat xyz(n, 3);
     for(int i = 0; i < n; i++){
         double lonrad = 2*M_PI*lonlat(i,0)/360;
         double latrad = 2*M_PI*(lonlat(i,1)+90)/360;
@@ -196,16 +196,16 @@ arma::mat exponential_sphere_warp(NumericVector covparms, NumericMatrix lonlat )
 
 //' @describeIn exponential_sphere_warp Derivatives with respect to parameters
 // [[Rcpp::export]]
-arma::cube d_exponential_sphere_warp(NumericVector covparms, NumericMatrix lonlat ){
+arma::cube d_exponential_sphere_warp(arma::vec covparms, arma::mat lonlat ){
 
-    int n = lonlat.nrow();
+    int n = lonlat.n_rows;
     int nisoparms = 3;
-    NumericVector isoparms(nisoparms);
+    arma::vec isoparms(nisoparms);
     for(int i=0; i<nisoparms; i++){ isoparms(i) = covparms(i); }
-    int nbasis = covparms.length() - nisoparms;
+    int nbasis = covparms.n_elem - nisoparms;
     int Lmax = pow( nbasis + 4, 0.5 ) - 1;
     
-    Rcpp::NumericMatrix xyz(n, 3);
+    Rcpp::arma::mat xyz(n, 3);
     for(int i = 0; i < n; i++){
         double lonrad = 2*M_PI*lonlat(i,0)/360;
         double latrad = 2*M_PI*(lonlat(i,1)+90)/360;
@@ -227,7 +227,7 @@ arma::cube d_exponential_sphere_warp(NumericVector covparms, NumericMatrix lonla
     }
 
     arma::cube ddcov = d_exponential_isotropic( isoparms, xyz );
-    arma::cube dcovmat(n,n,covparms.length());
+    arma::cube dcovmat(n,n,covparms.n_elem);
     for(int i=0; i<nisoparms; i++){ dcovmat.slice(i) = ddcov.slice(i); }
     for(int j=0; j<nbasis; j++){
         for(int i1=0; i1<n; i1++){ for(int i2=i1; i2<n; i2++){

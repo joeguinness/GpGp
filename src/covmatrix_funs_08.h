@@ -43,7 +43,7 @@ using namespace arma;
 //' contained in the last \code{p} columns of \code{Z}, and 
 //' \eqn{c_1,...,c_p} are the nonstationary variance parameters.
 // [[Rcpp::export]]
-arma::mat matern_nonstat_var(NumericVector covparms, NumericMatrix Z ){
+arma::mat matern_nonstat_var(arma::vec covparms, arma::mat Z ){
     
     // this is a 2D covariance function!
     // first two columns of Z are spatial locations
@@ -53,11 +53,11 @@ arma::mat matern_nonstat_var(NumericVector covparms, NumericMatrix Z ){
     // covparms(1) = isotropic range
     // covparms(2) = smoothness
     // covparms(3) = nugget
-    // covparms(4) ... covparms(covparms.length()-1) = coefficients
-    // in log linear variance function multiplying Z(,2) .... Z(,Z.ncol()-1)
+    // covparms(4) ... covparms(covparms.n_elem-1) = coefficients
+    // in log linear variance function multiplying Z(,2) .... Z(,Z.n_cols-1)
     int dim = 2;
-    int n = Z.nrow();
-    int nbasis = Z.ncol() - dim;
+    int n = Z.n_rows;
+    int nbasis = Z.n_cols - dim;
     int nisoparm = 4;
     double nugget = covparms( 0 )*covparms( 3 );
     double normcon = covparms(0)/(pow(2.0,covparms(2)-1.0)*Rf_gammafn(covparms(2)));
@@ -99,11 +99,11 @@ arma::mat matern_nonstat_var(NumericVector covparms, NumericMatrix Z ){
 
 //' @describeIn matern_nonstat_var Derivatives with respect to parameters
 // [[Rcpp::export]]
-arma::cube d_matern_nonstat_var(NumericVector covparms, NumericMatrix Z ){
+arma::cube d_matern_nonstat_var(arma::vec covparms, arma::mat Z ){
 
     int dim = 2;
-    int n = Z.nrow();
-    int nbasis = Z.ncol() - dim;
+    int n = Z.n_rows;
+    int nbasis = Z.n_cols - dim;
     int nisoparm = 4;
     //double nugget = covparms( 0 )*covparms( 3 );
     double normcon = covparms(0)/(pow(2.0,covparms(2)-1.0)*Rf_gammafn(covparms(2)));
@@ -112,7 +112,7 @@ arma::cube d_matern_nonstat_var(NumericVector covparms, NumericMatrix Z ){
         covparms(0)/(pow(2.0,covparms(2)+eps-1.0)*Rf_gammafn(covparms(2)+eps));
     
     // calculate derivatives
-    arma::cube dcovmat = arma::cube(n,n,covparms.length(), fill::zeros);
+    arma::cube dcovmat = arma::cube(n,n,covparms.n_elem, fill::zeros);
     for(int i1=0; i1<n; i1++){ for(int i2=0; i2<=i1; i2++){
         // calculate scaled distance
         double d = 0.0;
@@ -156,7 +156,7 @@ arma::cube d_matern_nonstat_var(NumericVector covparms, NumericMatrix Z ){
             dcovmat(i1,i2,0) += covparms(3);
             dcovmat(i1,i2,3) += covparms(0); 
         } else { // fill in opposite entry
-            for(int j=0; j<covparms.length(); j++){
+            for(int j=0; j<covparms.n_elem; j++){
                 dcovmat(i1,i2,j) = dcovmat(i2,i1,j);
             }
         }
@@ -195,7 +195,7 @@ arma::cube d_matern_nonstat_var(NumericVector covparms, NumericMatrix Z ){
 //' contained in the last \code{p} columns of \code{Z}, and 
 //' \eqn{c_1,...,c_p} are the nonstationary variance parameters.
 // [[Rcpp::export]]
-arma::mat exponential_nonstat_var(NumericVector covparms, NumericMatrix Z ){
+arma::mat exponential_nonstat_var(arma::vec covparms, arma::mat Z ){
     
     // this is a 2D covariance function!
     // first two columns of Z are spatial locations
@@ -204,11 +204,11 @@ arma::mat exponential_nonstat_var(NumericVector covparms, NumericMatrix Z ){
     // covparms(0) = overall variance
     // covparms(1) = isotropic range
     // covparms(2) = nugget
-    // covparms(3) ... covparms(covparms.length()-1) = coefficients
-    // in log linear variance function multiplying Z(,2) .... Z(,Z.ncol()-1)
+    // covparms(3) ... covparms(covparms.n_elem-1) = coefficients
+    // in log linear variance function multiplying Z(,2) .... Z(,Z.n_cols-1)
     int dim = 2;
-    int n = Z.nrow();
-    int nbasis = Z.ncol() - dim;
+    int n = Z.n_rows;
+    int nbasis = Z.n_cols - dim;
     int nisoparm = 3;
     double nugget = covparms( 0 )*covparms( 2 );
 
@@ -248,16 +248,16 @@ arma::mat exponential_nonstat_var(NumericVector covparms, NumericMatrix Z ){
 
 //' @describeIn exponential_nonstat_var Derivatives with respect to parameters
 // [[Rcpp::export]]
-arma::cube d_exponential_nonstat_var(NumericVector covparms, NumericMatrix Z ){
+arma::cube d_exponential_nonstat_var(arma::vec covparms, arma::mat Z ){
 
     int dim = 2;
-    int n = Z.nrow();
-    int nbasis = Z.ncol() - dim;
+    int n = Z.n_rows;
+    int nbasis = Z.n_cols - dim;
     int nisoparm = 3;
     //double nugget = covparms( 0 )*covparms( 2 );
 
     // calculate derivatives
-    arma::cube dcovmat = arma::cube(n,n,covparms.length(), fill::zeros);
+    arma::cube dcovmat = arma::cube(n,n,covparms.n_elem, fill::zeros);
     for(int i1=0; i1<n; i1++){ for(int i2=0; i2<=i1; i2++){
         // calculate scaled distance
         double d = 0.0;
@@ -295,7 +295,7 @@ arma::cube d_exponential_nonstat_var(NumericVector covparms, NumericMatrix Z ){
             dcovmat(i1,i2,0) += covparms(2);
             dcovmat(i1,i2,2) += covparms(0); 
         } else { // fill in opposite entry
-            for(int j=0; j<covparms.length(); j++){
+            for(int j=0; j<covparms.n_elem; j++){
                 dcovmat(i1,i2,j) = dcovmat(i2,i1,j);
             }
         }

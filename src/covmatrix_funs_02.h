@@ -36,7 +36,7 @@ using namespace arma;
 //' The nugget value \eqn{ \sigma^2 \tau^2 } is added to the diagonal of the covariance matrix.
 //' NOTE: the nugget is \eqn{ \sigma^2 \tau^2 }, not \eqn{ \tau^2 }. 
 // [[Rcpp::export]]
-arma::mat matern_anisotropic2D(NumericVector covparms, NumericMatrix locs ){
+arma::mat matern_anisotropic2D(arma::vec covparms, arma::mat locs ){
     
     // covparms(0) = sigmasq
     // covparms(1) = L00
@@ -47,8 +47,8 @@ arma::mat matern_anisotropic2D(NumericVector covparms, NumericMatrix locs ){
     // nugget = sigmasq*tausq
     // overall variance = sigmasq*(1 + tausq) = sigmasq + nugget
     
-    //int dim = locs.ncol();
-    int n = locs.nrow();
+    //int dim = locs.n_cols;
+    int n = locs.n_rows;
     double nugget = covparms( 0 )*covparms( 5 );
     double normcon = covparms(0)/(pow(2.0,covparms(4)-1.0)*Rf_gammafn(covparms(4)));
     
@@ -85,7 +85,7 @@ arma::mat matern_anisotropic2D(NumericVector covparms, NumericMatrix locs ){
 
 //' @describeIn matern_anisotropic2D Derivatives of anisotropic Matern covariance
 // [[Rcpp::export]]
-arma::cube d_matern_anisotropic2D(NumericVector covparms, NumericMatrix locs ){
+arma::cube d_matern_anisotropic2D(arma::vec covparms, arma::mat locs ){
 
     // covparms(0) = sigmasq
     // covparms(1) = L00
@@ -96,7 +96,7 @@ arma::cube d_matern_anisotropic2D(NumericVector covparms, NumericMatrix locs ){
     // nugget = sigmasq*tausq
     // overall variance = sigmasq*(1 + tausq) = sigmasq + nugget
 
-    int n = locs.nrow();
+    int n = locs.n_rows;
     //double nugget = covparms( 0 )*covparms( 5 );
     double normcon = covparms(0)/(pow(2.0,covparms(4)-1.0)*Rf_gammafn(covparms(4)));
     double eps = 1e-8;
@@ -108,7 +108,7 @@ arma::cube d_matern_anisotropic2D(NumericVector covparms, NumericMatrix locs ){
     double b2 = covparms(2)*covparms(3);
 
     // calculate derivatives
-    arma::cube dcovmat = arma::cube(n,n,covparms.length(), fill::zeros);
+    arma::cube dcovmat = arma::cube(n,n,covparms.n_elem, fill::zeros);
     for(int i1=0; i1<n; i1++){ for(int i2=0; i2<=i1; i2++){
         
         // calculate rescaled distance
@@ -141,7 +141,7 @@ arma::cube d_matern_anisotropic2D(NumericVector covparms, NumericMatrix locs ){
             dcovmat(i1,i2,0) += covparms(5);
             dcovmat(i1,i2,5) += covparms(0); 
         } else { // fill in opposite entry
-            for(int j=0; j<covparms.length(); j++){
+            for(int j=0; j<covparms.n_elem; j++){
                 dcovmat(i2,i1,j) = dcovmat(i1,i2,j);
             }
         }
@@ -174,7 +174,7 @@ arma::cube d_matern_anisotropic2D(NumericVector covparms, NumericMatrix locs ){
 //' The nugget value \eqn{ \sigma^2 \tau^2 } is added to the diagonal of the covariance matrix.
 //' NOTE: the nugget is \eqn{ \sigma^2 \tau^2 }, not \eqn{ \tau^2 }. 
 // [[Rcpp::export]]
-arma::mat matern_anisotropic3D(NumericVector covparms, NumericMatrix locs ){
+arma::mat matern_anisotropic3D(arma::vec covparms, arma::mat locs ){
     
     // covparms(0) = sigmasq
     // covparms(1) = L00
@@ -188,8 +188,8 @@ arma::mat matern_anisotropic3D(NumericVector covparms, NumericMatrix locs ){
     // nugget = sigmasq*tausq
     // overall variance = sigmasq*(1 + tausq) = sigmasq + nugget
     
-    //int dim = locs.ncol();
-    int n = locs.nrow();
+    //int dim = locs.n_cols;
+    int n = locs.n_rows;
     double nugget = covparms( 0 )*covparms( 8 );
     double smooth = covparms( 7 );
     double normcon = covparms(0)/(pow(2.0,smooth-1.0)*Rf_gammafn(smooth));
@@ -228,7 +228,7 @@ arma::mat matern_anisotropic3D(NumericVector covparms, NumericMatrix locs ){
 
 //' @describeIn matern_anisotropic3D Derivatives of anisotropic Matern covariance
 // [[Rcpp::export]]
-arma::cube d_matern_anisotropic3D(NumericVector covparms, NumericMatrix locs ){
+arma::cube d_matern_anisotropic3D(arma::vec covparms, arma::mat locs ){
 
     // covparms(0) = sigmasq
     // covparms(1) = L00
@@ -242,7 +242,7 @@ arma::cube d_matern_anisotropic3D(NumericVector covparms, NumericMatrix locs ){
     // nugget = sigmasq*tausq
     // overall variance = sigmasq*(1 + tausq) = sigmasq + nugget
 
-    int n = locs.nrow();
+    int n = locs.n_rows;
     //double nugget = covparms( 0 )*covparms( 8 );
     double smooth = covparms( 7 );
     double normcon = covparms(0)/(pow(2.0,smooth-1.0)*Rf_gammafn(smooth));
@@ -251,7 +251,7 @@ arma::cube d_matern_anisotropic3D(NumericVector covparms, NumericMatrix locs ){
         covparms(0)/(pow(2.0,smooth+eps-1.0)*Rf_gammafn(smooth+eps));
     
     // calculate derivatives
-    arma::cube dcovmat = arma::cube(n,n,covparms.length(), fill::zeros);
+    arma::cube dcovmat = arma::cube(n,n,covparms.n_elem, fill::zeros);
     for(int i2=0; i2<n; i2++){ for(int i1=0; i1<=i2; i1++){
         
         // calculate rescaled distance
@@ -295,7 +295,7 @@ arma::cube d_matern_anisotropic3D(NumericVector covparms, NumericMatrix locs ){
             dcovmat(i1,i2,0) += covparms(8);
             dcovmat(i1,i2,8) += covparms(0); 
         } else { // fill in opposite entry
-            for(int j=0; j<covparms.length(); j++){
+            for(int j=0; j<covparms.n_elem; j++){
                 dcovmat(i2,i1,j) = dcovmat(i1,i2,j);
             }
         }
@@ -330,7 +330,7 @@ arma::cube d_matern_anisotropic3D(NumericVector covparms, NumericMatrix locs ){
 //' The nugget value \eqn{ \sigma^2 \tau^2 } is added to the diagonal of the covariance matrix.
 //' NOTE: the nugget is \eqn{ \sigma^2 \tau^2 }, not \eqn{ \tau^2 }. 
 // [[Rcpp::export]]
-arma::mat exponential_anisotropic2D(NumericVector covparms, NumericMatrix locs ){
+arma::mat exponential_anisotropic2D(arma::vec covparms, arma::mat locs ){
     
     // covparms(0) = sigmasq
     // covparms(1) = L00
@@ -340,8 +340,8 @@ arma::mat exponential_anisotropic2D(NumericVector covparms, NumericMatrix locs )
     // nugget = sigmasq*tausq
     // overall variance = sigmasq*(1 + tausq) = sigmasq + nugget
     
-    //int dim = locs.ncol();
-    int n = locs.nrow();
+    //int dim = locs.n_cols;
+    int n = locs.n_rows;
     double nugget = covparms( 0 )*covparms( 4 );
 
     // calculate covariances
@@ -375,7 +375,7 @@ arma::mat exponential_anisotropic2D(NumericVector covparms, NumericMatrix locs )
 
 //' @describeIn exponential_anisotropic2D Derivatives of anisotropic exponential covariance
 // [[Rcpp::export]]
-arma::cube d_exponential_anisotropic2D(NumericVector covparms, NumericMatrix locs ){
+arma::cube d_exponential_anisotropic2D(arma::vec covparms, arma::mat locs ){
 
     // covparms(0) = sigmasq
     // covparms(1) = L00
@@ -385,11 +385,11 @@ arma::cube d_exponential_anisotropic2D(NumericVector covparms, NumericMatrix loc
     // nugget = sigmasq*tausq
     // overall variance = sigmasq*(1 + tausq) = sigmasq + nugget
 
-    int n = locs.nrow();
+    int n = locs.n_rows;
     //double nugget = covparms( 0 )*covparms( 4 );
 
     // calculate derivatives
-    arma::cube dcovmat = arma::cube(n,n,covparms.length(), fill::zeros);
+    arma::cube dcovmat = arma::cube(n,n,covparms.n_elem, fill::zeros);
     for(int i2=0; i2<n; i2++){ for(int i1=0; i1<=i2; i1++){
         
         // calculate rescaled distance
@@ -421,7 +421,7 @@ arma::cube d_exponential_anisotropic2D(NumericVector covparms, NumericMatrix loc
             dcovmat(i1,i2,0) += covparms(4);
             dcovmat(i1,i2,4) += covparms(0); 
         } else { // fill in opposite entry
-            for(int j=0; j<covparms.length(); j++){
+            for(int j=0; j<covparms.n_elem; j++){
                 dcovmat(i2,i1,j) = dcovmat(i1,i2,j);
             }
         }
@@ -460,7 +460,7 @@ arma::cube d_exponential_anisotropic2D(NumericVector covparms, NumericMatrix loc
 //' The nugget value \eqn{ \sigma^2 \tau^2 } is added to the diagonal of the covariance matrix.
 //' NOTE: the nugget is \eqn{ \sigma^2 \tau^2 }, not \eqn{ \tau^2 }. 
 // [[Rcpp::export]]
-arma::mat exponential_anisotropic3D(NumericVector covparms, NumericMatrix locs ){
+arma::mat exponential_anisotropic3D(arma::vec covparms, arma::mat locs ){
     
     // covparms(0) = sigmasq
     // covparms(1) = L00
@@ -473,8 +473,8 @@ arma::mat exponential_anisotropic3D(NumericVector covparms, NumericMatrix locs )
     // nugget = sigmasq*tausq
     // overall variance = sigmasq*(1 + tausq) = sigmasq + nugget
     
-    //int dim = locs.ncol();
-    int n = locs.nrow();
+    //int dim = locs.n_cols;
+    int n = locs.n_rows;
     double nugget = covparms( 0 )*covparms( 7 );
 
     // calculate covariances
@@ -510,7 +510,7 @@ arma::mat exponential_anisotropic3D(NumericVector covparms, NumericMatrix locs )
 
 //' @describeIn exponential_anisotropic3D Derivatives of anisotropic exponential covariance
 // [[Rcpp::export]]
-arma::cube d_exponential_anisotropic3D(NumericVector covparms, NumericMatrix locs ){
+arma::cube d_exponential_anisotropic3D(arma::vec covparms, arma::mat locs ){
 
     // covparms(0) = sigmasq
     // covparms(1) = L00
@@ -523,11 +523,11 @@ arma::cube d_exponential_anisotropic3D(NumericVector covparms, NumericMatrix loc
     // nugget = sigmasq*tausq
     // overall variance = sigmasq*(1 + tausq) = sigmasq + nugget
 
-    int n = locs.nrow();
+    int n = locs.n_rows;
     double nugget = covparms( 0 )*covparms( 7 );
 
     // calculate derivatives
-    arma::cube dcovmat = arma::cube(n,n,covparms.length(), fill::zeros);
+    arma::cube dcovmat = arma::cube(n,n,covparms.n_elem, fill::zeros);
     for(int i2=0; i2<n; i2++){ for(int i1=0; i1<=i2; i1++){
         
         // calculate rescaled distance
@@ -565,7 +565,7 @@ arma::cube d_exponential_anisotropic3D(NumericVector covparms, NumericMatrix loc
             dcovmat(i1,i2,0) += covparms(7);
             dcovmat(i1,i2,7) += covparms(0); 
         } else { // fill in opposite entry
-            for(int j=0; j<covparms.length(); j++){
+            for(int j=0; j<covparms.n_elem; j++){
                 dcovmat(i2,i1,j) = dcovmat(i1,i2,j);
             }
         }

@@ -28,8 +28,8 @@ using namespace arma;
 
 
 struct covfun_t {
-    arma::mat    (*p_covfun)(NumericVector, NumericMatrix);
-    arma::cube (*p_d_covfun)(NumericVector, NumericMatrix);
+    arma::mat    (*p_covfun)(arma::vec, arma::mat);
+    arma::cube (*p_d_covfun)(arma::vec, arma::mat);
 } ;
 
 
