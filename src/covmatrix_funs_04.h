@@ -42,7 +42,7 @@ arma::mat matern_sphere(arma::vec covparms, arma::mat lonlat ){
     int n = lonlat.n_rows;
     double lonrad;                                  // longitude
     double latrad;                                  // latitude
-    Rcpp::arma::mat xyz(n, 3);
+    arma::mat xyz(n, 3);
     for(int i = 0; i < n; i++){
         lonrad = 2*M_PI*lonlat(i,0)/360;
         latrad = 2*M_PI*(lonlat(i,1)+90)/360;
@@ -60,7 +60,7 @@ arma::mat matern_sphere(arma::vec covparms, arma::mat lonlat ){
 arma::cube d_matern_sphere(arma::vec covparms, arma::mat lonlat ){
 
     int n = lonlat.n_rows;
-    Rcpp::arma::mat xyz(n, 3);
+    arma::mat xyz(n, 3);
     for(int i = 0; i < n; i++){
         double lonrad = 2*M_PI*lonlat(i,0)/360;
         double latrad = 2*M_PI*(lonlat(i,1)+90)/360;
@@ -102,7 +102,7 @@ arma::mat exponential_sphere(arma::vec covparms, arma::mat lonlat ){
     int n = lonlat.n_rows;
     double lonrad;                                  // longitude
     double latrad;                                  // latitude
-    Rcpp::arma::mat xyz(n, 3);
+    arma::mat xyz(n, 3);
     for(int i = 0; i < n; i++){
         lonrad = 2*M_PI*lonlat(i,0)/360;
         latrad = 2*M_PI*(lonlat(i,1)+90)/360;
@@ -120,7 +120,7 @@ arma::mat exponential_sphere(arma::vec covparms, arma::mat lonlat ){
 arma::cube d_exponential_sphere(arma::vec covparms, arma::mat lonlat ){
 
     int n = lonlat.n_rows;
-    Rcpp::arma::mat xyz(n, 3);
+    arma::mat xyz(n, 3);
     for(int i = 0; i < n; i++){
         double lonrad = 2*M_PI*lonlat(i,0)/360;
         double latrad = 2*M_PI*(lonlat(i,1)+90)/360;

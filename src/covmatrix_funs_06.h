@@ -46,7 +46,7 @@ arma::mat matern_sphere_warp(arma::vec covparms, arma::mat lonlat ){
     int nbasis = covparms.n_elem - nisoparms;
     int Lmax = pow( nbasis + 4, 0.5 ) - 1;
     
-    Rcpp::arma::mat xyz(n, 3);
+    arma::mat xyz(n, 3);
     for(int i = 0; i < n; i++){
         double lonrad = 2*M_PI*lonlat(i,0)/360;
         double latrad = 2*M_PI*(lonlat(i,1)+90)/360;
@@ -83,7 +83,7 @@ arma::cube d_matern_sphere_warp(arma::vec covparms, arma::mat lonlat ){
     int nbasis = covparms.n_elem - nisoparms;
     int Lmax = pow( nbasis + 4, 0.5 ) - 1;
     
-    Rcpp::arma::mat xyz(n, 3);
+    arma::mat xyz(n, 3);
     for(int i = 0; i < n; i++){
         double lonrad = 2*M_PI*lonlat(i,0)/360;
         double latrad = 2*M_PI*(lonlat(i,1)+90)/360;
@@ -168,7 +168,7 @@ arma::mat exponential_sphere_warp(arma::vec covparms, arma::mat lonlat ){
     int nbasis = covparms.n_elem - nisoparms;
     int Lmax = pow( nbasis + 4, 0.5 ) - 1;
     
-    Rcpp::arma::mat xyz(n, 3);
+    arma::mat xyz(n, 3);
     for(int i = 0; i < n; i++){
         double lonrad = 2*M_PI*lonlat(i,0)/360;
         double latrad = 2*M_PI*(lonlat(i,1)+90)/360;
@@ -205,7 +205,7 @@ arma::cube d_exponential_sphere_warp(arma::vec covparms, arma::mat lonlat ){
     int nbasis = covparms.n_elem - nisoparms;
     int Lmax = pow( nbasis + 4, 0.5 ) - 1;
     
-    Rcpp::arma::mat xyz(n, 3);
+    arma::mat xyz(n, 3);
     for(int i = 0; i < n; i++){
         double lonrad = 2*M_PI*lonlat(i,0)/360;
         double latrad = 2*M_PI*(lonlat(i,1)+90)/360;

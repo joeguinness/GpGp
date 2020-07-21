@@ -17,10 +17,10 @@ using namespace arma;
 //' @param Lmax largest degree of spherical harmonics. 
 //' Current only Lmax=2 supported
 // [[Rcpp::export]]
-arma::cube sph_grad_xyz( NumericMatrix xyz, int Lmax ){
+arma::cube sph_grad_xyz( arma::mat xyz, int Lmax ){
     
     int nbasis = (Lmax+1)*(Lmax+1) - 4;
-    int n = xyz.nrow();
+    int n = xyz.n_rows;
     cube grad_basis = cube( n, nbasis, 3, fill::zeros );
     
     if(Lmax > 1){

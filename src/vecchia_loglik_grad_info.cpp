@@ -51,7 +51,7 @@ List vecchia_profbeta_loglik_grad_info(
     NumericVector y,
     NumericMatrix X,
     const NumericMatrix locs,
-    IntegerMatrix NNarray ){
+    NumericMatrix NNarray ){
     
     NumericVector ll(1);
     NumericVector grad( covparms.length() );
@@ -110,7 +110,7 @@ List vecchia_profbeta_loglik(
     NumericVector y,
     NumericMatrix X,
     const NumericMatrix locs,
-    IntegerMatrix NNarray ){
+    NumericMatrix NNarray ){
     
     NumericVector ll(1);
     NumericVector grad( covparms.length() );
@@ -171,7 +171,7 @@ List vecchia_meanzero_loglik(
     StringVector covfun_name,
     NumericVector y,
     const NumericMatrix locs,
-    IntegerMatrix NNarray ){
+    NumericMatrix NNarray ){
     
     NumericMatrix X(1,1);
     NumericVector ll(1);
