@@ -60,7 +60,7 @@ arma::mat matern_nonstat_var(arma::vec covparms, arma::mat Z ){
     int nbasis = Z.n_cols - dim;
     int nisoparm = 4;
     double nugget = covparms( 0 )*covparms( 3 );
-    double normcon = covparms(0)/(pow(2.0,covparms(2)-1.0)*Rf_gammafn(covparms(2)));
+    double normcon = covparms(0)/(pow(2.0,covparms(2)-1.0)*boost::math::tgamma(covparms(2)) );
     
     // calculate covariances
     arma::mat covmat(n,n);
@@ -86,7 +86,7 @@ arma::mat matern_nonstat_var(arma::vec covparms, arma::mat Z ){
             } else {
                 // calculate covariance
                 covmat(i2,i1) = normcon*v *
-                    pow( d, covparms(2) ) * Rf_bessel_k( d, covparms(2), 1.0 );
+                    pow( d, covparms(2) ) * boost::math::cyl_bessel_k(covparms(2), d);
             }
             // add nugget
             if( i1 == i2 ){ covmat(i2,i2) += nugget; } 
@@ -106,10 +106,10 @@ arma::cube d_matern_nonstat_var(arma::vec covparms, arma::mat Z ){
     int nbasis = Z.n_cols - dim;
     int nisoparm = 4;
     //double nugget = covparms( 0 )*covparms( 3 );
-    double normcon = covparms(0)/(pow(2.0,covparms(2)-1.0)*Rf_gammafn(covparms(2)));
+    double normcon = covparms(0)/(pow(2.0,covparms(2)-1.0)*boost::math::tgamma(covparms(2)));
     double eps = 1e-8;
     double normconeps = 
-        covparms(0)/(pow(2.0,covparms(2)+eps-1.0)*Rf_gammafn(covparms(2)+eps));
+        covparms(0)/(pow(2.0,covparms(2)+eps-1.0)*boost::math::tgamma(covparms(2) + eps));
     
     // calculate derivatives
     arma::cube dcovmat = arma::cube(n,n,covparms.n_elem, fill::zeros);
@@ -137,16 +137,16 @@ arma::cube d_matern_nonstat_var(arma::vec covparms, arma::mat Z ){
             }
         } else {
             cov = normcon * v *
-                pow( d, covparms(2) ) * Rf_bessel_k( d, covparms(2), 1.0 );
+                pow( d, covparms(2) ) *boost::math::cyl_bessel_k(covparms(2), d);
             // variance parameter
             dcovmat(i2,i1,0) += cov/covparms(0);
-            // range parameter
+            // range parameter 
             dcovmat(i2,i1,1) += normcon * v * pow(d,covparms(2))*
-                Rf_bessel_k(d,covparms(2)-1.0,1.0)*d/covparms(1);
+                boost::math::cyl_bessel_k(covparms(2)-1.0, d)*d/covparms(1);
             // smoothness parameter (finite differencing)
             dcovmat(i2,i1,2) += 
                 ( normconeps*v*pow(d,covparms(2)+eps)*
-                  Rf_bessel_k(d,covparms(2)+eps,1.0) - cov )/eps;
+                boost::math::cyl_bessel_k(covparms(2)+eps, d)- cov )/eps;
             // log linear variance parameters
             for(int j=0; j<nbasis; j++){
                 dcovmat(i2,i1,j+nisoparm) = cov*( Z(i1,j+dim) + Z(i2,j+dim) );
