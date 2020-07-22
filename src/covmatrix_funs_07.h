@@ -43,16 +43,16 @@ using namespace arma;
 //' The warped locations are input into \code{matern_spacetime}. The function
 //' does not do temporal warping.
 // [[Rcpp::export]]
-arma::mat matern_spheretime_warp(NumericVector covparms, NumericMatrix lonlattime ){
+arma::mat matern_spheretime_warp(arma::vec covparms, arma::mat lonlattime ){
 
-    int n = lonlattime.nrow();
+    int n = lonlattime.n_rows;
     int nisoparms = 5;
-    NumericVector isoparms(nisoparms);
+    arma::vec isoparms(nisoparms);
     for(int i=0; i<nisoparms; i++){ isoparms(i) = covparms(i); }
-    int nbasis = covparms.length() - nisoparms;
+    int nbasis = covparms.n_elem - nisoparms;
     int Lmax = pow( nbasis + 4, 0.5 ) - 1;
     
-    Rcpp::NumericMatrix xyzt(n, 4);
+    arma::mat xyzt(n, 4);
     for(int i=0; i<n; i++){
         double lonrad = 2*M_PI*lonlattime(i,0)/360;
         double latrad = 2*M_PI*(lonlattime(i,1)+90)/360;
@@ -78,16 +78,16 @@ arma::mat matern_spheretime_warp(NumericVector covparms, NumericMatrix lonlattim
 
 //' @describeIn matern_spheretime_warp Derivatives with respect to parameters
 // [[Rcpp::export]]
-arma::cube d_matern_spheretime_warp(NumericVector covparms, NumericMatrix lonlattime ){
+arma::cube d_matern_spheretime_warp(arma::vec covparms, arma::mat lonlattime ){
 
-    int n = lonlattime.nrow();
+    int n = lonlattime.n_rows;
     int nisoparms = 5;
-    NumericVector isoparms(nisoparms);
+    arma::vec isoparms(nisoparms);
     for(int i=0; i<nisoparms; i++){ isoparms(i) = covparms(i); }
-    int nbasis = covparms.length() - nisoparms;
+    int nbasis = covparms.n_elem - nisoparms;
     int Lmax = pow( nbasis + 4, 0.5 ) - 1;
     
-    Rcpp::NumericMatrix xyzt(n, 4);
+    arma::mat xyzt(n, 4);
     for(int i=0; i<n; i++){
         double lonrad = 2*M_PI*lonlattime(i,0)/360;
         double latrad = 2*M_PI*(lonlattime(i,1)+90)/360;
@@ -107,7 +107,7 @@ arma::cube d_matern_spheretime_warp(NumericVector covparms, NumericMatrix lonlat
     }}}
     
     arma::cube ddcov = d_matern_spacetime( isoparms, xyzt );
-    arma::cube dcovmat(n,n,covparms.length());
+    arma::cube dcovmat(n,n,covparms.n_elem);
     for(int i=0; i<nisoparms; i++){ dcovmat.slice(i) = ddcov.slice(i); }
 
     for(int j=0; j<nbasis; j++){
@@ -181,16 +181,16 @@ arma::cube d_matern_spheretime_warp(NumericVector covparms, NumericMatrix lonlat
 //' The warped locations are input into \code{exponential_spacetime}. The function
 //' does not do temporal warping.
 // [[Rcpp::export]]
-arma::mat exponential_spheretime_warp(NumericVector covparms, NumericMatrix lonlattime ){
+arma::mat exponential_spheretime_warp(arma::vec covparms, arma::mat lonlattime ){
 
-    int n = lonlattime.nrow();
+    int n = lonlattime.n_rows;
     int nisoparms = 4;
-    NumericVector isoparms(nisoparms);
+    arma::vec isoparms(nisoparms);
     for(int i=0; i<nisoparms; i++){ isoparms(i) = covparms(i); }
-    int nbasis = covparms.length() - nisoparms;
+    int nbasis = covparms.n_elem - nisoparms;
     int Lmax = pow( nbasis + 4, 0.5 ) - 1;
     
-    Rcpp::NumericMatrix xyzt(n, 4);
+    arma::mat xyzt(n, 4);
     for(int i=0; i<n; i++){
         double lonrad = 2*M_PI*lonlattime(i,0)/360;
         double latrad = 2*M_PI*(lonlattime(i,1)+90)/360;
@@ -216,16 +216,16 @@ arma::mat exponential_spheretime_warp(NumericVector covparms, NumericMatrix lonl
 
 //' @describeIn exponential_spheretime_warp Derivatives with respect to parameters
 // [[Rcpp::export]]
-arma::cube d_exponential_spheretime_warp(NumericVector covparms, NumericMatrix lonlattime ){
+arma::cube d_exponential_spheretime_warp(arma::vec covparms, arma::mat lonlattime ){
 
-    int n = lonlattime.nrow();
+    int n = lonlattime.n_rows;
     int nisoparms = 4;
-    NumericVector isoparms(nisoparms);
+    arma::vec isoparms(nisoparms);
     for(int i=0; i<nisoparms; i++){ isoparms(i) = covparms(i); }
-    int nbasis = covparms.length() - nisoparms;
+    int nbasis = covparms.n_elem - nisoparms;
     int Lmax = pow( nbasis + 4, 0.5 ) - 1;
     
-    Rcpp::NumericMatrix xyzt(n, 4);
+    arma::mat xyzt(n, 4);
     for(int i=0; i<n; i++){
         double lonrad = 2*M_PI*lonlattime(i,0)/360;
         double latrad = 2*M_PI*(lonlattime(i,1)+90)/360;
@@ -245,7 +245,7 @@ arma::cube d_exponential_spheretime_warp(NumericVector covparms, NumericMatrix l
     }}}
     
     arma::cube ddcov = d_exponential_spacetime( isoparms, xyzt );
-    arma::cube dcovmat(n,n,covparms.length());
+    arma::cube dcovmat(n,n,covparms.n_elem);
     for(int i=0; i<nisoparms; i++){ dcovmat.slice(i) = ddcov.slice(i); }
 
     for(int j=0; j<nbasis; j++){

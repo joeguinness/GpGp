@@ -11,12 +11,12 @@ using namespace arma;
 
  
 void compute_pieces(
-    NumericVector covparms, 
+    arma::vec covparms, 
     StringVector covfun_name,
-    const NumericMatrix locs, 
-    IntegerMatrix NNarray,
-    NumericVector& y, 
-    NumericMatrix X,
+    arma::mat locs, 
+    arma::mat NNarray,
+    arma::vec y, 
+    arma::mat X,
     mat* XSX,
     vec* ySX,
     double* ySy,
@@ -26,16 +26,16 @@ void compute_pieces(
     vec* dySy,
     vec* dlogdet,
     mat* ainfo,
-    bool profbeta,
-    bool grad_info
+    int profbeta,
+    int grad_info
 ){
 
     // data dimensions
-    int n = y.length();
-    int m = NNarray.ncol();
-    int p = X.ncol();
-    int nparms = covparms.length();
-    int dim = locs.ncol();
+    int n = y.n_elem;
+    int m = NNarray.n_cols;
+    int p = X.n_cols;
+    int nparms = covparms.n_elem;
+    int dim = locs.n_cols;
     
     // convert StringVector to std::string to use .compare() below
     std::string covfun_name_string;
@@ -43,8 +43,8 @@ void compute_pieces(
     
     // assign covariance fun and derivative based on covfun_name_string
     covfun_t covstruct = get_covfun(covfun_name_string);
-    mat (*p_covfun)(NumericVector, NumericMatrix) = covstruct.p_covfun;
-    cube (*p_d_covfun)(NumericVector, NumericMatrix) = covstruct.p_d_covfun;
+    mat (*p_covfun)(arma::vec, arma::mat) = covstruct.p_covfun;
+    cube (*p_d_covfun)(arma::vec, arma::mat) = covstruct.p_d_covfun;
     
     // loop over every observation    
     for(int i=0; i<n; i++){
@@ -53,7 +53,7 @@ void compute_pieces(
         int bsize = std::min(i+1,m);
 
         // first, fill in ysub, locsub, and X0 in reverse order
-        NumericMatrix locsub(bsize, dim);
+        arma::mat locsub(bsize, dim);
         arma::vec ysub(bsize);
         arma::mat X0( bsize, p );
         for(int j=bsize-1; j>=0; j--){
@@ -169,12 +169,12 @@ void compute_pieces(
     
     
 void compute_pieces_grouped(
-    NumericVector covparms, 
+    arma::vec covparms, 
     StringVector covfun_name,
-    const NumericMatrix locs, 
+    arma::mat locs, 
     List NNlist,
-    NumericVector& y, 
-    NumericMatrix X,
+    arma::vec y, 
+    arma::mat X,
     mat* XSX,
     vec* ySX,
     double* ySy,
@@ -192,9 +192,9 @@ void compute_pieces_grouped(
     // data dimensions
     //int n = y.length();
     //int m = NNarray.ncol();
-    int p = X.ncol();
-    int nparms = covparms.length();
-    int dim = locs.ncol();
+    int p = X.n_cols;
+    int nparms = covparms.n_elem;
+    int dim = locs.n_cols;
     
     // convert StringVector to std::string to use .compare() below
     std::string covfun_name_string;
@@ -202,21 +202,21 @@ void compute_pieces_grouped(
     
     // assign covariance fun and derivative based on covfun_name_string
     covfun_t covstruct = get_covfun(covfun_name_string);
-    mat (*p_covfun)(NumericVector, NumericMatrix) = covstruct.p_covfun;
-    cube (*p_d_covfun)(NumericVector, NumericMatrix) = covstruct.p_d_covfun;
+    mat (*p_covfun)(arma::vec, arma::mat) = covstruct.p_covfun;
+    cube (*p_d_covfun)(arma::vec, arma::mat) = covstruct.p_d_covfun;
 
     // vector of all indices
-    IntegerVector all_inds = NNlist["all_inds"];
+    arma::vec all_inds = NNlist["all_inds"];
     // vector of local response indices
-    IntegerVector local_resp_inds = as<IntegerVector>(NNlist["local_resp_inds"]);
+    arma::vec local_resp_inds = as<arma::vec>(NNlist["local_resp_inds"]);
     // vector of global response indices
-    IntegerVector global_resp_inds = as<IntegerVector>(NNlist["global_resp_inds"]);
+    arma::vec global_resp_inds = as<arma::vec>(NNlist["global_resp_inds"]);
     // last index of each block in all_inds
-    IntegerVector last_ind_of_block = as<IntegerVector>(NNlist["last_ind_of_block"]);
+    arma::vec last_ind_of_block = as<arma::vec>(NNlist["last_ind_of_block"]);
     // last response index of each block in local_resp_inds and global_resp_inds
-    IntegerVector last_resp_of_block = as<IntegerVector>(NNlist["last_resp_of_block"]);
+    arma::vec last_resp_of_block = as<arma::vec>(NNlist["last_resp_of_block"]);
 
-    int nb = last_ind_of_block.size();  // number of blocks
+    int nb = last_ind_of_block.n_elem;  // number of blocks
 
 
     // loop over every block
@@ -245,7 +245,7 @@ void compute_pieces_grouped(
         }
 
         // fill in ysub, locsub, and X0 in forward order
-        NumericMatrix locsub(bsize, dim);
+        arma::mat locsub(bsize, dim);
         arma::vec ysub(bsize);
         arma::mat X0( bsize, p );
         for(int j=0; j<bsize; j++){
@@ -365,7 +365,7 @@ void synthesize(
     NumericVector covparms, 
     StringVector covfun_name,
     const NumericMatrix locs, 
-    IntegerMatrix NNarray,
+    NumericMatrix NNarray,
     NumericVector& y, 
     NumericMatrix X,
     NumericVector* ll, 
@@ -398,8 +398,15 @@ void synthesize(
     arma::mat ainfo = arma::mat(nparms, nparms, fill::zeros);
 
     // this is where the big computation happens
+    // first convert Numeric- to arma
+    arma::vec covparms_c = arma::vec(covparms.begin(),covparms.length());
+    arma::mat locs_c = arma::mat(locs.begin(),locs.nrow(),locs.ncol());
+    arma::mat NNarray_c = arma::mat(NNarray.begin(),NNarray.nrow(),NNarray.ncol());
+    arma::vec y_c = arma::vec(y.begin(),y.length());
+    arma::mat X_c = arma::mat(X.begin(),X.nrow(),X.ncol());
+    
     compute_pieces(
-        covparms, covfun_name, locs, NNarray, y, X,
+        covparms_c, covfun_name, locs_c, NNarray_c, y_c, X_c,
         &XSX, &ySX, &ySy, &logdet, &dXSX, &dySX, &dySy, &dlogdet, &ainfo,
         profbeta, grad_info
     );
@@ -487,9 +494,19 @@ void synthesize_grouped(
     arma::vec dlogdet = arma::vec(nparms, fill::zeros);
     // fisher information
     arma::mat ainfo = arma::mat(nparms, nparms, fill::zeros);
+    
+    
     // this is where the big computation happens
+    
+    // convert Numeric- to arma
+    arma::vec covparms_c = arma::vec(covparms.begin(),covparms.length());
+    arma::mat locs_c = arma::mat(locs.begin(),locs.nrow(),locs.ncol());
+    arma::vec y_c = arma::vec(y.begin(),y.length());
+    arma::mat X_c = arma::mat(X.begin(),X.nrow(),X.ncol());
+    
+    
     compute_pieces_grouped(
-        covparms, covfun_name, locs, NNlist, y, X,
+        covparms_c, covfun_name, locs_c, NNlist, y_c, X_c,
         &XSX, &ySX, &ySy, &logdet, &dXSX, &dySX, &dySy, &dlogdet, &ainfo,
         profbeta, grad_info
     );
@@ -566,17 +583,17 @@ void synthesize_grouped(
 //' @export
 // [[Rcpp::export]]
 NumericMatrix vecchia_Linv(
-    NumericVector covparms,
+    arma::vec covparms,
     StringVector covfun_name,
-    const NumericMatrix locs,
-    IntegerMatrix NNarray, 
+    arma::mat locs,
+    arma::mat NNarray, 
     int start_ind = 1){
     
     // data dimensions
-    int n = locs.nrow();
-    int m = NNarray.ncol();
+    int n = locs.n_rows;
+    int m = NNarray.n_cols;
     //int nparms = covparms.length();
-    int dim = locs.ncol();
+    int dim = locs.n_cols;
     NumericMatrix Linv(n,m);
     
     // convert StringVector to std::string to use .compare() below
@@ -585,7 +602,7 @@ NumericMatrix vecchia_Linv(
     
     // assign covariance fun and derivative based on covfun_name_string
     covfun_t covstruct = get_covfun(covfun_name_string);
-    mat (*p_covfun)(NumericVector, NumericMatrix) = covstruct.p_covfun;
+    mat (*p_covfun)(arma::vec, arma::mat) = covstruct.p_covfun;
     //cube (*p_d_covfun)(NumericVector, NumericMatrix) = covstruct.p_d_covfun;
 
     // loop over every observation    
@@ -595,7 +612,7 @@ NumericMatrix vecchia_Linv(
         int bsize = std::min(i+1,m);
 
         // first, fill in ysub, locsub, and X0 in reverse order
-        NumericMatrix locsub(bsize, dim);
+        arma::mat locsub(bsize, dim);
         for(int j=bsize-1; j>=0; j--){
             for(int k=0;k<dim;k++){ locsub(bsize-1-j,k) = locs( NNarray(i,j)-1, k ); }
         }

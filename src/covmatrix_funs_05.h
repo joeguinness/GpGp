@@ -37,11 +37,11 @@ using namespace arma;
 //' and to date, no such distortions have been documented. Guinness and
 //' Fuentes (2016) argue that 3D embeddings produce reasonable models for data on spheres.
 // [[Rcpp::export]]
-arma::mat matern_spheretime(NumericVector covparms, NumericMatrix lonlattime ){
+arma::mat matern_spheretime(arma::vec covparms, arma::mat lonlattime ){
     
-    int n = lonlattime.nrow();
+    int n = lonlattime.n_rows;
     // matrix to hold (x,y,z,t)
-    NumericMatrix locs(n, 4);
+    arma::mat locs(n, 4);
     // convert lonlat to x,y,z
     for(int i=0; i<n; i++){
         double lonrad = 2*M_PI*lonlattime(i,0)/360;
@@ -60,11 +60,11 @@ arma::mat matern_spheretime(NumericVector covparms, NumericMatrix lonlattime ){
 
 //' @describeIn matern_spheretime Derivatives with respect to parameters
 // [[Rcpp::export]]
-arma::cube d_matern_spheretime(NumericVector covparms, NumericMatrix lonlattime){
+arma::cube d_matern_spheretime(arma::vec covparms, arma::mat lonlattime){
     
-    int n = lonlattime.nrow();
+    int n = lonlattime.n_rows;
     // matrix to hold (x,y,z,t)
-    NumericMatrix locs(n, 4);
+    arma::mat locs(n, 4);
     // convert lonlat to x,y,z
     for(int i=0; i<n; i++){
         double lonrad = 2*M_PI*lonlattime(i,0)/360;
@@ -104,11 +104,11 @@ arma::cube d_matern_spheretime(NumericVector covparms, NumericMatrix lonlattime)
 //' and to date, no such distortions have been documented. Guinness and
 //' Fuentes (2016) argue that 3D embeddings produce reasonable models for data on spheres.
 // [[Rcpp::export]]
-arma::mat exponential_spheretime(NumericVector covparms, NumericMatrix lonlattime ){
+arma::mat exponential_spheretime(arma::vec covparms, arma::mat lonlattime ){
     
-    int n = lonlattime.nrow();
+    int n = lonlattime.n_rows;
     // matrix to hold (x,y,z,t)
-    NumericMatrix locs(n, 4);
+    arma::mat locs(n, 4);
     // convert lonlat to x,y,z
     for(int i=0; i<n; i++){
         double lonrad = 2*M_PI*lonlattime(i,0)/360;
@@ -127,11 +127,11 @@ arma::mat exponential_spheretime(NumericVector covparms, NumericMatrix lonlattim
 
 //' @describeIn exponential_spheretime Derivatives with respect to parameters.
 // [[Rcpp::export]]
-arma::cube d_exponential_spheretime(NumericVector covparms, NumericMatrix lonlattime){
+arma::cube d_exponential_spheretime(arma::vec covparms, arma::mat lonlattime){
     
-    int n = lonlattime.nrow();
+    int n = lonlattime.n_rows;
     // matrix to hold (x,y,z,t)
-    NumericMatrix locs(n, 4);
+    arma::mat locs(n, 4);
     // convert lonlat to x,y,z
     for(int i=0; i<n; i++){
         double lonrad = 2*M_PI*lonlattime(i,0)/360;

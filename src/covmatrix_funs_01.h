@@ -35,10 +35,10 @@ using namespace arma;
 //' The nugget value \eqn{ \sigma^2 \tau^2 } is added to the diagonal of the covariance matrix.
 //' NOTE: the nugget is \eqn{ \sigma^2 \tau^2 }, not \eqn{ \tau^2 }. 
 // [[Rcpp::export]]
-arma::mat exponential_isotropic(NumericVector covparms, NumericMatrix locs ){
+arma::mat exponential_isotropic(arma::vec covparms, arma::mat locs ){
 
-    int dim = locs.ncol();
-    int n = locs.nrow();
+    int dim = locs.n_cols;
+    int n = locs.n_rows;
     double nugget = covparms( 0 )*covparms( 2 );
     // create scaled locations
     mat locs_scaled(n,dim);
@@ -73,10 +73,10 @@ arma::mat exponential_isotropic(NumericVector covparms, NumericMatrix locs ){
 
 //' @describeIn exponential_isotropic Derivatives of isotropic exponential covariance
 // [[Rcpp::export]]
-arma::cube d_exponential_isotropic(NumericVector covparms, NumericMatrix locs ){
+arma::cube d_exponential_isotropic(arma::vec covparms, arma::mat locs ){
 
-    int dim = locs.ncol();
-    int n = locs.nrow();
+    int dim = locs.n_cols;
+    int n = locs.n_rows;
     //double nugget = covparms( 0 )*covparms( 2 );
     // create scaled locations
     mat locs_scaled(n,dim);
@@ -86,7 +86,7 @@ arma::cube d_exponential_isotropic(NumericVector covparms, NumericMatrix locs ){
         }
     }
     // calculate derivatives
-    arma::cube dcovmat = arma::cube(n,n,covparms.length(), fill::zeros);
+    arma::cube dcovmat = arma::cube(n,n,covparms.n_elem, fill::zeros);
     for(int i1=0; i1<n; i1++){ for(int i2=0; i2<=i1; i2++){
         double d = 0.0;
         for(int j=0; j<dim; j++){
@@ -100,7 +100,7 @@ arma::cube d_exponential_isotropic(NumericVector covparms, NumericMatrix locs ){
             dcovmat(i1,i2,0) += covparms(2);
             dcovmat(i1,i2,2) += covparms(0); 
         } else { // fill in opposite entry
-            for(int j=0; j<covparms.length(); j++){
+            for(int j=0; j<covparms.n_elem; j++){
                 dcovmat(i2,i1,j) = dcovmat(i1,i2,j);
             }
         }
@@ -132,10 +132,10 @@ arma::cube d_exponential_isotropic(NumericVector covparms, NumericMatrix locs ){
 //' The nugget value \eqn{ \sigma^2 \tau^2 } is added to the diagonal of the covariance matrix.
 //' NOTE: the nugget is \eqn{ \sigma^2 \tau^2 }, not \eqn{ \tau^2 }. 
 // [[Rcpp::export]]
-arma::mat matern_isotropic(NumericVector covparms, NumericMatrix locs ){
+arma::mat matern_isotropic(arma::vec covparms, arma::mat locs ){
 
-    int dim = locs.ncol();
-    int n = locs.nrow();
+    int dim = locs.n_cols;
+    int n = locs.n_rows;
     double nugget = covparms( 0 )*covparms( 3 );
     double normcon = covparms(0)/(pow(2.0,covparms(2)-1.0)*Rf_gammafn(covparms(2)));
     
@@ -179,10 +179,10 @@ arma::mat matern_isotropic(NumericVector covparms, NumericMatrix locs ){
 
 //' @describeIn matern_isotropic Derivatives of isotropic Matern covariance
 // [[Rcpp::export]]
-arma::cube d_matern_isotropic(NumericVector covparms, NumericMatrix locs ){
+arma::cube d_matern_isotropic(arma::vec covparms, arma::mat locs ){
 
-    int dim = locs.ncol();
-    int n = locs.nrow();
+    int dim = locs.n_cols;
+    int n = locs.n_rows;
     //double nugget = covparms( 0 )*covparms( 3 );
     double normcon = covparms(0)/(pow(2.0,covparms(2)-1.0)*Rf_gammafn(covparms(2)));
     double eps = 1e-8;
@@ -197,7 +197,7 @@ arma::cube d_matern_isotropic(NumericVector covparms, NumericMatrix locs ){
         }
     }
     // calculate derivatives
-    arma::cube dcovmat = arma::cube(n,n,covparms.length(), fill::zeros);
+    arma::cube dcovmat = arma::cube(n,n,covparms.n_elem, fill::zeros);
     for(int i1=0; i1<n; i1++){ for(int i2=0; i2<=i1; i2++){
         double d = 0.0;
         for(int j=0; j<dim; j++){
@@ -227,7 +227,7 @@ arma::cube d_matern_isotropic(NumericVector covparms, NumericMatrix locs ){
             dcovmat(i1,i2,0) += covparms(3);
             dcovmat(i1,i2,3) += covparms(0); 
         } else { // fill in opposite entry
-            for(int j=0; j<covparms.length(); j++){
+            for(int j=0; j<covparms.n_elem; j++){
                 dcovmat(i2,i1,j) = dcovmat(i1,i2,j);
             }
         }
@@ -262,10 +262,10 @@ arma::cube d_matern_isotropic(NumericVector covparms, NumericMatrix locs ){
 //' The nugget value \eqn{ \sigma^2 \tau^2 } is added to the diagonal of the covariance matrix.
 //' NOTE: the nugget is \eqn{ \sigma^2 \tau^2 }, not \eqn{ \tau^2 }. 
 // [[Rcpp::export]]
-arma::mat matern15_isotropic(NumericVector covparms, NumericMatrix locs ){
+arma::mat matern15_isotropic(arma::vec covparms, arma::mat locs ){
 
-    int dim = locs.ncol();
-    int n = locs.nrow();
+    int dim = locs.n_cols;
+    int n = locs.n_rows;
     double nugget = covparms( 0 )*covparms( 2 );
     // create scaled locations
     mat locs_scaled(n,dim);
@@ -301,10 +301,10 @@ arma::mat matern15_isotropic(NumericVector covparms, NumericMatrix locs ){
 //' @describeIn exponential_isotropic Derivatives of isotropic 
 //' matern covariance with smoothness 1.5
 // [[Rcpp::export]]
-arma::cube d_matern15_isotropic(NumericVector covparms, NumericMatrix locs ){
+arma::cube d_matern15_isotropic(arma::vec covparms, arma::mat locs ){
 
-    int dim = locs.ncol();
-    int n = locs.nrow();
+    int dim = locs.n_cols;
+    int n = locs.n_rows;
     //double nugget = covparms( 0 )*covparms( 2 );
     // create scaled locations
     mat locs_scaled(n,dim);
@@ -314,7 +314,7 @@ arma::cube d_matern15_isotropic(NumericVector covparms, NumericMatrix locs ){
         }
     }
     // calculate derivatives
-    arma::cube dcovmat = arma::cube(n,n,covparms.length(), fill::zeros);
+    arma::cube dcovmat = arma::cube(n,n,covparms.n_elem, fill::zeros);
     for(int i1=0; i1<n; i1++){ for(int i2=0; i2<=i1; i2++){
         double d = 0.0;
         for(int j=0; j<dim; j++){
@@ -328,7 +328,7 @@ arma::cube d_matern15_isotropic(NumericVector covparms, NumericMatrix locs ){
             dcovmat(i1,i2,0) += covparms(2);
             dcovmat(i1,i2,2) += covparms(0); 
         } else { // fill in opposite entry
-            for(int j=0; j<covparms.length(); j++){
+            for(int j=0; j<covparms.n_elem; j++){
                 dcovmat(i2,i1,j) = dcovmat(i1,i2,j);
             }
         }
