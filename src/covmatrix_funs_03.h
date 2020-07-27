@@ -45,7 +45,7 @@ arma::mat matern_scaledim(arma::vec covparms, arma::mat locs ){
     int n = locs.n_rows;
     double nugget = covparms( 0 )*covparms( dim + 2 );
     double smooth = covparms(dim+1);
-    double normcon = covparms(0)/(pow(2.0,smooth-1.0)*Rf_gammafn(smooth));
+    double normcon = covparms(0)/(pow(2.0,smooth-1.0)*boost::math::tgamma(smooth));
     
     // create scaled locations
     mat locs_scaled(n,dim);
@@ -72,7 +72,7 @@ arma::mat matern_scaledim(arma::vec covparms, arma::mat locs ){
         } else {
             // calculate covariance            
             covmat(i2,i1) = normcon*
-                pow( d, smooth )*Rf_bessel_k( d, smooth, 1.0 );
+                pow( d, smooth )* boost::math::cyl_bessel_k(smooth, d);
         }
         // add nugget
         if( i1 == i2 ){ covmat(i2,i2) += nugget; } 
@@ -94,7 +94,7 @@ arma::cube d_matern_scaledim(arma::vec covparms, arma::mat locs ){
     int n = locs.n_rows;
     double nugget = covparms( 0 )*covparms( dim + 2 );
     double smooth = covparms(dim+1);
-    double normcon = covparms(0)/(pow(2.0,smooth-1.0)*Rf_gammafn(smooth));
+    double normcon = covparms(0)/(pow(2.0,smooth-1.0)*boost::math::tgamma(smooth));
     
     // create scaled locations
     mat locs_scaled(n,dim);
@@ -106,7 +106,7 @@ arma::cube d_matern_scaledim(arma::vec covparms, arma::mat locs ){
 
     double eps = 1e-8;
     double normconeps = 
-        covparms(0)/(pow(2.0,smooth+eps-1.0)*Rf_gammafn(smooth+eps));
+        covparms(0)/(pow(2.0,smooth+eps-1.0)*boost::math::tgamma(smooth+eps));
     
     // calculate derivatives
     arma::cube dcovmat = arma::cube(n,n,covparms.n_elem, fill::zeros);
@@ -123,18 +123,18 @@ arma::cube d_matern_scaledim(arma::vec covparms, arma::mat locs ){
             cov = covparms(0);
             dcovmat(i1,i2,0) += 1.0;
         } else {
-            cov = normcon*pow( d, smooth )*Rf_bessel_k(d,smooth,1.0);
+            cov = normcon*pow( d, smooth )* boost::math::cyl_bessel_k(smooth, d);
             // variance parameter
             dcovmat(i1,i2,0) += cov/covparms(0);
             // range parameters
             for(int j=0; j<dim; j++){
                 double dj2 = pow( locs_scaled(i1,j) - locs_scaled(i2,j), 2.0 );
                 dcovmat(i1,i2,j+1) += normcon*pow( d, smooth - 1.0)*
-                    Rf_bessel_k(d,smooth-1.0,1.0)*dj2/covparms(j+1);
+                    boost::math::cyl_bessel_k(smooth - 1.0, d)*dj2/covparms(j+1);
             }
             // smoothness parameter (finite differencing)
             dcovmat(i1,i2,dim+1) += 
-                ( normconeps*pow(d,smooth+eps)*Rf_bessel_k(d,smooth+eps,1.0) -
+                ( normconeps*pow(d,smooth+eps)* boost::math::cyl_bessel_k(smooth + eps, d) -
                   cov )/eps;
         }
         if( i1 == i2 ){ // update diagonal entry
@@ -336,10 +336,10 @@ arma::cube d_matern_spacetime(arma::vec covparms, arma::mat locs ){
     int n = locs.n_rows;
     double nugget = covparms( 0 )*covparms( 4 );
     double smooth = covparms( 3 );
-    double normcon = covparms(0)/(pow(2.0,smooth-1.0)*Rf_gammafn(smooth));
+    double normcon = covparms(0)/(pow(2.0,smooth-1.0)*boost::math::tgamma(smooth));
     double eps = 1e-8;
     double normconeps = 
-        covparms(0)/(pow(2.0,smooth+eps-1.0)*Rf_gammafn(smooth+eps));
+        covparms(0)/(pow(2.0,smooth+eps-1.0)*boost::math::tgamma(smooth+eps));
 
     // create scaled locations
     arma::mat locs_scaled(n,dim+1);
@@ -367,7 +367,7 @@ arma::cube d_matern_spacetime(arma::vec covparms, arma::mat locs ){
             cov = covparms(0);
             dcovmat(i1,i2,0) += 1.0;
         } else {
-            cov = normcon*pow( d, smooth )*Rf_bessel_k(d,smooth,1.0);
+            cov = normcon*pow( d, smooth )*boost::math::cyl_bessel_k(smooth, d);
 
             // variance parameter
             dcovmat(i1,i2,0) += cov/covparms(0);
@@ -378,14 +378,14 @@ arma::cube d_matern_spacetime(arma::vec covparms, arma::mat locs ){
                 dj2 += pow(locs_scaled(i1,j)-locs_scaled(i2,j),2.0);
             }
             dcovmat(i1,i2,1) += normcon*pow( d, smooth - 1.0)*
-                Rf_bessel_k(d,smooth-1.0,1.0)*dj2/covparms(1);
+                boost::math::cyl_bessel_k(smooth - 1.0, d)*dj2/covparms(1);
             dj2 = pow(locs_scaled(i1,dim)-locs_scaled(i2,dim),2.0);
             dcovmat(i1,i2,2) += normcon*pow( d, smooth - 1.0)*
-                Rf_bessel_k(d,smooth-1.0,1.0)*dj2/covparms(2);
+                boost::math::cyl_bessel_k(smooth - 1.0, d)*dj2/covparms(2);
             
             // smoothness parameter (finite differencing)
             dcovmat(i1,i2,3) += 
-                ( normconeps*pow(d,smooth+eps)*Rf_bessel_k(d,smooth+eps,1.0) -
+                ( normconeps*pow(d,smooth+eps)* boost::math::cyl_bessel_k(smooth + eps, d) -
                   cov )/eps;
         }
         if( i1 == i2 ){ // update diagonal entry

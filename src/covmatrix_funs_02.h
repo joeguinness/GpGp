@@ -50,7 +50,7 @@ arma::mat matern_anisotropic2D(arma::vec covparms, arma::mat locs ){
     //int dim = locs.n_cols;
     int n = locs.n_rows;
     double nugget = covparms( 0 )*covparms( 5 );
-    double normcon = covparms(0)/(pow(2.0,covparms(4)-1.0)*Rf_gammafn(covparms(4)));
+    double normcon = covparms(0)/(pow(2.0,covparms(4)-1.0)*boost::math::tgamma(covparms(4) ));
     
     double b0 = covparms(1)*covparms(1);
     double b1 = covparms(2)*covparms(2)+covparms(3)*covparms(3);
@@ -72,7 +72,7 @@ arma::mat matern_anisotropic2D(arma::vec covparms, arma::mat locs ){
             } else {
                 // calculate covariance            
                 covmat(i2,i1) = normcon*
-                    pow( d, covparms(4) )*Rf_bessel_k(d,covparms(4),1.0);
+                    pow( d, covparms(4) )*boost::math::cyl_bessel_k(covparms(4), d);
             }
             // add nugget
             if( i1 == i2 ){ covmat(i2,i2) += nugget; } 
@@ -98,10 +98,10 @@ arma::cube d_matern_anisotropic2D(arma::vec covparms, arma::mat locs ){
 
     int n = locs.n_rows;
     //double nugget = covparms( 0 )*covparms( 5 );
-    double normcon = covparms(0)/(pow(2.0,covparms(4)-1.0)*Rf_gammafn(covparms(4)));
+    double normcon = covparms(0)/(pow(2.0,covparms(4)-1.0)*boost::math::tgamma(covparms(4) ));
     double eps = 1e-8;
     double normconeps = 
-        covparms(0)/(pow(2.0,covparms(4)+eps-1.0)*Rf_gammafn(covparms(4)+eps));
+        covparms(0)/(pow(2.0,covparms(4)+eps-1.0)*boost::math::tgamma(covparms(4)+eps ));
     
     double b0 = covparms(1)*covparms(1);
     double b1 = covparms(2)*covparms(2)+covparms(3)*covparms(3);
@@ -122,19 +122,19 @@ arma::cube d_matern_anisotropic2D(arma::vec covparms, arma::mat locs ){
             cov = covparms(0);
             dcovmat(i1,i2,0) += 1.0;
         } else {
-            cov = normcon*pow( d, covparms(4) )*Rf_bessel_k(d,covparms(4),1.0);
+            cov = normcon*pow( d, covparms(4) )*boost::math::cyl_bessel_k(covparms(4), d);
             // variance parameter
             dcovmat(i1,i2,0) += cov/covparms(0);
             // cholesky parameters
             double cov_nu_m1 = normcon*pow(d,covparms(4)-1.0)*
-                Rf_bessel_k(d,covparms(4)-1.0,1.0);  
+                boost::math::cyl_bessel_k(covparms(4)-1.0, d);  
             dcovmat(i1,i2,1) -= cov_nu_m1*(h0*h0*covparms(1));
             dcovmat(i1,i2,2) -= cov_nu_m1*(h1*h1*covparms(2) + h0*h1*covparms(3));
             dcovmat(i1,i2,3) -= cov_nu_m1*(h1*h1*covparms(3) + h0*h1*covparms(2));
             
             // smoothness parameter (finite differencing)
             dcovmat(i1,i2,4) += 
-                ( normconeps*pow(d,covparms(4)+eps)*Rf_bessel_k(d,covparms(4)+eps,1.0) -
+                ( normconeps*pow(d,covparms(4)+eps)*boost::math::cyl_bessel_k(covparms(4) + eps, d) -
                   cov )/eps;
         }
         if( i1 == i2 ){ // update diagonal entry
@@ -192,7 +192,7 @@ arma::mat matern_anisotropic3D(arma::vec covparms, arma::mat locs ){
     int n = locs.n_rows;
     double nugget = covparms( 0 )*covparms( 8 );
     double smooth = covparms( 7 );
-    double normcon = covparms(0)/(pow(2.0,smooth-1.0)*Rf_gammafn(smooth));
+    double normcon = covparms(0)/(pow(2.0,smooth-1.0)*boost::math::tgamma(smooth));
     
     // calculate covariances
     arma::mat covmat(n,n);
@@ -215,7 +215,7 @@ arma::mat matern_anisotropic3D(arma::vec covparms, arma::mat locs ){
             } else {
                 // calculate covariance            
                 covmat(i2,i1) = normcon*
-                    pow( d, smooth )*Rf_bessel_k(d,smooth,1.0);
+                    pow( d, smooth )*boost::math::cyl_bessel_k(smooth, d);
             }
             // add nugget
             if( i1 == i2 ){ covmat(i2,i2) += nugget; } 
@@ -245,10 +245,10 @@ arma::cube d_matern_anisotropic3D(arma::vec covparms, arma::mat locs ){
     int n = locs.n_rows;
     //double nugget = covparms( 0 )*covparms( 8 );
     double smooth = covparms( 7 );
-    double normcon = covparms(0)/(pow(2.0,smooth-1.0)*Rf_gammafn(smooth));
+    double normcon = covparms(0)/(pow(2.0,smooth-1.0)*boost::math::tgamma(smooth));
     double eps = 1e-8;
     double normconeps = 
-        covparms(0)/(pow(2.0,smooth+eps-1.0)*Rf_gammafn(smooth+eps));
+        covparms(0)/(pow(2.0,smooth+eps-1.0)*boost::math::tgamma(smooth+eps));
     
     // calculate derivatives
     arma::cube dcovmat = arma::cube(n,n,covparms.n_elem, fill::zeros);
@@ -270,12 +270,12 @@ arma::cube d_matern_anisotropic3D(arma::vec covparms, arma::mat locs ){
             cov = covparms(0);
             dcovmat(i1,i2,0) += 1.0;
         } else {
-            cov = normcon*pow( d, smooth )*Rf_bessel_k( d, smooth, 1.0 );
+            cov = normcon*pow( d, smooth )*boost::math::cyl_bessel_k(smooth, d);
             // variance parameter
             dcovmat(i1,i2,0) += cov/covparms(0);
             // cholesky parameters
             double cov_nu_m1 = normcon*pow( d, smooth - 1.0 )*
-                Rf_bessel_k( d, smooth - 1.0, 1.0 );  
+                boost::math::cyl_bessel_k(smooth - 1.0, d);  
             double Limhm = covparms(1)*h0;
                 dcovmat(i1,i2,1) = -cov_nu_m1*Limhm*h0;
             Limhm = covparms(2)*h0 + covparms(3)*h1;
@@ -288,7 +288,7 @@ arma::cube d_matern_anisotropic3D(arma::vec covparms, arma::mat locs ){
     
             // smoothness parameter (finite differencing)
             dcovmat(i1,i2,7) += 
-                ( normconeps*pow(d,smooth+eps)*Rf_bessel_k(d,smooth+eps,1.0) -
+                ( normconeps*pow(d,smooth+eps)*boost::math::cyl_bessel_k(smooth + eps, d) -
                   cov )/eps;
         }
         if( i1 == i2 ){ // update diagonal entry
