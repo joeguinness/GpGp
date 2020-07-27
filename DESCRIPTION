@@ -24,7 +24,8 @@ Depends: R (>= 2.10)
 License: MIT + file LICENSE
 Imports:
     Rcpp (>= 0.12.13),
-    FNN
+    FNN,
+    BH
 Suggests:
     fields,
     knitr,
@@ -32,6 +33,6 @@ Suggests:
     testthat,
     maps,
     maptools
-LinkingTo: Rcpp, RcppArmadillo
+LinkingTo: Rcpp, RcppArmadillo,BH
 RoxygenNote: 7.1.1
 LazyData: true

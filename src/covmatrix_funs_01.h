@@ -10,12 +10,12 @@
 #include <cassert>
 #include "basis.h"
 
-#include <boost/math/special_functions/bessel.hpp>
-#include <boost/math/special_functions/gamma.hpp>
+#include <boost/math/special_functions.hpp>
 
 using namespace Rcpp;
 using namespace arma;
 //[[Rcpp::depends(RcppArmadillo)]]
+//[[Rcpp::depends(BH)]]
 
 
 //' Isotropic exponential covariance function
