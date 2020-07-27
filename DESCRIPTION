@@ -33,6 +33,6 @@ Suggests:
     testthat,
     maps,
     maptools
-LinkingTo: Rcpp, RcppArmadillo,BH
+LinkingTo: Rcpp, RcppArmadillo, BH
 RoxygenNote: 7.1.1
 LazyData: true
