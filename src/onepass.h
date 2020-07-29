@@ -14,27 +14,26 @@
 using namespace Rcpp;
 using namespace arma;
 
- 
 void compute_pieces(
-    arma::vec covparms, 
-    StringVector covfun_name,
-    arma::mat locs, 
-    arma::mat NNarray,
-    arma::vec y, 
-    arma::mat X,
-    mat* XSX,
-    vec* ySX,
-    double* ySy,
-    double* logdet,
-    cube* dXSX,
-    mat* dySX,
-    vec* dySy,
-    vec* dlogdet,
-    mat* ainfo,
-    int profbeta,
-    int grad_info
+        arma::vec covparms, 
+        StringVector covfun_name,
+        arma::mat locs, 
+        arma::mat NNarray,
+        arma::vec y, 
+        arma::mat X,
+        mat* XSX,
+        vec* ySX,
+        double* ySy,
+        double* logdet,
+        cube* dXSX,
+        mat* dySX,
+        vec* dySy,
+        vec* dlogdet,
+        mat* ainfo,
+        int profbeta,
+        int grad_info
 ){
-
+    
     // data dimensions
     int n = y.n_elem;
     int m = NNarray.n_cols;
@@ -50,6 +49,17 @@ void compute_pieces(
     covfun_t covstruct = get_covfun(covfun_name_string);
     mat (*p_covfun)(arma::vec, arma::mat) = covstruct.p_covfun;
     cube (*p_d_covfun)(arma::vec, arma::mat) = covstruct.p_d_covfun;
+    
+    
+    arma::mat m_XSX=arma::mat(p, p, fill::zeros);
+    arma::vec m_ySX=arma::vec(p, fill::zeros);
+    double m_ySy=0.0;
+    double m_logdet=0.0;
+    arma::cube m_dXSX= arma::cube(p,p,nparms,fill::zeros);
+    arma::mat m_dySX=arma::mat(p, nparms, fill::zeros);
+    arma::vec m_dySy=  arma::vec(nparms, fill::zeros);
+    arma::vec m_dlogdet=arma::vec(nparms, fill::zeros);
+    arma::mat m_ainfo =arma::mat(nparms, nparms, fill::zeros);
 #pragma omp parallel
 {
     arma::mat l_XSX=arma::mat(p, p, fill::zeros);
@@ -64,10 +74,10 @@ void compute_pieces(
     
     // loop over every observation    
 #pragma omp for
-        for(int i=0; i<n; i++){
-    
+    for(int i=0; i<n; i++){
+        
         int bsize = std::min(i+1,m);
-
+        
         // first, fill in ysub, locsub, and X0 in reverse order
         arma::mat locsub(bsize, dim);
         arma::vec ysub(bsize);
@@ -120,102 +130,111 @@ void compute_pieces(
         }
         
         if( grad_info ){
-        // gradient objects
-        // LidSLi3 is last column of Li * (dS_j) * Lit for 1 parameter i
-        // LidSLi2 stores these columns in a matrix for all parameters
-        arma::mat LidSLi2(bsize,nparms);
-        
-        if(cond){ // if we condition on anything
+            // gradient objects
+            // LidSLi3 is last column of Li * (dS_j) * Lit for 1 parameter i
+            // LidSLi2 stores these columns in a matrix for all parameters
+            arma::mat LidSLi2(bsize,nparms);
             
-            for(int j=0; j<nparms; j++){
-                // compute last column of Li * (dS_j) * Lit
-                arma::vec LidSLi3 = solve( trimatl(cholmat), dcovmat.slice(j) * choli2 );
-                // store LiX0.t() * LidSLi3 and Liy0.t() * LidSLi3
-                arma::vec v1 = LiX0.t() * LidSLi3;
-                double s1 = as_scalar( Liy0.t() * LidSLi3 ); 
-                // update all quantities
-                // bottom-right corner gets double counted, so need to subtract it off
-                (l_dXSX).slice(j) += v1 * LiX0.rows(i2) + ( v1 * LiX0.rows(i2) ).t() - 
-                    as_scalar(LidSLi3(i2)) * ( LiX0.rows(i2).t() * LiX0.rows(i2) );
-                (l_dySy)(j) += as_scalar( 2.0 * s1 * Liy0(i2)  - 
-                    LidSLi3(i2) * Liy0(i2) * Liy0(i2) );
-                (l_dySX).col(j) += (  s1 * LiX0.rows(i2) + ( v1 * Liy0(i2) ).t() -  
-                    as_scalar( LidSLi3(i2) ) * LiX0.rows(i2) * as_scalar( Liy0(i2))).t();
-                (l_dlogdet)(j) += as_scalar( LidSLi3(i2) );
-                // store last column of Li * (dS_j) * Lit
-                LidSLi2.col(j) = LidSLi3;
+            if(cond){ // if we condition on anything
+                
+                for(int j=0; j<nparms; j++){
+                    // compute last column of Li * (dS_j) * Lit
+                    arma::vec LidSLi3 = solve( trimatl(cholmat), dcovmat.slice(j) * choli2 );
+                    // store LiX0.t() * LidSLi3 and Liy0.t() * LidSLi3
+                    arma::vec v1 = LiX0.t() * LidSLi3;
+                    double s1 = as_scalar( Liy0.t() * LidSLi3 ); 
+                    // update all quantities
+                    // bottom-right corner gets double counted, so need to subtract it off
+                    (l_dXSX).slice(j) += v1 * LiX0.rows(i2) + ( v1 * LiX0.rows(i2) ).t() - 
+                        as_scalar(LidSLi3(i2)) * ( LiX0.rows(i2).t() * LiX0.rows(i2) );
+                    (l_dySy)(j) += as_scalar( 2.0 * s1 * Liy0(i2)  - 
+                        LidSLi3(i2) * Liy0(i2) * Liy0(i2) );
+                    (l_dySX).col(j) += (  s1 * LiX0.rows(i2) + ( v1 * Liy0(i2) ).t() -  
+                        as_scalar( LidSLi3(i2) ) * LiX0.rows(i2) * as_scalar( Liy0(i2))).t();
+                    (l_dlogdet)(j) += as_scalar( LidSLi3(i2) );
+                    // store last column of Li * (dS_j) * Lit
+                    LidSLi2.col(j) = LidSLi3;
+                }
+                
+                // fisher information object
+                // bottom right corner gets double counted, so subtract it off
+                for(int i=0; i<nparms; i++){ for(int j=0; j<i+1; j++){
+                    (l_ainfo)(i,j) += 
+                        1.0*accu( LidSLi2.col(i) % LidSLi2.col(j) ) - 
+                        0.5*accu( LidSLi2.rows(i2).col(j) %
+                        LidSLi2.rows(i2).col(i) );
+                }}
+                
+            } else { // similar calculations, but for when there is no conditioning set
+                for(int j=0; j<nparms; j++){
+                    arma::mat LidSLi = solve( trimatl(cholmat), dcovmat.slice(j) );
+                    LidSLi = solve( trimatl(cholmat), LidSLi.t() );
+                    (l_dXSX).slice(j) += LiX0.t() *  LidSLi * LiX0; 
+                    (l_dySy)(j) += as_scalar( Liy0.t() * LidSLi * Liy0 );
+                    (l_dySX).col(j) += ( ( Liy0.t() * LidSLi ) * LiX0 ).t();
+                    (l_dlogdet)(j) += trace( LidSLi );
+                    LidSLi2.col(j) = LidSLi;
+                }
+                
+                // fisher information object
+                for(int i=0; i<nparms; i++){ for(int j=0; j<i+1; j++){
+                    (l_ainfo)(i,j) += 0.5*accu( LidSLi2.col(i) % LidSLi2.col(j) ); 
+                }}
+                
             }
-
-            // fisher information object
-            // bottom right corner gets double counted, so subtract it off
-            for(int i=0; i<nparms; i++){ for(int j=0; j<i+1; j++){
-                (l_ainfo)(i,j) += 
-                    1.0*accu( LidSLi2.col(i) % LidSLi2.col(j) ) - 
-                    0.5*accu( LidSLi2.rows(i2).col(j) %
-                              LidSLi2.rows(i2).col(i) );
-            }}
             
-        } else { // similar calculations, but for when there is no conditioning set
-            for(int j=0; j<nparms; j++){
-                arma::mat LidSLi = solve( trimatl(cholmat), dcovmat.slice(j) );
-                LidSLi = solve( trimatl(cholmat), LidSLi.t() );
-                (l_dXSX).slice(j) += LiX0.t() *  LidSLi * LiX0; 
-                (l_dySy)(j) += as_scalar( Liy0.t() * LidSLi * Liy0 );
-                (l_dySX).col(j) += ( ( Liy0.t() * LidSLi ) * LiX0 ).t();
-                (l_dlogdet)(j) += trace( LidSLi );
-                LidSLi2.col(j) = LidSLi;
-            }
-            
-            // fisher information object
-            for(int i=0; i<nparms; i++){ for(int j=0; j<i+1; j++){
-                (l_ainfo)(i,j) += 0.5*accu( LidSLi2.col(i) % LidSLi2.col(j) ); 
-            }}
-
         }
         
-        }
-
     }
 #pragma omp critical
-        *XSX += l_XSX;
-        *ySX += l_ySX;
-        *ySy += l_ySy;
-        *logdet += l_logdet;
-        *dXSX += l_dXSX;
-        *dySX += l_dySX;
-        *dySy += l_dySy;
-        *dlogdet += l_dlogdet;
-        *ainfo += l_ainfo;
+    m_XSX += l_XSX;
+    m_ySX += l_ySX;
+    m_ySy += l_ySy;
+    m_logdet += l_logdet;
+    m_dXSX += l_dXSX;
+    m_dySX += l_dySX;
+    m_dySy += l_dySy;
+    m_dlogdet += l_dlogdet;
+    m_ainfo += l_ainfo;
 }
+*XSX = m_XSX;
+*ySX = m_ySX;
+*ySy = m_ySy;
+*logdet = m_logdet;
+*dXSX = m_dXSX;
+*dySX = m_dySX;
+*dySy = m_dySy;
+*dlogdet = m_dlogdet;
+*ainfo = m_ainfo;
+
 }  
 
-    
 
-    
-    
-    
-    
+
+
+
+
 void compute_pieces_grouped(
-    arma::vec covparms, 
-    StringVector covfun_name,
-    arma::mat locs, 
-    List NNlist,
-    arma::vec y, 
-    arma::mat X,
-    mat* XSX,
-    vec* ySX,
-    double* ySy,
-    double* logdet,
-    cube* dXSX,
-    mat* dySX,
-    vec* dySy,
-    vec* dlogdet,
-    mat* ainfo,
-    bool profbeta,
-    bool grad_info
+        arma::vec covparms, 
+        StringVector covfun_name,
+        arma::mat locs, 
+        List NNlist,
+        arma::vec y, 
+        arma::mat X,
+        mat* XSX,
+        vec* ySX,
+        double* ySy,
+        double* logdet,
+        cube* dXSX,
+        mat* dySX,
+        vec* dySy,
+        vec* dlogdet,
+        mat* ainfo,
+        bool profbeta,
+        bool grad_info
 ){
     
-
+    
     // data dimensions
     //int n = y.length();
     //int m = NNarray.ncol();
@@ -231,7 +250,7 @@ void compute_pieces_grouped(
     covfun_t covstruct = get_covfun(covfun_name_string);
     mat (*p_covfun)(arma::vec, arma::mat) = covstruct.p_covfun;
     cube (*p_d_covfun)(arma::vec, arma::mat) = covstruct.p_d_covfun;
-
+    
     // vector of all indices
     arma::vec all_inds = NNlist["all_inds"];
     // vector of local response indices
@@ -242,10 +261,19 @@ void compute_pieces_grouped(
     arma::vec last_ind_of_block = as<arma::vec>(NNlist["last_ind_of_block"]);
     // last response index of each block in local_resp_inds and global_resp_inds
     arma::vec last_resp_of_block = as<arma::vec>(NNlist["last_resp_of_block"]);
-
+    
     int nb = last_ind_of_block.n_elem;  // number of blocks
-
-
+    
+    
+    arma::mat m_XSX=arma::mat(p, p, fill::zeros);
+    arma::vec m_ySX=arma::vec(p, fill::zeros);
+    double m_ySy=0.0;
+    double m_logdet=0.0;
+    arma::cube m_dXSX= arma::cube(p,p,nparms,fill::zeros);
+    arma::mat m_dySX=arma::mat(p, nparms, fill::zeros);
+    arma::vec m_dySy=  arma::vec(nparms, fill::zeros);
+    arma::vec m_dlogdet=arma::vec(nparms, fill::zeros);
+    arma::mat m_ainfo =arma::mat(nparms, nparms, fill::zeros);
 #pragma omp parallel
 {
     arma::mat l_XSX=arma::mat(p, p, fill::zeros);
@@ -261,8 +289,8 @@ void compute_pieces_grouped(
     // loop over every observation    
 #pragma omp for
     for(int i=0; i<nb; i++){
-
-
+        
+        
         // first ind and last ind are the positions in all_inds
         // of the observations for block i.
         // these come in 1-indexing and are converted to 0-indexing here
@@ -282,7 +310,7 @@ void compute_pieces_grouped(
         for(int j=0; j<rsize; j++){
             whichresp(j) = local_resp_inds(first_resp+j) - 1;
         }
-
+        
         // fill in ysub, locsub, and X0 in forward order
         arma::mat locsub(bsize, dim);
         arma::vec ysub(bsize);
@@ -295,7 +323,7 @@ void compute_pieces_grouped(
                 for(int k=0;k<p;k++){ X0(j,k) = X( jglobal, k ); }
             }
         }
-
+        
         // compute covariance matrix and derivatives and take cholesky
         arma::mat covmat = (*p_covfun)( covparms, locsub );
         arma::cube dcovmat;
@@ -304,7 +332,7 @@ void compute_pieces_grouped(
         }
         arma::mat cholmat = eye( size(covmat) );
         chol( cholmat, covmat, "lower" );
-
+        
         // get response rows of inverse cholmat, put in column vectors
         arma::mat onemat = zeros(bsize,rsize);
         for(int j=0; j<rsize; j++){ 
@@ -335,97 +363,106 @@ void compute_pieces_grouped(
         }    
         
         if(grad_info){
-        // gradient objects
-        // LidSLi3 is last column of Li * (dS_j) * Lit for 1 parameter i
-        // LidSLi2 stores these columns in a matrix for all parameters
-        if(cond){ // if we condition on anything
-            
-            arma::cube LidSLi2 = arma::cube(bsize,rsize,nparms,fill::zeros);
-            for(int j=0; j<nparms; j++){
-                // compute last column of Li * (dS_j) * Lit
-                arma::mat LidSLi4 = 
-                    solve( trimatl(cholmat), 
-                           dcovmat.slice(j) * choli2 );
+            // gradient objects
+            // LidSLi3 is last column of Li * (dS_j) * Lit for 1 parameter i
+            // LidSLi2 stores these columns in a matrix for all parameters
+            if(cond){ // if we condition on anything
                 
-                for(int k=0; k<rsize; k++){
-                    int i2 = whichresp(k);
-                    arma::span i1 = span(0,i2);
-                    arma::vec LidSLi3 = LidSLi4(i1,k); 
-                    // store LiX0.t() * LidSLi3 and Liy0.t() * LidSLi3
-                    arma::vec v1 = LiX0.rows(i1).t() * LidSLi3;
-                    double s1 = dot( Liy0(i1), LidSLi3 ); 
-                    // update all quantities
-                    // bottom-right corner gets double counted, so need to subtract it off
-                    (l_dXSX).slice(j) += v1 * LiX0.row(i2) + ( v1 * LiX0.row(i2) ).t() - 
-                        LidSLi3(i2) * LiX0.row(i2).t() * LiX0.row(i2);
-                    (l_dySy)(j) += 2.0 * s1 * Liy0(i2)  - 
-                        LidSLi3(i2) * Liy0(i2) * Liy0(i2);
-                    (l_dySX).col(j) += (  s1 * LiX0.row(i2) + ( v1 * Liy0(i2) ).t() -  
-                        LidSLi3(i2) * LiX0.row(i2) * Liy0(i2) ).t();
-                    (l_dlogdet)(j) += LidSLi3(i2);
-                    // store last column of Li * (dS_j) * Lit
-                    LidSLi2.subcube(i1, span(k,k), span(j,j)) = LidSLi3;
+                arma::cube LidSLi2 = arma::cube(bsize,rsize,nparms,fill::zeros);
+                for(int j=0; j<nparms; j++){
+                    // compute last column of Li * (dS_j) * Lit
+                    arma::mat LidSLi4 = 
+                        solve( trimatl(cholmat), 
+                               dcovmat.slice(j) * choli2 );
+                    
+                    for(int k=0; k<rsize; k++){
+                        int i2 = whichresp(k);
+                        arma::span i1 = span(0,i2);
+                        arma::vec LidSLi3 = LidSLi4(i1,k); 
+                        // store LiX0.t() * LidSLi3 and Liy0.t() * LidSLi3
+                        arma::vec v1 = LiX0.rows(i1).t() * LidSLi3;
+                        double s1 = dot( Liy0(i1), LidSLi3 ); 
+                        // update all quantities
+                        // bottom-right corner gets double counted, so need to subtract it off
+                        (l_dXSX).slice(j) += v1 * LiX0.row(i2) + ( v1 * LiX0.row(i2) ).t() - 
+                            LidSLi3(i2) * LiX0.row(i2).t() * LiX0.row(i2);
+                        (l_dySy)(j) += 2.0 * s1 * Liy0(i2)  - 
+                            LidSLi3(i2) * Liy0(i2) * Liy0(i2);
+                        (l_dySX).col(j) += (  s1 * LiX0.row(i2) + ( v1 * Liy0(i2) ).t() -  
+                            LidSLi3(i2) * LiX0.row(i2) * Liy0(i2) ).t();
+                        (l_dlogdet)(j) += LidSLi3(i2);
+                        // store last column of Li * (dS_j) * Lit
+                        LidSLi2.subcube(i1, span(k,k), span(j,j)) = LidSLi3;
+                    }
                 }
-            }
-            // fisher information object
-            // bottom right corner gets double counted, so subtract it off
-            for(int i=0; i<nparms; i++){ for(int j=0; j<i+1; j++){
-                (l_ainfo)(i,j) += accu( LidSLi2.slice(i) % LidSLi2.slice(j) );
-                for(int k=0; k<rsize; k++){
-                    int i2 = whichresp(k);
-                    (l_ainfo)(i,j) -= 0.5*LidSLi2(i2,k,j) * LidSLi2(i2,k,i);
+                // fisher information object
+                // bottom right corner gets double counted, so subtract it off
+                for(int i=0; i<nparms; i++){ for(int j=0; j<i+1; j++){
+                    (l_ainfo)(i,j) += accu( LidSLi2.slice(i) % LidSLi2.slice(j) );
+                    for(int k=0; k<rsize; k++){
+                        int i2 = whichresp(k);
+                        (l_ainfo)(i,j) -= 0.5*LidSLi2(i2,k,j) * LidSLi2(i2,k,i);
+                    }
+                }}
+            } else { // similar calculations, but for when there is no conditioning set
+                arma::cube LidSLi2(bsize,bsize,nparms);
+                for(int j=0; j<nparms; j++){
+                    arma::mat LidSLi = solve( trimatl(cholmat), dcovmat.slice(j) );
+                    LidSLi = solve( trimatl(cholmat), LidSLi.t() );
+                    (l_dXSX).slice(j) += LiX0.t() *  LidSLi * LiX0; 
+                    (l_dySy)(j) += as_scalar( Liy0.t() * LidSLi * Liy0 );
+                    (l_dySX).col(j) += ( ( Liy0.t() * LidSLi ) * LiX0 ).t();
+                    (l_dlogdet)(j) += trace( LidSLi );
+                    LidSLi2.slice(j) = LidSLi;
                 }
-            }}
-        } else { // similar calculations, but for when there is no conditioning set
-            arma::cube LidSLi2(bsize,bsize,nparms);
-            for(int j=0; j<nparms; j++){
-                arma::mat LidSLi = solve( trimatl(cholmat), dcovmat.slice(j) );
-                LidSLi = solve( trimatl(cholmat), LidSLi.t() );
-                (l_dXSX).slice(j) += LiX0.t() *  LidSLi * LiX0; 
-                (l_dySy)(j) += as_scalar( Liy0.t() * LidSLi * Liy0 );
-                (l_dySX).col(j) += ( ( Liy0.t() * LidSLi ) * LiX0 ).t();
-                (l_dlogdet)(j) += trace( LidSLi );
-                LidSLi2.slice(j) = LidSLi;
+                
+                // fisher information object
+                for(int i=0; i<nparms; i++){ for(int j=0; j<i+1; j++){
+                    (l_ainfo)(i,j) += 0.5*accu( LidSLi2.slice(i) % LidSLi2.slice(j) ); 
+                }}
             }
-            
-            // fisher information object
-            for(int i=0; i<nparms; i++){ for(int j=0; j<i+1; j++){
-                (l_ainfo)(i,j) += 0.5*accu( LidSLi2.slice(i) % LidSLi2.slice(j) ); 
-            }}
-        }
         }
     }
 #pragma omp critical
-    *XSX += l_XSX;
-    *ySX += l_ySX;
-    *ySy += l_ySy;
-    *logdet += l_logdet;
-    *dXSX += l_dXSX;
-    *dySX += l_dySX;
-    *dySy += l_dySy;
-    *dlogdet += l_dlogdet;
-    *ainfo += l_ainfo;
+    m_XSX += l_XSX;
+    m_ySX += l_ySX;
+    m_ySy += l_ySy;
+    m_logdet += l_logdet;
+    m_dXSX += l_dXSX;
+    m_dySX += l_dySX;
+    m_dySy += l_dySy;
+    m_dlogdet += l_dlogdet;
+    m_ainfo += l_ainfo;
 }
-}    
+*XSX = m_XSX;
+*ySX = m_ySX;
+*ySy = m_ySy;
+*logdet = m_logdet;
+*dXSX = m_dXSX;
+*dySX = m_dySX;
+*dySy = m_dySy;
+*dlogdet = m_dlogdet;
+*ainfo = m_ainfo;
 
-    
-    
+} 
+
+
 
 void synthesize(
-    NumericVector covparms, 
-    StringVector covfun_name,
-    const NumericMatrix locs, 
-    NumericMatrix NNarray,
-    NumericVector& y, 
-    NumericMatrix X,
-    NumericVector* ll, 
-    NumericVector* betahat,
-    NumericVector* grad,
-    NumericMatrix* info,
-    NumericMatrix* betainfo,
-    bool profbeta,
-    bool grad_info ){
-
+        NumericVector covparms, 
+        StringVector covfun_name,
+        const NumericMatrix locs, 
+        NumericMatrix NNarray,
+        NumericVector& y, 
+        NumericMatrix X,
+        NumericVector* ll, 
+        NumericVector* betahat,
+        NumericVector* grad,
+        NumericMatrix* info,
+        NumericMatrix* betainfo,
+        bool profbeta,
+        bool grad_info ){
+    
     // data dimensions
     int n = y.length();
     //int m = NNarray.ncol();
@@ -446,7 +483,7 @@ void synthesize(
     arma::vec dlogdet = arma::vec(nparms, fill::zeros);
     // fisher information
     arma::mat ainfo = arma::mat(nparms, nparms, fill::zeros);
-
+    
     // this is where the big computation happens
     // first convert Numeric- to arma
     arma::vec covparms_c = arma::vec(covparms.begin(),covparms.length());
@@ -460,70 +497,70 @@ void synthesize(
         &XSX, &ySX, &ySy, &logdet, &dXSX, &dySX, &dySy, &dlogdet, &ainfo,
         profbeta, grad_info
     );
-        
+    
     // synthesize everything and update loglik, grad, beta, betainfo, info
     
     // betahat and dbeta
     arma::vec abeta = arma::vec( p, fill::zeros );
     if(profbeta){ abeta = solve( XSX, ySX ); }
     for(int j=0; j<p; j++){ (*betahat)(j) = abeta(j); };
-
+    
     arma::mat dbeta = arma::mat(p,nparms, fill::zeros);
     if( profbeta && grad_info){
-    for(int j=0; j<nparms; j++){
-        dbeta.col(j) = solve( XSX, dySX.col(j) - dXSX.slice(j) * abeta );
-    }
+        for(int j=0; j<nparms; j++){
+            dbeta.col(j) = solve( XSX, dySX.col(j) - dXSX.slice(j) * abeta );
+        }
     }
     // get sigmahatsq
     double sig2 = ( ySy - 2.0*as_scalar( ySX.t() * abeta ) + 
-        as_scalar( abeta.t() * XSX * abeta ) )/n;
+                    as_scalar( abeta.t() * XSX * abeta ) )/n;
     // loglikelihood
     (*ll)(0) = -0.5*( n*std::log(2.0*M_PI) + logdet + n*sig2 ); 
     
     if(profbeta){
-    // betainfo
-    for(int i=0; i<p; i++){ for(int j=0; j<i+1; j++){
-        (*betainfo)(i,j) = XSX(i,j);
-        (*betainfo)(j,i) = XSX(j,i);
-    }}
+        // betainfo
+        for(int i=0; i<p; i++){ for(int j=0; j<i+1; j++){
+            (*betainfo)(i,j) = XSX(i,j);
+            (*betainfo)(j,i) = XSX(j,i);
+        }}
     }
-
+    
     if(grad_info){
-    // gradient
-    for(int j=0; j<nparms; j++){
-        (*grad)(j) = 0.0;
-        (*grad)(j) -= 0.5*dlogdet(j);
-        (*grad)(j) += 0.5*dySy(j);
-        (*grad)(j) -= 1.0*as_scalar( abeta.t() * dySX.col(j) );
-        (*grad)(j) += 1.0*as_scalar( ySX.t() * dbeta.col(j) );
-        (*grad)(j) += 0.5*as_scalar( abeta.t() * dXSX.slice(j) * abeta );
-        (*grad)(j) -= 1.0*as_scalar( abeta.t() * XSX * dbeta.col(j) );
+        // gradient
+        for(int j=0; j<nparms; j++){
+            (*grad)(j) = 0.0;
+            (*grad)(j) -= 0.5*dlogdet(j);
+            (*grad)(j) += 0.5*dySy(j);
+            (*grad)(j) -= 1.0*as_scalar( abeta.t() * dySX.col(j) );
+            (*grad)(j) += 1.0*as_scalar( ySX.t() * dbeta.col(j) );
+            (*grad)(j) += 0.5*as_scalar( abeta.t() * dXSX.slice(j) * abeta );
+            (*grad)(j) -= 1.0*as_scalar( abeta.t() * XSX * dbeta.col(j) );
+        }
+        // fisher information
+        for(int i=0; i<nparms; i++){ for(int j=0; j<i+1; j++){
+            (*info)(i,j) = ainfo(i,j);
+            (*info)(j,i) = (*info)(i,j);
+        }}
     }
-    // fisher information
-    for(int i=0; i<nparms; i++){ for(int j=0; j<i+1; j++){
-        (*info)(i,j) = ainfo(i,j);
-        (*info)(j,i) = (*info)(i,j);
-    }}
-    }
-
+    
 }
 
 
 void synthesize_grouped(
-    NumericVector covparms, 
-    StringVector covfun_name,
-    const NumericMatrix locs, 
-    List NNlist,
-    NumericVector& y, 
-    NumericMatrix X,
-    NumericVector* ll, 
-    NumericVector* betahat,
-    NumericVector* grad,
-    NumericMatrix* info,
-    NumericMatrix* betainfo,
-    bool profbeta,
-    bool grad_info){
-
+        NumericVector covparms, 
+        StringVector covfun_name,
+        const NumericMatrix locs, 
+        List NNlist,
+        NumericVector& y, 
+        NumericMatrix X,
+        NumericVector* ll, 
+        NumericVector* betahat,
+        NumericVector* grad,
+        NumericMatrix* info,
+        NumericMatrix* betainfo,
+        bool profbeta,
+        bool grad_info){
+    
     // data dimensions
     int n = y.length();
     //int m = NNarray.ncol();
@@ -561,8 +598,8 @@ void synthesize_grouped(
         profbeta, grad_info
     );
     
-        
-        
+    
+    
     // synthesize everything and update loglik, grad, beta, betainfo, info
     
     // betahat and dbeta
@@ -572,40 +609,40 @@ void synthesize_grouped(
     
     arma::mat dbeta(p,nparms);
     if(profbeta && grad_info){
-    for(int j=0; j<nparms; j++){
-        dbeta.col(j) = solve( XSX, dySX.col(j) - dXSX.slice(j) * abeta );
-    }
+        for(int j=0; j<nparms; j++){
+            dbeta.col(j) = solve( XSX, dySX.col(j) - dXSX.slice(j) * abeta );
+        }
     }
     // get sigmahatsq
     double sig2 = ( ySy - 2.0*as_scalar( ySX.t() * abeta ) + 
-        as_scalar( abeta.t() * XSX * abeta ) )/n;
+                    as_scalar( abeta.t() * XSX * abeta ) )/n;
     // loglikelihood
     (*ll)(0) = -0.5*( n*std::log(2.0*M_PI) + logdet + n*sig2 ); 
     
     if(profbeta){    
-    // betainfo
-    for(int i=0; i<p; i++){ for(int j=0; j<i+1; j++){
-        (*betainfo)(i,j) = XSX(i,j);
-        (*betainfo)(j,i) = XSX(j,i);
-    }}
+        // betainfo
+        for(int i=0; i<p; i++){ for(int j=0; j<i+1; j++){
+            (*betainfo)(i,j) = XSX(i,j);
+            (*betainfo)(j,i) = XSX(j,i);
+        }}
     }
     
     if(grad_info){
-    // gradient
-    for(int j=0; j<nparms; j++){
-        (*grad)(j) = 0.0;
-        (*grad)(j) -= 0.5*dlogdet(j);
-        (*grad)(j) += 0.5*dySy(j);
-        (*grad)(j) -= 1.0*as_scalar( abeta.t() * dySX.col(j) );
-        (*grad)(j) += 1.0*as_scalar( ySX.t() * dbeta.col(j) );
-        (*grad)(j) += 0.5*as_scalar( abeta.t() * dXSX.slice(j) * abeta );
-        (*grad)(j) -= 1.0*as_scalar( abeta.t() * XSX * dbeta.col(j) );
-    }
-    // fisher information
-    for(int i=0; i<nparms; i++){ for(int j=0; j<i+1; j++){
-        (*info)(i,j) = ainfo(i,j);
-        (*info)(j,i) = (*info)(i,j);
-    }}
+        // gradient
+        for(int j=0; j<nparms; j++){
+            (*grad)(j) = 0.0;
+            (*grad)(j) -= 0.5*dlogdet(j);
+            (*grad)(j) += 0.5*dySy(j);
+            (*grad)(j) -= 1.0*as_scalar( abeta.t() * dySX.col(j) );
+            (*grad)(j) += 1.0*as_scalar( ySX.t() * dbeta.col(j) );
+            (*grad)(j) += 0.5*as_scalar( abeta.t() * dXSX.slice(j) * abeta );
+            (*grad)(j) -= 1.0*as_scalar( abeta.t() * XSX * dbeta.col(j) );
+        }
+        // fisher information
+        for(int i=0; i<nparms; i++){ for(int j=0; j<i+1; j++){
+            (*info)(i,j) = ainfo(i,j);
+            (*info)(j,i) = (*info)(i,j);
+        }}
     }
 }
 
@@ -633,11 +670,11 @@ void synthesize_grouped(
 //' @export
 // [[Rcpp::export]]
 NumericMatrix vecchia_Linv(
-    arma::vec covparms,
-    StringVector covfun_name,
-    arma::mat locs,
-    arma::mat NNarray, 
-    int start_ind = 1){
+        arma::vec covparms,
+        StringVector covfun_name,
+        arma::mat locs,
+        arma::mat NNarray, 
+        int start_ind = 1){
     
     // data dimensions
     int n = locs.n_rows;
@@ -654,13 +691,13 @@ NumericMatrix vecchia_Linv(
     covfun_t covstruct = get_covfun(covfun_name_string);
     mat (*p_covfun)(arma::vec, arma::mat) = covstruct.p_covfun;
     //cube (*p_d_covfun)(NumericVector, NumericMatrix) = covstruct.p_d_covfun;
-
+    
     // loop over every observation    
     for(int i=start_ind-1; i<n; i++){
-    
+        
         Rcpp::checkUserInterrupt();
         int bsize = std::min(i+1,m);
-
+        
         // first, fill in ysub, locsub, and X0 in reverse order
         arma::mat locsub(bsize, dim);
         for(int j=bsize-1; j>=0; j--){
@@ -692,4 +729,5 @@ NumericMatrix vecchia_Linv(
 
 
 #endif
-    
+
+
