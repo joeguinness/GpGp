@@ -1,7 +1,6 @@
 #ifndef ONEPASS_H
 #define ONEPASS_H
 
-
 #ifdef _OPENMP
 #include <omp.h>
 #endif
@@ -13,6 +12,7 @@
 
 using namespace Rcpp;
 using namespace arma;
+
 
 void compute_pieces(
         arma::vec covparms, 
@@ -50,16 +50,6 @@ void compute_pieces(
     mat (*p_covfun)(arma::vec, arma::mat) = covstruct.p_covfun;
     cube (*p_d_covfun)(arma::vec, arma::mat) = covstruct.p_d_covfun;
     
-    
-    arma::mat m_XSX=arma::mat(p, p, fill::zeros);
-    arma::vec m_ySX=arma::vec(p, fill::zeros);
-    double m_ySy=0.0;
-    double m_logdet=0.0;
-    arma::cube m_dXSX= arma::cube(p,p,nparms,fill::zeros);
-    arma::mat m_dySX=arma::mat(p, nparms, fill::zeros);
-    arma::vec m_dySy=  arma::vec(nparms, fill::zeros);
-    arma::vec m_dlogdet=arma::vec(nparms, fill::zeros);
-    arma::mat m_ainfo =arma::mat(nparms, nparms, fill::zeros);
 #pragma omp parallel
 {
     arma::mat l_XSX=arma::mat(p, p, fill::zeros);
@@ -187,27 +177,20 @@ void compute_pieces(
         
     }
 #pragma omp critical
-    m_XSX += l_XSX;
-    m_ySX += l_ySX;
-    m_ySy += l_ySy;
-    m_logdet += l_logdet;
-    m_dXSX += l_dXSX;
-    m_dySX += l_dySX;
-    m_dySy += l_dySy;
-    m_dlogdet += l_dlogdet;
-    m_ainfo += l_ainfo;
+{
+    *XSX += l_XSX;
+    *ySX += l_ySX;
+    *ySy += l_ySy;
+    *logdet += l_logdet;
+    *dXSX += l_dXSX;
+    *dySX += l_dySX;
+    *dySy += l_dySy;
+    *dlogdet += l_dlogdet;
+    *ainfo += l_ainfo;
 }
-*XSX = m_XSX;
-*ySX = m_ySX;
-*ySy = m_ySy;
-*logdet = m_logdet;
-*dXSX = m_dXSX;
-*dySX = m_dySX;
-*dySy = m_dySy;
-*dlogdet = m_dlogdet;
-*ainfo = m_ainfo;
+}
+}    
 
-}  
 
 
 
@@ -265,15 +248,6 @@ void compute_pieces_grouped(
     int nb = last_ind_of_block.n_elem;  // number of blocks
     
     
-    arma::mat m_XSX=arma::mat(p, p, fill::zeros);
-    arma::vec m_ySX=arma::vec(p, fill::zeros);
-    double m_ySy=0.0;
-    double m_logdet=0.0;
-    arma::cube m_dXSX= arma::cube(p,p,nparms,fill::zeros);
-    arma::mat m_dySX=arma::mat(p, nparms, fill::zeros);
-    arma::vec m_dySy=  arma::vec(nparms, fill::zeros);
-    arma::vec m_dlogdet=arma::vec(nparms, fill::zeros);
-    arma::mat m_ainfo =arma::mat(nparms, nparms, fill::zeros);
 #pragma omp parallel
 {
     arma::mat l_XSX=arma::mat(p, p, fill::zeros);
@@ -286,7 +260,7 @@ void compute_pieces_grouped(
     arma::vec l_dlogdet=arma::vec(nparms, fill::zeros);
     arma::mat l_ainfo =arma::mat(nparms, nparms, fill::zeros);
     
-    // loop over every observation    
+    // loop over every block    
 #pragma omp for
     for(int i=0; i<nb; i++){
         
@@ -424,27 +398,20 @@ void compute_pieces_grouped(
         }
     }
 #pragma omp critical
-    m_XSX += l_XSX;
-    m_ySX += l_ySX;
-    m_ySy += l_ySy;
-    m_logdet += l_logdet;
-    m_dXSX += l_dXSX;
-    m_dySX += l_dySX;
-    m_dySy += l_dySy;
-    m_dlogdet += l_dlogdet;
-    m_ainfo += l_ainfo;
+{
+    *XSX += l_XSX;
+    *ySX += l_ySX;
+    *ySy += l_ySy;
+    *logdet += l_logdet;
+    *dXSX += l_dXSX;
+    *dySX += l_dySX;
+    *dySy += l_dySy;
+    *dlogdet += l_dlogdet;
+    *ainfo += l_ainfo;
 }
-*XSX = m_XSX;
-*ySX = m_ySX;
-*ySy = m_ySy;
-*logdet = m_logdet;
-*dXSX = m_dXSX;
-*dySX = m_dySX;
-*dySy = m_dySy;
-*dlogdet = m_dlogdet;
-*ainfo = m_ainfo;
+}
+}
 
-} 
 
 
 
@@ -729,5 +696,3 @@ NumericMatrix vecchia_Linv(
 
 
 #endif
-
-
