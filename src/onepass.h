@@ -1,6 +1,10 @@
 #ifndef ONEPASS_H
 #define ONEPASS_H
 
+#ifdef _OPENMP
+#include <omp.h>
+#endif
+
 #include <RcppArmadillo.h>
 #include "covmatrix_funs.h"
 
@@ -46,10 +50,22 @@ void compute_pieces(
     mat (*p_covfun)(arma::vec, arma::mat) = covstruct.p_covfun;
     cube (*p_d_covfun)(arma::vec, arma::mat) = covstruct.p_d_covfun;
     
+#pragma omp parallel
+{
+    arma::mat l_XSX=arma::mat(p, p, fill::zeros);
+    arma::vec l_ySX=arma::vec(p, fill::zeros);
+    double l_ySy=0.0;
+    double l_logdet=0.0;
+    arma::cube l_dXSX= arma::cube(p,p,nparms,fill::zeros);
+    arma::mat l_dySX=arma::mat(p, nparms, fill::zeros);
+    arma::vec l_dySy=  arma::vec(nparms, fill::zeros);
+    arma::vec l_dlogdet=arma::vec(nparms, fill::zeros);
+    arma::mat l_ainfo =arma::mat(nparms, nparms, fill::zeros);
+
     // loop over every observation    
+#pragma omp for
     for(int i=0; i<n; i++){
     
-        Rcpp::checkUserInterrupt();
         int bsize = std::min(i+1,m);
 
         // first, fill in ysub, locsub, and X0 in reverse order
@@ -96,11 +112,11 @@ void compute_pieces(
         arma::vec Liy0 = solve( trimatl(cholmat), ysub );
         
         // loglik objects
-        *logdet += 2.0*std::log( as_scalar(cholmat(i2,i2)) ); 
-        *ySy +=    pow( as_scalar(Liy0(i2)), 2 );
+        l_logdet += 2.0*std::log( as_scalar(cholmat(i2,i2)) ); 
+        l_ySy +=    pow( as_scalar(Liy0(i2)), 2 );
         if(profbeta){
-            *XSX +=   LiX0.rows(i2).t() * LiX0.rows(i2);
-            *ySX += ( Liy0(i2) * LiX0.rows(i2) ).t();
+            l_XSX +=   LiX0.rows(i2).t() * LiX0.rows(i2);
+            l_ySX += ( Liy0(i2) * LiX0.rows(i2) ).t();
         }
         
         if( grad_info ){
@@ -119,13 +135,13 @@ void compute_pieces(
                 double s1 = as_scalar( Liy0.t() * LidSLi3 ); 
                 // update all quantities
                 // bottom-right corner gets double counted, so need to subtract it off
-                (*dXSX).slice(j) += v1 * LiX0.rows(i2) + ( v1 * LiX0.rows(i2) ).t() - 
+                (l_dXSX).slice(j) += v1 * LiX0.rows(i2) + ( v1 * LiX0.rows(i2) ).t() - 
                     as_scalar(LidSLi3(i2)) * ( LiX0.rows(i2).t() * LiX0.rows(i2) );
-                (*dySy)(j) += as_scalar( 2.0 * s1 * Liy0(i2)  - 
+                (l_dySy)(j) += as_scalar( 2.0 * s1 * Liy0(i2)  - 
                     LidSLi3(i2) * Liy0(i2) * Liy0(i2) );
-                (*dySX).col(j) += (  s1 * LiX0.rows(i2) + ( v1 * Liy0(i2) ).t() -  
+                (l_dySX).col(j) += (  s1 * LiX0.rows(i2) + ( v1 * Liy0(i2) ).t() -  
                     as_scalar( LidSLi3(i2) ) * LiX0.rows(i2) * as_scalar( Liy0(i2))).t();
-                (*dlogdet)(j) += as_scalar( LidSLi3(i2) );
+                (l_dlogdet)(j) += as_scalar( LidSLi3(i2) );
                 // store last column of Li * (dS_j) * Lit
                 LidSLi2.col(j) = LidSLi3;
             }
@@ -133,7 +149,7 @@ void compute_pieces(
             // fisher information object
             // bottom right corner gets double counted, so subtract it off
             for(int i=0; i<nparms; i++){ for(int j=0; j<i+1; j++){
-                (*ainfo)(i,j) += 
+                (l_ainfo)(i,j) += 
                     1.0*accu( LidSLi2.col(i) % LidSLi2.col(j) ) - 
                     0.5*accu( LidSLi2.rows(i2).col(j) %
                               LidSLi2.rows(i2).col(i) );
@@ -143,16 +159,16 @@ void compute_pieces(
             for(int j=0; j<nparms; j++){
                 arma::mat LidSLi = solve( trimatl(cholmat), dcovmat.slice(j) );
                 LidSLi = solve( trimatl(cholmat), LidSLi.t() );
-                (*dXSX).slice(j) += LiX0.t() *  LidSLi * LiX0; 
-                (*dySy)(j) += as_scalar( Liy0.t() * LidSLi * Liy0 );
-                (*dySX).col(j) += ( ( Liy0.t() * LidSLi ) * LiX0 ).t();
-                (*dlogdet)(j) += trace( LidSLi );
+                (l_dXSX).slice(j) += LiX0.t() *  LidSLi * LiX0; 
+                (l_dySy)(j) += as_scalar( Liy0.t() * LidSLi * Liy0 );
+                (l_dySX).col(j) += ( ( Liy0.t() * LidSLi ) * LiX0 ).t();
+                (l_dlogdet)(j) += trace( LidSLi );
                 LidSLi2.col(j) = LidSLi;
             }
             
             // fisher information object
             for(int i=0; i<nparms; i++){ for(int j=0; j<i+1; j++){
-                (*ainfo)(i,j) += 0.5*accu( LidSLi2.col(i) % LidSLi2.col(j) ); 
+                (l_ainfo)(i,j) += 0.5*accu( LidSLi2.col(i) % LidSLi2.col(j) ); 
             }}
 
         }
@@ -160,6 +176,19 @@ void compute_pieces(
         }
 
     }
+#pragma omp critical
+{
+    *XSX += l_XSX;
+    *ySX += l_ySX;
+    *ySy += l_ySy;
+    *logdet += l_logdet;
+    *dXSX += l_dXSX;
+    *dySX += l_dySX;
+    *dySy += l_dySy;
+    *dlogdet += l_dlogdet;
+    *ainfo += l_ainfo;
+}
+}
 }    
 
     
@@ -218,12 +247,23 @@ void compute_pieces_grouped(
 
     int nb = last_ind_of_block.n_elem;  // number of blocks
 
-
+#pragma omp parallel
+{
+    arma::mat l_XSX=arma::mat(p, p, fill::zeros);
+    arma::vec l_ySX=arma::vec(p, fill::zeros);
+    double l_ySy=0.0;
+    double l_logdet=0.0;
+    arma::cube l_dXSX= arma::cube(p,p,nparms,fill::zeros);
+    arma::mat l_dySX=arma::mat(p, nparms, fill::zeros);
+    arma::vec l_dySy=  arma::vec(nparms, fill::zeros);
+    arma::vec l_dlogdet=arma::vec(nparms, fill::zeros);
+    arma::mat l_ainfo =arma::mat(nparms, nparms, fill::zeros);
+    
+#pragma omp for
     // loop over every block
     for(int i=0; i<nb; i++){
 
-        Rcpp::checkUserInterrupt();
-        
+
         // first ind and last ind are the positions in all_inds
         // of the observations for block i.
         // these come in 1-indexing and are converted to 0-indexing here
@@ -287,11 +327,11 @@ void compute_pieces_grouped(
         // loglik objects
         for(int j=0; j<rsize; j++){
             int ii = whichresp(j);
-            *logdet += 2.0*std::log( as_scalar(cholmat(ii,ii)) ); 
-            *ySy +=    pow( as_scalar(Liy0(ii)), 2 );
+            l_logdet += 2.0*std::log( as_scalar(cholmat(ii,ii)) ); 
+            l_ySy +=    pow( as_scalar(Liy0(ii)), 2 );
             if(profbeta){
-                *XSX +=    LiX0.row(ii).t() * LiX0.row(ii);
-                *ySX += ( Liy0(ii) * LiX0.row(ii) ).t();
+                l_XSX +=    LiX0.row(ii).t() * LiX0.row(ii);
+                l_ySX += ( Liy0(ii) * LiX0.row(ii) ).t();
             }
         }    
         
@@ -317,13 +357,13 @@ void compute_pieces_grouped(
                     double s1 = dot( Liy0(i1), LidSLi3 ); 
                     // update all quantities
                     // bottom-right corner gets double counted, so need to subtract it off
-                    (*dXSX).slice(j) += v1 * LiX0.row(i2) + ( v1 * LiX0.row(i2) ).t() - 
+                    (l_dXSX).slice(j) += v1 * LiX0.row(i2) + ( v1 * LiX0.row(i2) ).t() - 
                         LidSLi3(i2) * LiX0.row(i2).t() * LiX0.row(i2);
-                    (*dySy)(j) += 2.0 * s1 * Liy0(i2)  - 
+                    (l_dySy)(j) += 2.0 * s1 * Liy0(i2)  - 
                         LidSLi3(i2) * Liy0(i2) * Liy0(i2);
-                    (*dySX).col(j) += (  s1 * LiX0.row(i2) + ( v1 * Liy0(i2) ).t() -  
+                    (l_dySX).col(j) += (  s1 * LiX0.row(i2) + ( v1 * Liy0(i2) ).t() -  
                         LidSLi3(i2) * LiX0.row(i2) * Liy0(i2) ).t();
-                    (*dlogdet)(j) += LidSLi3(i2);
+                    (l_dlogdet)(j) += LidSLi3(i2);
                     // store last column of Li * (dS_j) * Lit
                     LidSLi2.subcube(i1, span(k,k), span(j,j)) = LidSLi3;
                 }
@@ -331,10 +371,10 @@ void compute_pieces_grouped(
             // fisher information object
             // bottom right corner gets double counted, so subtract it off
             for(int i=0; i<nparms; i++){ for(int j=0; j<i+1; j++){
-                (*ainfo)(i,j) += accu( LidSLi2.slice(i) % LidSLi2.slice(j) );
+                (l_ainfo)(i,j) += accu( LidSLi2.slice(i) % LidSLi2.slice(j) );
                 for(int k=0; k<rsize; k++){
                     int i2 = whichresp(k);
-                    (*ainfo)(i,j) -= 0.5*LidSLi2(i2,k,j) * LidSLi2(i2,k,i);
+                    (l_ainfo)(i,j) -= 0.5*LidSLi2(i2,k,j) * LidSLi2(i2,k,i);
                 }
             }}
         } else { // similar calculations, but for when there is no conditioning set
@@ -342,20 +382,33 @@ void compute_pieces_grouped(
             for(int j=0; j<nparms; j++){
                 arma::mat LidSLi = solve( trimatl(cholmat), dcovmat.slice(j) );
                 LidSLi = solve( trimatl(cholmat), LidSLi.t() );
-                (*dXSX).slice(j) += LiX0.t() *  LidSLi * LiX0; 
-                (*dySy)(j) += as_scalar( Liy0.t() * LidSLi * Liy0 );
-                (*dySX).col(j) += ( ( Liy0.t() * LidSLi ) * LiX0 ).t();
-                (*dlogdet)(j) += trace( LidSLi );
+                (l_dXSX).slice(j) += LiX0.t() *  LidSLi * LiX0; 
+                (l_dySy)(j) += as_scalar( Liy0.t() * LidSLi * Liy0 );
+                (l_dySX).col(j) += ( ( Liy0.t() * LidSLi ) * LiX0 ).t();
+                (l_dlogdet)(j) += trace( LidSLi );
                 LidSLi2.slice(j) = LidSLi;
             }
             
             // fisher information object
             for(int i=0; i<nparms; i++){ for(int j=0; j<i+1; j++){
-                (*ainfo)(i,j) += 0.5*accu( LidSLi2.slice(i) % LidSLi2.slice(j) ); 
+                (l_ainfo)(i,j) += 0.5*accu( LidSLi2.slice(i) % LidSLi2.slice(j) ); 
             }}
         }
         }
     }
+#pragma omp critical
+{
+    *XSX += l_XSX;
+    *ySX += l_ySX;
+    *ySy += l_ySy;
+    *logdet += l_logdet;
+    *dXSX += l_dXSX;
+    *dySX += l_dySX;
+    *dySy += l_dySy;
+    *dlogdet += l_dlogdet;
+    *ainfo += l_ainfo;
+}   
+}
 }    
 
     
