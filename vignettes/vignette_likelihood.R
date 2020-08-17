@@ -1,8 +1,9 @@
 # a short vignette demonstrating how to use the functions
 # library("GpGp")
+devtools::load_all("..")
 
 # grid size for data locations
-gsize <- 70
+gsize <- 100
 nvec <- c(gsize,gsize)
 n <- prod(nvec)
 
@@ -16,7 +17,7 @@ locs <- as.matrix(expand.grid(x1,x2))
 covparms <- c(variance = 4, range = 0.1, smoothness = 0.5, nugget = 0.1)
 
 # simulate some data
-y <- fast_Gp_sim(covparms, "exponential_isotropic",locs,20)
+y <- fast_Gp_sim(covparms[c(1,2,4)], "exponential_isotropic",locs,20)
 
 # generate an ordering
 ord <- order_maxmin(locs)
@@ -40,18 +41,33 @@ X <- matrix( rep(1,n), n, 1 )
 Xord <- X[ord,,drop=FALSE]
 
 # get ungrouped and grouped likelihood
+#devtools::load_all("..")
+
+{
 ii <- c(1,2,4)
-system.time(ll1 <- vecchia_meanzero_loglik(covparms[ii],"exponential_isotropic",yord,locsord,NNarray))
-system.time(
-  ll2 <- vecchia_profbeta_loglik(covparms[ii],"exponential_isotropic",yord,Xord,locsord,NNarray))
-system.time( ll3 <-
-               vecchia_profbeta_loglik_grad_info(covparms[ii],"exponential_isotropic",yord,Xord,locsord,NNarray))
+print( system.time( ll1 <- vecchia_meanzero_loglik(
+    covparms[ii],"exponential_isotropic",yord,locsord,NNarray)))
+#print( system.time( ll2 <- vecchia_profbeta_loglik(
+#    covparms[ii],"exponential_isotropic",yord,Xord,locsord,NNarray)))
+#print( system.time( ll3 <- vecchia_profbeta_loglik_grad_info(
+#    covparms[ii],"exponential_isotropic",yord,Xord,locsord,NNarray)))
+print( system.time( ll4 <- vecchia_meanzero_loglik(
+    covparms[ii],"exponential_isotropic_fast",yord,locsord,NNarray)))
+#print( system.time( ll5 <- vecchia_profbeta_loglik(
+#    covparms[ii],"exponential_isotropic_fast",yord,Xord,locsord,NNarray)))
+#print( system.time( ll6 <- vecchia_profbeta_loglik_grad_info(
+#    covparms[ii],"exponential_isotropic_fast",yord,Xord,locsord,NNarray)))
+}
+print(ll1)
+print(ll4)
 
-
-
-system.time( ll1 <- vecchia_grouped_meanzero_loglik(covparms[c(1,2,4)],"exponential_isotropic",yord,locsord,NNlist ) )
-system.time( ll2 <- vecchia_grouped_profbeta_loglik(covparms[c(1,2,4)],"exponential_isotropic",yord,Xord,locsord,NNlist ) )
-system.time( ll3 <- vecchia_grouped_profbeta_loglik_grad_info(covparms[c(1,2,4)],"exponential_isotropic",yord,Xord,locsord,NNlist ) )
+if( FALSE ){
+system.time( ll1 <- vecchia_grouped_meanzero_loglik(
+    covparms[c(1,2,4)],"exponential_isotropic",yord,locsord,NNlist ) )
+system.time( ll2 <- vecchia_grouped_profbeta_loglik(
+    covparms[c(1,2,4)],"exponential_isotropic",yord,Xord,locsord,NNlist ) )
+system.time( ll3 <- vecchia_grouped_profbeta_loglik_grad_info(
+    covparms[c(1,2,4)],"exponential_isotropic",yord,Xord,locsord,NNlist ) )
 
 # get entries of L^{-1}
 system.time( Linv1 <- vecchia_Linv(covparms[c(1,2,4)], "exponential_isotropic", locsord, NNarray) )
@@ -67,7 +83,4 @@ gpfit <- fit_model( y = y, locs = locs, X = X, "exponential_isotropic",
 )
 print(proc.time() - t1)
 
-
-
-
-
+}

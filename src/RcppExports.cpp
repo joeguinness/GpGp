@@ -42,6 +42,30 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// exponential_isotropic_fast
+arma::mat exponential_isotropic_fast(arma::vec covparms, arma::mat locs);
+RcppExport SEXP _GpGp_exponential_isotropic_fast(SEXP covparmsSEXP, SEXP locsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec >::type covparms(covparmsSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type locs(locsSEXP);
+    rcpp_result_gen = Rcpp::wrap(exponential_isotropic_fast(covparms, locs));
+    return rcpp_result_gen;
+END_RCPP
+}
+// d_exponential_isotropic_fast
+arma::cube d_exponential_isotropic_fast(arma::vec covparms, arma::mat locs);
+RcppExport SEXP _GpGp_d_exponential_isotropic_fast(SEXP covparmsSEXP, SEXP locsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec >::type covparms(covparmsSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type locs(locsSEXP);
+    rcpp_result_gen = Rcpp::wrap(d_exponential_isotropic_fast(covparms, locs));
+    return rcpp_result_gen;
+END_RCPP
+}
 // matern_isotropic
 arma::mat matern_isotropic(arma::vec covparms, arma::mat locs);
 RcppExport SEXP _GpGp_matern_isotropic(SEXP covparmsSEXP, SEXP locsSEXP) {
@@ -856,6 +880,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_GpGp_sph_grad_xyz", (DL_FUNC) &_GpGp_sph_grad_xyz, 2},
     {"_GpGp_exponential_isotropic", (DL_FUNC) &_GpGp_exponential_isotropic, 2},
     {"_GpGp_d_exponential_isotropic", (DL_FUNC) &_GpGp_d_exponential_isotropic, 2},
+    {"_GpGp_exponential_isotropic_fast", (DL_FUNC) &_GpGp_exponential_isotropic_fast, 2},
+    {"_GpGp_d_exponential_isotropic_fast", (DL_FUNC) &_GpGp_d_exponential_isotropic_fast, 2},
     {"_GpGp_matern_isotropic", (DL_FUNC) &_GpGp_matern_isotropic, 2},
     {"_GpGp_d_matern_isotropic", (DL_FUNC) &_GpGp_d_matern_isotropic, 2},
     {"_GpGp_matern15_isotropic", (DL_FUNC) &_GpGp_matern15_isotropic, 2},

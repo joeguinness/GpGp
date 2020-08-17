@@ -120,6 +120,7 @@ fit_model <- function(y, locs, X = NULL, covfun_name = "matern_isotropic",
     if( ! covfun_name %in%
             c("exponential_isotropic",
               "matern_isotropic",
+              "exponential_isotropic_fast",
               "matern15_isotropic",
               "matern25_isotropic",
               "matern35_isotropic",
@@ -357,7 +358,7 @@ get_start_parms <- function(y,X,locs,covfun_name){
     randinds <- sample(1:n, min(n,200))
     dmat <- fields::rdist(locs[randinds,])
 
-    if(covfun_name == "exponential_isotropic"){
+    if(covfun_name %in% c("exponential_isotropic","exponential_isotropic_fast")){
         start_range <- mean( dmat )/4
         start_parms <- c(start_var, start_range, start_nug)
     }
@@ -662,7 +663,7 @@ get_penalty <- function(y,X,locs,covfun_name){
         return(ddpen)
     }
 
-    if(covfun_name == "exponential_isotropic"){
+    if(covfun_name %in% c("exponential_isotropic","exponential_isotropic_fast")){
           pen <- function(x){  pen_nug(x,3) +   pen_var(x,1)   }
          dpen <- function(x){  dpen_nug(x,3) +  dpen_var(x,1)  }
         ddpen <- function(x){  ddpen_nug(x,3) + ddpen_var(x,1) }

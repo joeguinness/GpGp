@@ -113,7 +113,90 @@ arma::cube d_exponential_isotropic(arma::vec covparms, arma::mat locs ){
 }
 
 
+// [[Rcpp::export]]
+arma::mat exponential_isotropic_fast(arma::vec covparms, arma::mat locs ){
 
+    int dim = locs.n_cols;
+    int n = locs.n_rows;
+    double nugget = covparms( 0 )*covparms( 2 );
+    // create scaled locations
+    mat locs_scaled(n,dim);
+    for(int j=0; j<dim; j++){ 
+        for(int i=0; i<n; i++){
+            locs_scaled(i,j) = locs(i,j)/covparms(1);
+        }
+    }
+    // calculate covariances
+    arma::mat covmat(n,n);
+    arma::mat distmat(n,n, fill::zeros);
+
+    // loop over first dim-1 dimensions
+    if( dim > 1 ){
+    for(int j=0; j<dim; j++){
+        for(int i1=0; i1<n; i1++){ for(int i2=0; i2<=i1; i2++){
+        //for(int i1=0; i1<n; i1++){ for(int i2=0; i2<n; i2++){
+            distmat(i2,i1) += pow( locs_scaled(i1,j) - locs_scaled(i2,j), 2.0 );
+	}}	
+    }}
+    distmat = sqrt(distmat);
+				
+    //for(int i1=0; i1<n; i1++){ for(int i2=0; i2<=i1; i2++){
+    for(int i1=0; i1<n; i1++){ for(int i2=0; i2<n; i2++){
+
+        // calculate contribution to distance from last dimension
+        //distmat(i2,i1) += pow( locs_scaled(i1,dim-1) - locs_scaled(i2,dim-1), 2.0 );
+	//distmat(i2,i1) = pow( distmat(i2,i1), 0.5 );
+	
+        if( distmat(i2,i1) == 0.0 ){
+            covmat(i2,i1) = covparms(0);
+        } else {
+            covmat(i2,i1) = covparms(0)*std::exp( -distmat(i2,i1) );
+        }
+        // add nugget
+        if( i1 == i2 ){ covmat(i2,i2) += nugget; } 
+        // fill in opposite entry
+	covmat(i1,i2) = covmat(i2,i1);
+
+    }}
+    return covmat;
+}
+
+// [[Rcpp::export]]
+arma::cube d_exponential_isotropic_fast(arma::vec covparms, arma::mat locs ){
+
+    int dim = locs.n_cols;
+    int n = locs.n_rows;
+    //double nugget = covparms( 0 )*covparms( 2 );
+    // create scaled locations
+    mat locs_scaled(n,dim);
+    for(int j=0; j<dim; j++){ 
+        for(int i=0; i<n; i++){
+            locs_scaled(i,j) = locs(i,j)/covparms(1);
+        }
+    }
+    // calculate derivatives
+    arma::cube dcovmat = arma::cube(n,n,covparms.n_elem, fill::zeros);
+    for(int i1=0; i1<n; i1++){ for(int i2=0; i2<=i1; i2++){
+        double d = 0.0;
+        for(int j=0; j<dim; j++){
+            d += pow( locs_scaled(i1,j) - locs_scaled(i2,j), 2.0 );
+        }
+        d = pow( d, 0.5 );
+        
+        dcovmat(i1,i2,0) += std::exp(-d);
+        dcovmat(i1,i2,1) += covparms(0)*std::exp(-d)*d/covparms(1);
+        if( i1 == i2 ){ // update diagonal entry
+            dcovmat(i1,i2,0) += covparms(2);
+            dcovmat(i1,i2,2) += covparms(0); 
+        } else { // fill in opposite entry
+            for(int j=0; j<covparms.n_elem; j++){
+                dcovmat(i2,i1,j) = dcovmat(i1,i2,j);
+            }
+        }
+    }}
+
+    return dcovmat;
+}
 
 //' Isotropic Matern covariance function
 //'

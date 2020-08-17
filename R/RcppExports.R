@@ -38,6 +38,14 @@ d_exponential_isotropic <- function(covparms, locs) {
     .Call('_GpGp_d_exponential_isotropic', PACKAGE = 'GpGp', covparms, locs)
 }
 
+exponential_isotropic_fast <- function(covparms, locs) {
+    .Call('_GpGp_exponential_isotropic_fast', PACKAGE = 'GpGp', covparms, locs)
+}
+
+d_exponential_isotropic_fast <- function(covparms, locs) {
+    .Call('_GpGp_d_exponential_isotropic_fast', PACKAGE = 'GpGp', covparms, locs)
+}
+
 #' Isotropic Matern covariance function
 #'
 #' From a matrix of locations and covariance parameters of the form
