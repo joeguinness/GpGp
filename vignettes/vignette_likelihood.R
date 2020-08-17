@@ -3,7 +3,7 @@
 devtools::load_all("..")
 
 # grid size for data locations
-gsize <- 100
+gsize <- 70
 nvec <- c(gsize,gsize)
 n <- prod(nvec)
 
@@ -47,16 +47,16 @@ Xord <- X[ord,,drop=FALSE]
 ii <- c(1,2,4)
 print( system.time( ll1 <- vecchia_meanzero_loglik(
     covparms[ii],"exponential_isotropic",yord,locsord,NNarray)))
-#print( system.time( ll2 <- vecchia_profbeta_loglik(
-#    covparms[ii],"exponential_isotropic",yord,Xord,locsord,NNarray)))
-#print( system.time( ll3 <- vecchia_profbeta_loglik_grad_info(
-#    covparms[ii],"exponential_isotropic",yord,Xord,locsord,NNarray)))
+print( system.time( ll2 <- vecchia_profbeta_loglik(
+    covparms[ii],"exponential_isotropic",yord,Xord,locsord,NNarray)))
+print( system.time( ll3 <- vecchia_profbeta_loglik_grad_info(
+    covparms[ii],"exponential_isotropic",yord,Xord,locsord,NNarray)))
 print( system.time( ll4 <- vecchia_meanzero_loglik(
     covparms[ii],"exponential_isotropic_fast",yord,locsord,NNarray)))
-#print( system.time( ll5 <- vecchia_profbeta_loglik(
-#    covparms[ii],"exponential_isotropic_fast",yord,Xord,locsord,NNarray)))
-#print( system.time( ll6 <- vecchia_profbeta_loglik_grad_info(
-#    covparms[ii],"exponential_isotropic_fast",yord,Xord,locsord,NNarray)))
+print( system.time( ll5 <- vecchia_profbeta_loglik(
+    covparms[ii],"exponential_isotropic_fast",yord,Xord,locsord,NNarray)))
+print( system.time( ll6 <- vecchia_profbeta_loglik_grad_info(
+    covparms[ii],"exponential_isotropic_fast",yord,Xord,locsord,NNarray)))
 }
 print(ll1)
 print(ll4)
