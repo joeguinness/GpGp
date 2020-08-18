@@ -43,8 +43,9 @@ Xord <- X[ord,,drop=FALSE]
 # get ungrouped and grouped likelihood
 
 ii <- c(1,2,4)
-cv1 <- exponential_isotropic_fast( covparms[ii], locs[1:61,] )
-dv1 <- d_exponential_isotropic_fast( covparms[ii], locs[1:61,] )
+cv1 <- exponential_isotropic_fast( covparms[ii], locs[1:11,] )
+dv1 <- d_exponential_isotropic_fast( covparms[ii], locs[1:11,] )
+print(cv1)
 
 if(TRUE){
 {
@@ -67,7 +68,7 @@ print(ll3)
 print(ll6)
 }
 
-if(TRUE){
+if(FALSE){
 system.time( ll1 <- vecchia_grouped_meanzero_loglik(
     covparms[c(1,2,4)],"exponential_isotropic",yord,locsord,NNlist ) )
 system.time( ll2 <- vecchia_grouped_profbeta_loglik(
