@@ -9,7 +9,6 @@
 #include <vector>
 #include <cassert>
 #include "basis.h"
-
 #include <boost/math/special_functions.hpp>
 
 using namespace Rcpp;
@@ -58,7 +57,7 @@ arma::mat exponential_isotropic(arma::vec covparms, arma::mat locs ){
         for(int j=0; j<dim; j++){
             d += pow( locs_scaled(i1,j) - locs_scaled(i2,j), 2.0 );
         }
-        d = pow( d, 0.5 );
+        d = std::sqrt( d );
         if( d == 0.0 ){
             covmat(i2,i1) = covparms(0);
         } else {
@@ -95,7 +94,7 @@ arma::cube d_exponential_isotropic(arma::vec covparms, arma::mat locs ){
         for(int j=0; j<dim; j++){
             d += pow( locs_scaled(i1,j) - locs_scaled(i2,j), 2.0 );
         }
-        d = pow( d, 0.5 );
+        d = std::sqrt( d );
         
         dcovmat(i1,i2,0) += std::exp(-d);
         dcovmat(i1,i2,1) += covparms(0)*std::exp(-d)*d/covparms(1);
@@ -116,6 +115,14 @@ arma::cube d_exponential_isotropic(arma::vec covparms, arma::mat locs ){
 // [[Rcpp::export]]
 arma::mat exponential_isotropic_fast(arma::vec covparms, arma::mat locs ){
 
+    std::chrono::steady_clock::time_point t1;
+    std::chrono::steady_clock::time_point t2;
+    std::chrono::steady_clock::time_point t3;
+    std::chrono::steady_clock::time_point t4;
+    std::chrono::steady_clock::time_point t5;
+    std::chrono::steady_clock::time_point t6;
+
+	t1 = std::chrono::steady_clock::now();
     int dim = locs.n_cols;
     int n = locs.n_rows;
     double nugget = covparms( 0 )*covparms( 2 );
@@ -126,9 +133,12 @@ arma::mat exponential_isotropic_fast(arma::vec covparms, arma::mat locs ){
             locs_scaled(i,j) = locs(i,j)/covparms(1);
         }
     }
+	t2 = std::chrono::steady_clock::now();
     // calculate covariances
     arma::mat covmat(n,n);
 	arma::mat distmat(n,n, fill::zeros);
+
+	t3 = std::chrono::steady_clock::now();
 
     for(int j=0; j<dim; j++){
 	    for(int i1=0; i1<n; i1++){ for(int i2=0; i2<=i1; i2++){
@@ -136,10 +146,11 @@ arma::mat exponential_isotropic_fast(arma::vec covparms, arma::mat locs ){
             distmat(i2,i1) += pow( locs_scaled(i1,j) - locs_scaled(i2,j), 2.0 );
 	    }}	
     }
-    distmat = sqrt(distmat);
-				
+	t4 = std::chrono::steady_clock::now();
+
     for(int i1=0; i1<n; i1++){ for(int i2=0; i2<=i1; i2++){
 		 
+		distmat(i2,i1) = std::sqrt( distmat(i2,i1) );
         if( distmat(i2,i1) == 0.0 ){
             covmat(i2,i1) = covparms(0);
         } else {
@@ -151,43 +162,76 @@ arma::mat exponential_isotropic_fast(arma::vec covparms, arma::mat locs ){
 		covmat(i1,i2) = covmat(i2,i1);
 
     }}
+
+	t5 = std::chrono::steady_clock::now();
+
+	/*
+	Rcout << std::chrono::duration_cast<std::chrono::microseconds>(t2-t1).count() << endl;
+	Rcout << std::chrono::duration_cast<std::chrono::microseconds>(t3-t2).count() << endl;
+	Rcout << std::chrono::duration_cast<std::chrono::microseconds>(t4-t3).count() << endl;
+	Rcout << std::chrono::duration_cast<std::chrono::microseconds>(t5-t4).count() << endl;
+	*/
+
     return covmat;
 }
 
 // [[Rcpp::export]]
 arma::cube d_exponential_isotropic_fast(arma::vec covparms, arma::mat locs ){
 
+    std::chrono::steady_clock::time_point t1;
+    std::chrono::steady_clock::time_point t2;
+    std::chrono::steady_clock::time_point t3;
+    std::chrono::steady_clock::time_point t4;
+    std::chrono::steady_clock::time_point t5;
+    std::chrono::steady_clock::time_point t6;
+	double cc = 1.0/covparms(1);
+	
     int dim = locs.n_cols;
     int n = locs.n_rows;
     //double nugget = covparms( 0 )*covparms( 2 );
     // create scaled locations
+
+	t1 = std::chrono::steady_clock::now();
+	
     mat locs_scaled(n,dim);
     for(int j=0; j<dim; j++){ 
         for(int i=0; i<n; i++){
             locs_scaled(i,j) = locs(i,j)/covparms(1);
         }
     }
+	t2 = std::chrono::steady_clock::now();
     // calculate derivatives
     arma::cube dcovmat = arma::cube(n,n,covparms.n_elem, fill::zeros);
+	arma::mat distmat(n,n, fill::zeros);
+    for(int j=0; j<dim; j++){
+	    for(int i1=0; i1<n; i1++){ for(int i2=0; i2<=i1; i2++){
+            distmat(i2,i1) += pow( locs_scaled(i1,j) - locs_scaled(i2,j), 2.0 );
+	    }}	
+    }
+	t3 = std::chrono::steady_clock::now();
     for(int i1=0; i1<n; i1++){ for(int i2=0; i2<=i1; i2++){
-        double d = 0.0;
-        for(int j=0; j<dim; j++){
-            d += pow( locs_scaled(i1,j) - locs_scaled(i2,j), 2.0 );
-        }
-        d = pow( d, 0.5 );
-        
-        dcovmat(i1,i2,0) += std::exp(-d);
-        dcovmat(i1,i2,1) += covparms(0)*std::exp(-d)*d/covparms(1);
+
+        distmat(i2,i1) = std::sqrt( distmat(i2,i1) );
+        dcovmat(i2,i1,0) += std::exp( -distmat(i2,i1) );
+        dcovmat(i2,i1,1) += covparms(0)*dcovmat(i2,i1,0)*distmat(i2,i1)*cc;
         if( i1 == i2 ){ // update diagonal entry
-            dcovmat(i1,i2,0) += covparms(2);
-            dcovmat(i1,i2,2) += covparms(0); 
+            dcovmat(i2,i1,0) += covparms(2);
+            dcovmat(i2,i1,2) += covparms(0); 
         } else { // fill in opposite entry
             for(int j=0; j<covparms.n_elem; j++){
-                dcovmat(i2,i1,j) = dcovmat(i1,i2,j);
+                dcovmat(i1,i2,j) = dcovmat(i2,i1,j);
             }
+		    dcovmat(i1,i2,0) = dcovmat(i2,i1,0);
         }
     }}
-
+/*
+	Rcout << std::chrono::duration_cast<std::chrono::microseconds>(t2-t1).count() << endl;
+	Rcout << std::chrono::duration_cast<std::chrono::microseconds>(t3-t2).count() << endl;
+	Rcout << std::chrono::duration_cast<std::chrono::microseconds>(t4-t3).count() << endl;
+	Rcout << std::chrono::duration_cast<std::chrono::microseconds>(t5-t4).count() << endl;
+	Rcout << std::chrono::duration_cast<std::chrono::microseconds>(t6-t5).count() << endl;
+	*/
+	
     return dcovmat;
 }
 

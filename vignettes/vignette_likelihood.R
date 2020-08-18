@@ -3,7 +3,7 @@
 devtools::load_all("..")
 
 # grid size for data locations
-gsize <- 70
+gsize <- 100
 nvec <- c(gsize,gsize)
 n <- prod(nvec)
 
@@ -41,10 +41,13 @@ X <- matrix( rep(1,n), n, 1 )
 Xord <- X[ord,,drop=FALSE]
 
 # get ungrouped and grouped likelihood
-#devtools::load_all("..")
 
-{
 ii <- c(1,2,4)
+cv1 <- exponential_isotropic_fast( covparms[ii], locs[1:61,] )
+dv1 <- d_exponential_isotropic_fast( covparms[ii], locs[1:61,] )
+
+if(TRUE){
+{
 print( system.time( ll1 <- vecchia_meanzero_loglik(
     covparms[ii],"exponential_isotropic",yord,locsord,NNarray)))
 print( system.time( ll2 <- vecchia_profbeta_loglik(
@@ -60,8 +63,11 @@ print( system.time( ll6 <- vecchia_profbeta_loglik_grad_info(
 }
 print(ll1)
 print(ll4)
+print(ll3)
+print(ll6)
+}
 
-if( FALSE ){
+if(TRUE){
 system.time( ll1 <- vecchia_grouped_meanzero_loglik(
     covparms[c(1,2,4)],"exponential_isotropic",yord,locsord,NNlist ) )
 system.time( ll2 <- vecchia_grouped_profbeta_loglik(
@@ -79,6 +85,12 @@ system.time( z1 <- Linv_mult(Linv1,yord,NNarray) )
 # fit a model
 t1 <- proc.time()
 gpfit <- fit_model( y = y, locs = locs, X = X, "exponential_isotropic",
+                    fixed_parms = 3, start_parms = c(1,1,0.0) 
+)
+print(proc.time() - t1)
+
+t1 <- proc.time()
+gpfit <- fit_model( y = y, locs = locs, X = X, "exponential_isotropic_fast",
                     fixed_parms = 3, start_parms = c(1,1,0.0) 
 )
 print(proc.time() - t1)
