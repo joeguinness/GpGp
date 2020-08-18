@@ -30,6 +30,23 @@ arma::vec forward_solve( arma::mat cholmat, arma::vec b ){
 
 } 
 
+arma::vec backward_solve( arma::mat lower, arma::vec b ){
+
+    int n = lower.n_rows;
+    arma::vec x(n);
+    x(n-1) = b(n-1)/lower(n-1,n-1);
+
+    for(int i=n-2; i>=0; i--){
+        double dd = 0.0;
+        for(int j=n-1; j>i; j--){
+            dd += lower(j,i)*x(j);
+        }
+        x(i) = (b(i)-dd)/lower(i,i);
+    }    
+    return x;
+
+} 
+
 arma::mat forward_solve_mat( arma::mat cholmat, arma::mat b ){
 
     int n = cholmat.n_rows;
@@ -159,7 +176,8 @@ void compute_pieces(
         onevec(bsize-1) = 1.0;
         arma::vec choli2;
         if(grad_info){
-            choli2 = solve( trimatu(cholmat.t()), onevec );
+            //choli2 = solve( trimatu(cholmat.t()), onevec );
+            choli2 = backward_solve( cholmat, onevec );
         }
         
 	t6 = std::chrono::steady_clock::now();
@@ -250,18 +268,18 @@ void compute_pieces(
         
         }
 
-//	if( i == 1000 ){
-//	cout << std::chrono::duration_cast<std::chrono::microseconds>(t2-t1).count() << endl;
-//	cout << std::chrono::duration_cast<std::chrono::microseconds>(t3-t2).count() << endl;
-//	cout << std::chrono::duration_cast<std::chrono::microseconds>(t4-t3).count() << endl;
-//	cout << std::chrono::duration_cast<std::chrono::microseconds>(t5-t4).count() << endl;
-//	cout << std::chrono::duration_cast<std::chrono::microseconds>(t6-t5).count() << endl;
-//	cout << std::chrono::duration_cast<std::chrono::microseconds>(t7-t6).count() << endl;
-//	cout << std::chrono::duration_cast<std::chrono::microseconds>(t8-t7).count() << endl;
-//	cout << std::chrono::duration_cast<std::chrono::microseconds>(t9-t8).count() << endl;
-//	cout << std::chrono::duration_cast<std::chrono::microseconds>(t10-t9).count() << endl;
-//	cout << std::chrono::duration_cast<std::chrono::microseconds>(t11-t10).count() << endl;
-//    }
+	//	if( i == 1000 ){
+	//	cout << std::chrono::duration_cast<std::chrono::microseconds>(t2-t1).count() << endl;
+	//	cout << std::chrono::duration_cast<std::chrono::microseconds>(t3-t2).count() << endl;
+	//	cout << std::chrono::duration_cast<std::chrono::microseconds>(t4-t3).count() << endl;
+	//	cout << std::chrono::duration_cast<std::chrono::microseconds>(t5-t4).count() << endl;
+	//	cout << std::chrono::duration_cast<std::chrono::microseconds>(t6-t5).count() << endl;
+	//	cout << std::chrono::duration_cast<std::chrono::microseconds>(t7-t6).count() << endl;
+	//	cout << std::chrono::duration_cast<std::chrono::microseconds>(t8-t7).count() << endl;
+	//	cout << std::chrono::duration_cast<std::chrono::microseconds>(t9-t8).count() << endl;
+	//	cout << std::chrono::duration_cast<std::chrono::microseconds>(t10-t9).count() << endl;
+	//	cout << std::chrono::duration_cast<std::chrono::microseconds>(t11-t10).count() << endl;
+	//        }
     }
 #pragma omp critical
 {
