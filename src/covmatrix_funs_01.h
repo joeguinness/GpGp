@@ -138,24 +138,25 @@ arma::mat exponential_isotropic_fast(arma::vec covparms, arma::mat locs ){
     arma::mat covmat(n,n);
 	arma::mat distmat(n,n, fill::zeros);
 
-	t3 = std::chrono::steady_clock::now();
-
     for(int j=0; j<dim; j++){
 	    for(int i1=0; i1<n; i1++){ for(int i2=0; i2<=i1; i2++){
-			//for(int i1=0; i1<n; i1++){ for(int i2=0; i2<n; i2++){
-            distmat(i2,i1) += pow( locs_scaled(i1,j) - locs_scaled(i2,j), 2.0 );
+		//for(int i1=0; i1<n; i1++){ for(int i2=0; i2<n; i2++){
+				double dd = locs_scaled(i1,j)-locs_scaled(i2,j);
+				//distmat(i2,i1) += pow(locs_scaled(i1,j)-locs_scaled(i2,j),2.0);
+				distmat(i2,i1) += dd*dd;
 	    }}	
     }
-	t4 = std::chrono::steady_clock::now();
+
+	t3 = std::chrono::steady_clock::now();
 
     for(int i1=0; i1<n; i1++){ for(int i2=0; i2<=i1; i2++){
 		 
 		distmat(i2,i1) = std::sqrt( distmat(i2,i1) );
-        if( distmat(i2,i1) == 0.0 ){
-            covmat(i2,i1) = covparms(0);
-        } else {
-		  covmat(i2,i1) = covparms(0)*std::exp( -distmat(i2,i1) );
-        }
+        //if( distmat(i2,i1) == 0.0 ){
+        //    covmat(i2,i1) = covparms(0);
+        //} else {
+		covmat(i2,i1) = covparms(0)*std::exp( -distmat(i2,i1) );
+		  //}
         // add nugget
         if( i1 == i2 ){ covmat(i2,i2) += nugget; } 
         // fill in opposite entry
@@ -163,14 +164,12 @@ arma::mat exponential_isotropic_fast(arma::vec covparms, arma::mat locs ){
 
     }}
 
-	t5 = std::chrono::steady_clock::now();
+	t4 = std::chrono::steady_clock::now();
 
-	/*
-	Rcout << std::chrono::duration_cast<std::chrono::microseconds>(t2-t1).count() << endl;
-	Rcout << std::chrono::duration_cast<std::chrono::microseconds>(t3-t2).count() << endl;
-	Rcout << std::chrono::duration_cast<std::chrono::microseconds>(t4-t3).count() << endl;
-	Rcout << std::chrono::duration_cast<std::chrono::microseconds>(t5-t4).count() << endl;
-	*/
+	//Rcout << std::chrono::duration_cast<std::chrono::microseconds>(t2-t1).count() << endl;
+	//Rcout << std::chrono::duration_cast<std::chrono::microseconds>(t3-t2).count() << endl;
+	//Rcout << std::chrono::duration_cast<std::chrono::microseconds>(t4-t3).count() << endl;
+	//	Rcout << std::chrono::duration_cast<std::chrono::microseconds>(t5-t4).count() << endl;
 
     return covmat;
 }
@@ -199,16 +198,21 @@ arma::cube d_exponential_isotropic_fast(arma::vec covparms, arma::mat locs ){
             locs_scaled(i,j) = locs(i,j)/covparms(1);
         }
     }
+
 	t2 = std::chrono::steady_clock::now();
+
     // calculate derivatives
     arma::cube dcovmat = arma::cube(n,n,covparms.n_elem, fill::zeros);
 	arma::mat distmat(n,n, fill::zeros);
     for(int j=0; j<dim; j++){
 	    for(int i1=0; i1<n; i1++){ for(int i2=0; i2<=i1; i2++){
-            distmat(i2,i1) += pow( locs_scaled(i1,j) - locs_scaled(i2,j), 2.0 );
+			double dd = locs_scaled(i1,j)-locs_scaled(i2,j);
+            distmat(i2,i1) += dd*dd;
 	    }}	
     }
+
 	t3 = std::chrono::steady_clock::now();
+
     for(int i1=0; i1<n; i1++){ for(int i2=0; i2<=i1; i2++){
 
         distmat(i2,i1) = std::sqrt( distmat(i2,i1) );
@@ -224,13 +228,14 @@ arma::cube d_exponential_isotropic_fast(arma::vec covparms, arma::mat locs ){
 		    dcovmat(i1,i2,0) = dcovmat(i2,i1,0);
         }
     }}
-/*
-	Rcout << std::chrono::duration_cast<std::chrono::microseconds>(t2-t1).count() << endl;
-	Rcout << std::chrono::duration_cast<std::chrono::microseconds>(t3-t2).count() << endl;
-	Rcout << std::chrono::duration_cast<std::chrono::microseconds>(t4-t3).count() << endl;
-	Rcout << std::chrono::duration_cast<std::chrono::microseconds>(t5-t4).count() << endl;
-	Rcout << std::chrono::duration_cast<std::chrono::microseconds>(t6-t5).count() << endl;
-	*/
+	
+	t4 = std::chrono::steady_clock::now();
+
+	//Rcout << std::chrono::duration_cast<std::chrono::microseconds>(t2-t1).count() << endl;
+	//Rcout << std::chrono::duration_cast<std::chrono::microseconds>(t3-t2).count() << endl;
+	//Rcout << std::chrono::duration_cast<std::chrono::microseconds>(t4-t3).count() << endl;
+	//	Rcout << std::chrono::duration_cast<std::chrono::microseconds>(t5-t4).count() << endl;
+	//	Rcout << std::chrono::duration_cast<std::chrono::microseconds>(t6-t5).count() << endl;
 	
     return dcovmat;
 }

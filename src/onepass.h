@@ -13,7 +13,43 @@
 using namespace Rcpp;
 using namespace arma;
 
- 
+arma::vec forward_solve( arma::mat cholmat, arma::vec b ){
+
+    int n = cholmat.n_rows;
+    arma::vec x(n);
+    x(0) = b(0)/cholmat(0,0);
+
+    for(int i=1; i<n; i++){
+        double dd = 0.0;
+        for(int j=0; j<i; j++){
+            dd += cholmat(i,j)*x(j);
+        }
+        x(i) = (b(i)-dd)/cholmat(i,i);
+    }    
+    return x;
+
+} 
+
+arma::mat forward_solve_mat( arma::mat cholmat, arma::mat b ){
+
+    int n = cholmat.n_rows;
+    int p = b.n_cols;
+    arma::mat x(n,p);
+    for(int k=0; k<p; k++){ x(0,k) = b(0,k)/cholmat(0,0); }
+
+    for(int i=1; i<n; i++){
+		for(int k=0; k<p; k++){
+            double dd = 0.0;
+            for(int j=0; j<i; j++){
+                dd += cholmat(i,j)*x(j,k);
+            }
+            x(i,k) = (b(i,k)-dd)/cholmat(i,i);
+		}
+    }    
+    return x;
+	
+} 
+
 void compute_pieces(
     arma::vec covparms, 
     StringVector covfun_name,
@@ -126,17 +162,21 @@ void compute_pieces(
             choli2 = solve( trimatu(cholmat.t()), onevec );
         }
         
+	t6 = std::chrono::steady_clock::now();
+
         bool cond = bsize > 1;
         //double fac = 1.0;
         
         // do solves with X and y
         arma::mat LiX0;
         if(profbeta){
-            LiX0 = solve( trimatl(cholmat), X0 );
+            //LiX0 = solve( trimatl(cholmat), X0 );
+            LiX0 = forward_solve_mat( cholmat, X0 );
         }
-        arma::vec Liy0 = solve( trimatl(cholmat), ysub );
+        //arma::vec Liy0 = solve( trimatl(cholmat), ysub );
+        arma::vec Liy0 = forward_solve( cholmat, ysub );
         
-	t6 = std::chrono::steady_clock::now();
+	t7 = std::chrono::steady_clock::now();
 
         // loglik objects
         l_logdet += 2.0*std::log( as_scalar(cholmat(i2,i2)) ); 
@@ -146,7 +186,7 @@ void compute_pieces(
             l_ySX += ( Liy0(i2) * LiX0.rows(i2) ).t();
         }
         
-	t7 = std::chrono::steady_clock::now();
+	t8 = std::chrono::steady_clock::now();
 
         if( grad_info ){
         // gradient objects
@@ -156,11 +196,9 @@ void compute_pieces(
         
         if(cond){ // if we condition on anything
             
-	t8 = std::chrono::steady_clock::now();
-
             for(int j=0; j<nparms; j++){
                 // compute last column of Li * (dS_j) * Lit
-                arma::vec LidSLi3 = solve( trimatl(cholmat), dcovmat.slice(j) * choli2 );
+                arma::vec LidSLi3 = forward_solve_mat(cholmat,dcovmat.slice(j)*choli2);
                 // store LiX0.t() * LidSLi3 and Liy0.t() * LidSLi3
                 arma::vec v1 = LiX0.t() * LidSLi3;
                 double s1 = as_scalar( Liy0.t() * LidSLi3 ); 
@@ -212,18 +250,18 @@ void compute_pieces(
         
         }
 
-	if( i == 1000 ){
-	cout << std::chrono::duration_cast<std::chrono::microseconds>(t2-t1).count() << endl;
-	cout << std::chrono::duration_cast<std::chrono::microseconds>(t3-t2).count() << endl;
-	cout << std::chrono::duration_cast<std::chrono::microseconds>(t4-t3).count() << endl;
-	cout << std::chrono::duration_cast<std::chrono::microseconds>(t5-t4).count() << endl;
-	cout << std::chrono::duration_cast<std::chrono::microseconds>(t6-t5).count() << endl;
-	cout << std::chrono::duration_cast<std::chrono::microseconds>(t7-t6).count() << endl;
-	cout << std::chrono::duration_cast<std::chrono::microseconds>(t8-t7).count() << endl;
-	cout << std::chrono::duration_cast<std::chrono::microseconds>(t9-t8).count() << endl;
-	cout << std::chrono::duration_cast<std::chrono::microseconds>(t10-t9).count() << endl;
-	cout << std::chrono::duration_cast<std::chrono::microseconds>(t11-t10).count() << endl;
-    }
+//	if( i == 1000 ){
+//	cout << std::chrono::duration_cast<std::chrono::microseconds>(t2-t1).count() << endl;
+//	cout << std::chrono::duration_cast<std::chrono::microseconds>(t3-t2).count() << endl;
+//	cout << std::chrono::duration_cast<std::chrono::microseconds>(t4-t3).count() << endl;
+//	cout << std::chrono::duration_cast<std::chrono::microseconds>(t5-t4).count() << endl;
+//	cout << std::chrono::duration_cast<std::chrono::microseconds>(t6-t5).count() << endl;
+//	cout << std::chrono::duration_cast<std::chrono::microseconds>(t7-t6).count() << endl;
+//	cout << std::chrono::duration_cast<std::chrono::microseconds>(t8-t7).count() << endl;
+//	cout << std::chrono::duration_cast<std::chrono::microseconds>(t9-t8).count() << endl;
+//	cout << std::chrono::duration_cast<std::chrono::microseconds>(t10-t9).count() << endl;
+//	cout << std::chrono::duration_cast<std::chrono::microseconds>(t11-t10).count() << endl;
+//    }
     }
 #pragma omp critical
 {
