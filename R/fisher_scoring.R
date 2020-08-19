@@ -95,7 +95,7 @@ fisher_scoring <- function( likfun, start_parms, link,
             if (!silent) cat("Cond # of info matrix > 1/tol \n")
             #info <- 1.0*max(likobj0$info)*diag(nrow(likobj0$info))
             # regularize
-            diag(info) <- diag(info) + 0.001*max(diag(info))
+            diag(info) <- diag(info) + 0.00001*max(diag(info))
         }
 
         # calculate fisher step 

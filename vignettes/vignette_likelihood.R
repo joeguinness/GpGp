@@ -3,7 +3,7 @@
 devtools::load_all("..")
 
 # grid size for data locations
-gsize <- 100
+gsize <- 80
 nvec <- c(gsize,gsize)
 n <- prod(nvec)
 
@@ -27,7 +27,7 @@ locsord <- locs[ord,]
 yord <- y[ord]
 
 # find the ordered m nearest neighbors
-m <- 30
+m <- 60
 NNarray <- find_ordered_nn(locs,m)
 
 # automatically group the observations
@@ -68,7 +68,7 @@ print(ll4)
 #print(ll6)
 }
 
-if(TRUE){
+if(FALSE){
 system.time( ll1 <- vecchia_grouped_meanzero_loglik(
     covparms[c(1,2,4)],"exponential_isotropic",yord,locsord,NNlist ) )
 system.time( ll2 <- vecchia_grouped_profbeta_loglik(
