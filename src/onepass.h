@@ -268,18 +268,18 @@ void compute_pieces(
         
         }
 
-	//	if( i == 1000 ){
-	//	cout << std::chrono::duration_cast<std::chrono::microseconds>(t2-t1).count() << endl;
-	//	cout << std::chrono::duration_cast<std::chrono::microseconds>(t3-t2).count() << endl;
-	//	cout << std::chrono::duration_cast<std::chrono::microseconds>(t4-t3).count() << endl;
-	//	cout << std::chrono::duration_cast<std::chrono::microseconds>(t5-t4).count() << endl;
-	//	cout << std::chrono::duration_cast<std::chrono::microseconds>(t6-t5).count() << endl;
-	//	cout << std::chrono::duration_cast<std::chrono::microseconds>(t7-t6).count() << endl;
-	//	cout << std::chrono::duration_cast<std::chrono::microseconds>(t8-t7).count() << endl;
-	//	cout << std::chrono::duration_cast<std::chrono::microseconds>(t9-t8).count() << endl;
-	//	cout << std::chrono::duration_cast<std::chrono::microseconds>(t10-t9).count() << endl;
-	//	cout << std::chrono::duration_cast<std::chrono::microseconds>(t11-t10).count() << endl;
-	//        }
+		if( i == 1000 ){
+		cout << std::chrono::duration_cast<std::chrono::microseconds>(t2-t1).count() << endl;
+		cout << std::chrono::duration_cast<std::chrono::microseconds>(t3-t2).count() << endl;
+		cout << std::chrono::duration_cast<std::chrono::microseconds>(t4-t3).count() << endl;
+		cout << std::chrono::duration_cast<std::chrono::microseconds>(t5-t4).count() << endl;
+		cout << std::chrono::duration_cast<std::chrono::microseconds>(t6-t5).count() << endl;
+		cout << std::chrono::duration_cast<std::chrono::microseconds>(t7-t6).count() << endl;
+		cout << std::chrono::duration_cast<std::chrono::microseconds>(t8-t7).count() << endl;
+		cout << std::chrono::duration_cast<std::chrono::microseconds>(t9-t8).count() << endl;
+		cout << std::chrono::duration_cast<std::chrono::microseconds>(t10-t9).count() << endl;
+		cout << std::chrono::duration_cast<std::chrono::microseconds>(t11-t10).count() << endl;
+	        }
     }
 #pragma omp critical
 {

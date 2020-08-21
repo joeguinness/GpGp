@@ -121,11 +121,15 @@ arma::mat exponential_isotropic_fast(arma::vec covparms, arma::mat locs ){
     std::chrono::steady_clock::time_point t4;
     std::chrono::steady_clock::time_point t5;
     std::chrono::steady_clock::time_point t6;
+    std::chrono::steady_clock::time_point t7;
+    std::chrono::steady_clock::time_point t8;
 
 	t1 = std::chrono::steady_clock::now();
+
     int dim = locs.n_cols;
     int n = locs.n_rows;
     double nugget = covparms( 0 )*covparms( 2 );
+	
     // create scaled locations
     mat locs_scaled(n,dim);
     for(int j=0; j<dim; j++){ 
@@ -133,43 +137,133 @@ arma::mat exponential_isotropic_fast(arma::vec covparms, arma::mat locs ){
             locs_scaled(i,j) = locs(i,j)/covparms(1);
         }
     }
+
+	/*
+    // create scaled locations
+	double ls[n][dim];
+    for(int j=0; j<dim; j++){ 
+        for(int i=0; i<n; i++){
+            ls[i][j] = locs(i,j)/covparms(1);
+        }
+    }
+	*/
+
 	t2 = std::chrono::steady_clock::now();
+
     // calculate covariances
     arma::mat covmat(n,n);
 	arma::mat distmat(n,n, fill::zeros);
+    //double dmat[n][n];
+    //double cmat[n][n];
 
+	/*
+    for(int i1=0; i1<n; i1++){ for(int i2=0; i2<n; i2++){ 
+        dmat[i1][i2] = 0.0;
+    }}
+	*/
+
+	t3 = std::chrono::steady_clock::now();
+
+	/*
     for(int j=0; j<dim; j++){
-	    for(int i1=0; i1<n; i1++){ for(int i2=0; i2<=i1; i2++){
-		//for(int i1=0; i1<n; i1++){ for(int i2=0; i2<n; i2++){
+		for(int i1=0; i1<n; i1++){ for(int i2=0; i2<=i1; i2++){
+				double dd = ls[i1][j]-ls[i2][j];
+				dmat[i1][i2] += dd*dd;
+	    }}	
+    }
+	*/
+
+	t4 = std::chrono::steady_clock::now();
+		
+    for(int j=0; j<dim; j++){
+	    //for(arma::uword i1=0; i1<n; i1++){ for(arma::uword i2=0; i2<=i1; i2++){
+		for(int i1=0; i1<n; i1++){ for(int i2=0; i2<n; i2++){
 				double dd = locs_scaled(i1,j)-locs_scaled(i2,j);
-				//distmat(i2,i1) += pow(locs_scaled(i1,j)-locs_scaled(i2,j),2.0);
 				distmat(i2,i1) += dd*dd;
 	    }}	
     }
 
-	t3 = std::chrono::steady_clock::now();
+	/*
+	for(arma::uword j=0; j<dim; j++){
+        for(arma::uword i2=0; i2<n; i2++){
+            double ls2 = locs_scaled(i2,j);
+            arma::mat::iterator it_end = covmat.end_col(i2);
+            for(arma::mat::iterator it = covmat.begin_col(i2); it != it_end; ++it ){
+                (*it) += 
+    }
+	*/
 
-    for(int i1=0; i1<n; i1++){ for(int i2=0; i2<=i1; i2++){
-		 
+
+	t5 = std::chrono::steady_clock::now();
+
+	//covmat = distmat;
+
+	t6 = std::chrono::steady_clock::now();
+
+    for(arma::uword i1=0; i1<n; i1++){ for(arma::uword i2=0; i2<=i1; i2++){
 		distmat(i2,i1) = std::sqrt( distmat(i2,i1) );
-        //if( distmat(i2,i1) == 0.0 ){
-        //    covmat(i2,i1) = covparms(0);
-        //} else {
 		covmat(i2,i1) = covparms(0)*std::exp( -distmat(i2,i1) );
-		  //}
-        // add nugget
         if( i1 == i2 ){ covmat(i2,i2) += nugget; } 
-        // fill in opposite entry
 		covmat(i1,i2) = covmat(i2,i1);
-
     }}
 
-	t4 = std::chrono::steady_clock::now();
+	/*
+	arma::mat::iterator it_end = covmat.end();
+	for(arma::mat::iterator it = covmat.begin(); it != it_end; ++it){
+		(*it) = covparms(0)*std::exp( -std::sqrt( (*it) ) );
+	}
 
-	//Rcout << std::chrono::duration_cast<std::chrono::microseconds>(t2-t1).count() << endl;
-	//Rcout << std::chrono::duration_cast<std::chrono::microseconds>(t3-t2).count() << endl;
-	//Rcout << std::chrono::duration_cast<std::chrono::microseconds>(t4-t3).count() << endl;
-	//	Rcout << std::chrono::duration_cast<std::chrono::microseconds>(t5-t4).count() << endl;
+	t7 = std::chrono::steady_clock::now();
+
+	for(int i=0; i<n; i++){
+        covmat(i,i) += nugget; 
+    } 
+	*/
+	
+	t8 = std::chrono::steady_clock::now();
+
+	/*
+    for(arma::uword i1=0; i1<n; i1++){ for(arma::uword i2=0; i2<n; i2++){
+		distmat(i2,i1) = std::sqrt( distmat(i2,i1) );
+		covmat(i2,i1) = covparms(0)*std::exp( -distmat(i2,i1) );
+        if( i1 == i2 ){ covmat(i2,i2) += nugget; } 
+		covmat(i1,i2) = covmat(i2,i1);
+    }}
+
+	arma::mat::iterator it_end = covmat.end();
+	for(arma::mat::iterator it = covmat.begin(); it != it_end; ++it){
+		distmat(it) = std::sqrt( distmat(it) );
+		covmat(it) = covparms(0)*std::exp( -distmat(it) );
+	}
+	for(int i=0; i<n; i++){
+        covmat(i,i) += nugget; 
+    } 
+	*/
+
+	/*
+    for(int i1=0; i1<n; i1++){ for(int i2=0; i2<=i1; i2++){
+		dmat[i1][i2] = std::sqrt( dmat[i1][i2] );
+		cmat[i1][i2] = covparms(0)*std::exp( -dmat[i1][i2] );
+        if( i1 == i2 ){ cmat[i2][i2] += nugget; } 
+    }}
+
+	t7 = std::chrono::steady_clock::now();
+
+    for(int i1=0; i1<n; i1++){ for(int i2=0; i2<=i1; i2++){
+		covmat(i2,i1) = cmat[i1][i2];
+        covmat(i1,i2) = cmat[i1][i2];
+    }}
+	*/
+		
+	/*
+	Rcout << std::chrono::duration_cast<std::chrono::microseconds>(t2-t1).count() << endl;
+	Rcout << std::chrono::duration_cast<std::chrono::microseconds>(t3-t2).count() << endl;
+	Rcout << std::chrono::duration_cast<std::chrono::microseconds>(t4-t3).count() << endl;
+	Rcout << std::chrono::duration_cast<std::chrono::microseconds>(t5-t4).count() << endl;
+	Rcout << std::chrono::duration_cast<std::chrono::microseconds>(t6-t5).count() << endl;
+	Rcout << std::chrono::duration_cast<std::chrono::microseconds>(t7-t6).count() << endl;
+	Rcout << std::chrono::duration_cast<std::chrono::microseconds>(t8-t7).count() << endl;
+	*/
 
     return covmat;
 }

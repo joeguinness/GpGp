@@ -1,9 +1,10 @@
 # a short vignette demonstrating how to use the functions
-# library("GpGp")
-devtools::load_all("..")
+install.packages("/home/jsg342/research/GpGp_0.2.2.tar.gz",type="source",repos=NULL)
+library("GpGp")
+#devtools::load_all("..")
 
 # grid size for data locations
-gsize <- 80
+gsize <- 100
 nvec <- c(gsize,gsize)
 n <- prod(nvec)
 
@@ -27,7 +28,7 @@ locsord <- locs[ord,]
 yord <- y[ord]
 
 # find the ordered m nearest neighbors
-m <- 60
+m <- 30
 NNarray <- find_ordered_nn(locs,m)
 
 # automatically group the observations
@@ -43,12 +44,16 @@ Xord <- X[ord,,drop=FALSE]
 # get ungrouped and grouped likelihood
 
 ii <- c(1,2,4)
+cv0 <- exponential_isotropic( covparms[ii], locs[1:11,] )
 cv1 <- exponential_isotropic_fast( covparms[ii], locs[1:31,] )
 dv1 <- d_exponential_isotropic_fast( covparms[ii], locs[1:31,] )
+cv1 <- exponential_isotropic_fast( covparms[ii], locs[1:31,] )
+dv1 <- d_exponential_isotropic_fast( covparms[ii], locs[1:31,] )
+#print(cv0)
 #print(cv1)
 
 if(TRUE){
-{
+for(j in 1:2){
 print( system.time( ll1 <- vecchia_meanzero_loglik(
     covparms[ii],"exponential_isotropic",yord,locsord,NNarray)))
 print( system.time( ll2 <- vecchia_profbeta_loglik(
