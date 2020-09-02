@@ -128,17 +128,17 @@ fisher_scoring <- function( likfun, start_parms, link,
         no_decrease <- FALSE
         both <- FALSE
         mult <- 1.0
-        while (!wolfe_check(likobj0,likobj,logparms,newlogparms-logparms,both) &&
-                !no_decrease ){
-            info <- 1/mult*max(likobj$info)*diag(nrow(likobj0$info))
-            step <- -solve(info,grad)
-            if(!silent) cat("**\n") 
-            if ( sqrt(sum(step^2)) < 1e-4 ){ no_decrease <- TRUE }  # maybe we should throw error here?
-            newlogparms <- logparms + step
-            likobj <- likfun(newlogparms)
-            cnt <- cnt + 1
-            mult <- mult*0.5
-        }
+        #while (!wolfe_check(likobj0,likobj,logparms,newlogparms-logparms,both) &&
+        #        !no_decrease ){
+        #    info <- 1/mult*max(likobj$info)*diag(nrow(likobj0$info))
+        #    step <- -solve(info,grad)
+        #    if(!silent) cat("**\n") 
+        #    if ( sqrt(sum(step^2)) < 1e-4 ){ no_decrease <- TRUE }  # maybe we should throw error here?
+        #    newlogparms <- logparms + step
+        #    likobj <- likfun(newlogparms)
+        #    cnt <- cnt + 1
+        #    mult <- mult*0.5
+        #}
         stepgrad <- c(crossprod(step,grad))
         
         # redefine logparms, loglik, grad, info
