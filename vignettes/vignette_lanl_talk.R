@@ -1,7 +1,7 @@
 
 
-#devtools::install_github("joeguinness/GpGp")
-#library("GpGp")
+devtools::install_github("joeguinness/GpGp")
+library("GpGp")
 
 
 #######################################################
@@ -49,13 +49,6 @@ t3 <- proc.time()
 
 print(t2-t1)
 print(t3-t2)
-
-# fit a the model
-t1 <- proc.time()
-gpfit <- GpGp::fit_model( y = y, locs = locs, covfun = "exponential_isotropic")
-print(proc.time() - t1)
-
-
 
 
 #######################################################
@@ -207,7 +200,6 @@ fields::quilt.plot(lon,lat,windspeed,
     nx=400,ny=200,xlab="Lon",ylab="Lat",legend.lab = "windspeed (m/s)")
 map("world2",add=TRUE)
 dev.off()
-
 
 ## Preparing Variables for Fitting
 
