@@ -73,7 +73,9 @@ nrow(modis_temps)
 # make a default image.plot
 temp_dims <- c(500,300)
 temp_array <- array( modis_temps$subtemp, temp_dims )
+png("temps.png",width=600,height=600)
 image.plot(temp_array)
+dev.off()
 
 # detect missing values
 not_missing <- !is.na(modis_temps$subtemp)
@@ -114,11 +116,13 @@ print(proc.time()-t1)
 obs_and_pred <- modis_temps$subtemp
 obs_and_pred[pred_inds] <- pred
 
+png("temps_preds.png",width=1200,height=600)
 par(mfrow=c(1,2))
 image.plot( array(modis_temps$subtemp, temp_dims), axes = FALSE )
 mtext("Data")
 image.plot( array(obs_and_pred, temp_dims), axes = FALSE )
 mtext("Conditional Expectation (Prediction)")
+dev.off()
 
 # do conditional simulations
 # SIMULATE missing data, but consistent with the observed data
@@ -138,6 +142,7 @@ for(j in 1:30){
 pred_rmse <- sqrt( 1/30*sum_squares )
 
 # plot of data, predictions, 1 conditional simulation, prediction standard devs
+png("temps_preds_sims.png",width=800,height=800)
 par(mfrow=c(2,2), mar=c(1,1,3,3))
 image.plot( array(modis_temps$subtemp, temp_dims), axes = FALSE )
 mtext("Data")
@@ -147,6 +152,7 @@ image.plot( array(obs_and_sim, temp_dims), axes = FALSE )
 mtext("One Conditional Simulation")
 image.plot( array(pred_rmse, temp_dims), axes = FALSE )
 mtext("Prediction Standard Deviation")
+dev.off()
 
 
 
@@ -177,20 +183,30 @@ n         <- length(windspeed)
 ## Visualizing the Data
 
 # plot of data from first 6 hours
+pdf("jason1.pdf",width=8,height=6)
 par(mar=c(4,4,1,1))
 inds <- time < 6
 fields::quilt.plot(lon[inds],lat[inds],windspeed[inds],
     nx=400,ny=200,xlab="Lon",ylab="Lat",legend.lab = "windspeed (m/s)")
+map("world2",add=TRUE)
+dev.off()
 
 # plot of data from first day
+pdf("jason2.pdf",width=8,height=6)
+par(mar=c(4,4,1,1))
 inds <- time < 24
 fields::quilt.plot(lon[inds],lat[inds],windspeed[inds],
     nx=400,ny=200,xlab="Lon",ylab="Lat",legend.lab = "windspeed (m/s)")
+map("world2",add=TRUE)
+dev.off()
 
 # plot of all data
+pdf("jason3.pdf",width=8,height=6)
+par(mar=c(4,4,1,1))
 fields::quilt.plot(lon,lat,windspeed,
     nx=400,ny=200,xlab="Lon",ylab="Lat",legend.lab = "windspeed (m/s)")
 map("world2",add=TRUE)
+dev.off()
 
 
 ## Preparing Variables for Fitting
