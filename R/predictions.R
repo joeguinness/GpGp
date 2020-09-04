@@ -78,7 +78,7 @@ predictions <- function(fit = NULL, locs_pred, X_pred,
     Linv_all <- vecchia_Linv(covparms,covfun_name,locs_all,
         NNarray_all, n_obs+1)
     
-    y_withzeros <- c(yord_obs - Xord_obs %*% beta, rep(0,n_pred) )
+    y_withzeros <- c(yord_obs - c(Xord_obs %*% beta), rep(0,n_pred) )
     v1 <- Linv_mult(Linv_all, y_withzeros, NNarray_all )
     v1[inds1] <- 0
     Linv_all[1:n_obs,1] <- 1.0
