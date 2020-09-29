@@ -1,4 +1,12 @@
 
+# GpGp 0.3.0
+
+Now uses OpenMP for parallel computations of the likelihood.
+
+Updated behavior of Fisher scoring algorithm when information
+matrix is ill-conditioned (simple regularization of info matrix).
+
+
 # GpGp 0.2.2
 
 Fixed bug in "fit_model" when missing values are present.
