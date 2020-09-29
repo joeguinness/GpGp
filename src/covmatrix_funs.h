@@ -97,11 +97,6 @@ covfun_t get_covfun(std::string covfun_name_string)
         covstruct.p_covfun = &exponential_isotropic; 
         covstruct.p_d_covfun = &d_exponential_isotropic;
     }
-    else if( covfun_name_string.compare("exponential_isotropic_fast") == 0 )
-    { 
-        covstruct.p_covfun = &exponential_isotropic_fast; 
-        covstruct.p_d_covfun = &d_exponential_isotropic_fast;
-    }
     else if( covfun_name_string.compare("matern_sphere") == 0 )
     { 
         covstruct.p_covfun = &matern_sphere; 

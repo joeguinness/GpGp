@@ -5,7 +5,6 @@
 #include <RcppArmadillo.h>
 #include <iostream>
 #include <vector>
-#include <cassert>
 
 using namespace Rcpp;
 using namespace arma;

@@ -7,7 +7,6 @@
 #include <RcppArmadillo.h>
 #include <iostream>
 #include <vector>
-#include <cassert>
 #include "basis.h"
 
 using namespace Rcpp;

@@ -5,7 +5,6 @@
 #include <RcppArmadillo.h>
 #include <iostream>
 #include <vector>
-#include <cassert>
 #include "basis.h"
 #include "covmatrix_funs_01.h"
 
