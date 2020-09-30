@@ -13,5 +13,5 @@
 #'   \item{temp150}{Temperature at 150 dbars (roughly 150 meters)}
 #'   \item{temp200}{Temperature at 200 dbars (roughly 200 meters)}
 #' }
-#' @source Mikael Kuusela. Argo program: \url{http://www.argo.ucsd.edu/}
+#' @source Mikael Kuusela. Argo program: \url{http://argo.ucsd.edu/}
 "argo2016"
