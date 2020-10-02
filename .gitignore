@@ -3,7 +3,6 @@
 inst/doc
 .Rproj.user
 .Rbuildignore
-cran-comments.md
 .gitignore~
 src/*.so
 src/*.o
