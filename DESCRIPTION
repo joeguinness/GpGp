@@ -2,7 +2,7 @@ Package: GpGp
 Type: Package
 Title: Fast Gaussian Process Computation Using Vecchia's Approximation
 Version: 0.3.0
-Date: 2020-09-29
+Date: 2020-10-02
 Authors@R: c(
     person("Joseph", "Guinness", email = "joeguinness@gmail.com", role = c("aut", "cre")),
     person("Matthias", "Katzfuss", email = "katzfuss@gmail.com", role = "aut" ),
