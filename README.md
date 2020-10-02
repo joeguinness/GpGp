@@ -29,7 +29,8 @@ On PC and Linux, it's more complicated, but you can use
 
 ## Basic Use
 
-See the vignettes directory for examples using the package. The file vignette_likelihood.R 
-shows how to use the low-level functions to reorder, find neighbors, group, and calculate
-likelihoods. The file vignette_windspeed.R shows an analysis of spatial-temporal windspeed
-data using higher-level functions (i.e. more automation).
+The main function for fitting models is called 'fit_model', and the
+main function for doing predictions is called 'predictions'.
+
+See this youtube video for a tutorial:
+https://www.youtube.com/watch?v=phyB4n0CDWg&t=4s
