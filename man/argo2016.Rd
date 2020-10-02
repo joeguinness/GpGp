@@ -16,7 +16,7 @@ A data frame with 32436 rows and 6 columns
 }
 }
 \source{
-Mikael Kuusela. Argo program: \url{http://argo.ucsd.edu/}
+Mikael Kuusela. Argo program: \url{https://argo.ucsd.edu/}
 }
 \usage{
 argo2016
