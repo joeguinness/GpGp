@@ -95,7 +95,7 @@ fisher_scoring <- function( likfun, start_parms, link,
             if (!silent) cat("Cond # of info matrix > 1/tol \n")
             #info <- 1.0*max(likobj0$info)*diag(nrow(likobj0$info))
             # regularize
-            diag(info) <- diag(info) + 0.001*max(diag(info))
+            diag(info) <- diag(info) + 10*min(diag(info))
         }
 
         # calculate fisher step 
@@ -181,6 +181,7 @@ fisher_scoring <- function( likfun, start_parms, link,
         loglik = loglik,
         no_decrease = no_decrease,
         grad = likobj$grad,
+        info = likobj$info,
         conv = ( abs(stepgrad) < convtol || no_decrease )
     )
     return(ret)
