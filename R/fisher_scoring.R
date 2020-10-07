@@ -90,12 +90,12 @@ fisher_scoring <- function( likfun, start_parms, link,
         
         # if condition number of info matrix large, 
         # then gradient descent
-        tol <- 1e-4
+        tol <- 1e-10
         if (condition_number(info) > 1 / tol) {
             if (!silent) cat("Cond # of info matrix > 1/tol \n")
             #info <- 1.0*max(likobj0$info)*diag(nrow(likobj0$info))
             # regularize
-            diag(info) <- diag(info) + 0.0*min(diag(info))
+            diag(info) <- diag(info) + tol*max(diag(info))
         }
 
         # calculate fisher step 
