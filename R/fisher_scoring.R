@@ -130,7 +130,8 @@ fisher_scoring <- function( likfun, start_parms, link,
         mult <- 1.0
         if(!wolfe_check(likobj0,likobj,logparms,newlogparms-logparms,both) &&
                 !no_decrease ){
-            step <- 0.5*sqrt(mean(step^2))*grad/sqrt(sum(grad^2))
+            cat("@@\n")
+            step <- -0.5*sqrt(mean(step^2))*grad/sqrt(sum(grad^2))
         }
         #while (!wolfe_check(likobj0,likobj,logparms,newlogparms-logparms,both) &&
         #        !no_decrease ){
