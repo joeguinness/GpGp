@@ -99,7 +99,7 @@ fisher_scoring <- function( likfun, start_parms, link,
         }
 
         # calculate fisher step 
-        step <- - solve(info, grad)
+        step <- -solve(info, grad)
         
         # if step size large, then make it smaller
         if (mean(step^2) > 1) {
@@ -130,7 +130,7 @@ fisher_scoring <- function( likfun, start_parms, link,
         mult <- 1.0
         if(!wolfe_check(likobj0,likobj,logparms,newlogparms-logparms,both) &&
                 !no_decrease ){
-            step <- 0.5*step
+            step <- 0.5*sqrt(mean(step^2))*grad/sqrt(sum(grad^2))
         }
         #while (!wolfe_check(likobj0,likobj,logparms,newlogparms-logparms,both) &&
         #        !no_decrease ){
