@@ -128,6 +128,10 @@ fisher_scoring <- function( likfun, start_parms, link,
         no_decrease <- FALSE
         both <- FALSE
         mult <- 1.0
+        if(!wolfe_check(likobj0,likobj,logparms,newlogparms-logparms,both) &&
+                !no_decrease ){
+            step <- 0.5*step
+        }
         #while (!wolfe_check(likobj0,likobj,logparms,newlogparms-logparms,both) &&
         #        !no_decrease ){
         #    info <- 1/mult*max(likobj$info)*diag(nrow(likobj0$info))
