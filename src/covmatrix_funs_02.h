@@ -307,6 +307,190 @@ arma::cube d_matern_anisotropic3D(arma::vec covparms, arma::mat locs ){
 
 
 
+//' Geometrically anisotropic Matern covariance function (three dimensions, alternate parameterization)
+//'
+//' From a matrix of locations and covariance parameters of the form
+//' (variance, B11, B21, B22, B31, B32, B33, smoothness, nugget), return the square matrix of
+//' all pairwise covariances.
+//' @param locs A matrix with \code{n} rows and \code{3} columns.
+//' Each row of locs is a point in R^3.
+//' @param covparms A vector with covariance parameters
+//' in the form (variance, B11, B21, B22, B31, B32, B33, smoothness, nugget)
+//' @return A matrix with \code{n} rows and \code{n} columns, with the i,j entry
+//' containing the covariance between observations at \code{locs[i,]} and
+//' \code{locs[j,]}.
+//' @section Parameterization:
+//' The covariance parameter vector is (variance, L11, L21, L22, L31, L32, L33, smoothness, nugget)
+//' where B11, B21, B22, B31, B32, B33 transform the three coordinates as
+//' \deqn{ u_1 = B11[ x_1 + B12 x_2 + B13 x_3] }
+//' \deqn{ u_2 = B22[ x_2 + B23 x_3] }
+//' \deqn{ u_3 = B33[ x_3 ] }
+//' Assuming x is transformed to u and y transformed to v, the covariances are 
+//' \deqn{ M(x,y) = \sigma^2 2^{1-\nu}/\Gamma(\nu) (|| u - v || )^\nu K_\nu(|| u - v ||) }
+//' The nugget value \eqn{ \sigma^2 \tau^2 } is added to the diagonal of the covariance matrix.
+//' NOTE: the nugget is \eqn{ \sigma^2 \tau^2 }, not \eqn{ \tau^2 }. 
+// [[Rcpp::export]]
+arma::mat matern_anisotropic3D_alt(arma::vec covparms, arma::mat locs ){
+    
+    // covparms(0) = sigmasq
+    // covparms(1) = B00
+    // covparms(2) = B10
+    // covparms(3) = B11
+    // covparms(4) = B20
+    // covparms(5) = B21
+    // covparms(6) = B22
+    // covparms(7) = smoothness
+    // covparms(8) = tausq
+    // nugget = sigmasq*tausq
+    // overall variance = sigmasq*(1 + tausq) = sigmasq + nugget
+    
+    //int dim = locs.n_cols;
+    int n = locs.n_rows;
+    double nugget = covparms( 0 )*covparms( 8 );
+    double smooth = covparms( 7 );
+    double normcon = covparms(0)/(pow(2.0,smooth-1.0)*boost::math::tgamma(smooth));
+    
+    // calculate covariances
+    arma::mat covmat(n,n);
+    for(int i1 = 0; i1 < n; i1++){
+        for(int i2 = 0; i2 <= i1; i2++){
+            
+            // calculate rescaled distance
+            double h0 = locs(i1,0) - locs(i2,0);
+            double h1 = locs(i1,1) - locs(i2,1);
+            double h2 = locs(i1,2) - locs(i2,2);
+	    double r0 = covparms(1)*( h0 + covparms(2)*h1 + covparms(3)*h2 );
+	    double r1 = covparms(4)*( h1 + covparms(5)*h2 );
+	    double r2 = covparms(6)*( h2 );
+	    
+            // 3 is hard coded here
+            double d = 0.0;
+            d += pow( r0, 2 );
+            d += pow( r1, 2 );
+            d += pow( r2, 2 );
+            d =  pow( d, 0.5 );
+            
+            if( d == 0.0 ){
+                covmat(i2,i1) = covparms(0);
+            } else {
+                // calculate covariance            
+                covmat(i2,i1) = normcon*
+                    pow( d, smooth )*boost::math::cyl_bessel_k(smooth, d);
+            }
+            // add nugget
+            if( i1 == i2 ){ covmat(i2,i2) += nugget; } 
+            // fill in opposite entry
+            else { covmat(i1,i2) = covmat(i2,i1); }
+        }    
+    }
+    return covmat;
+}
+
+//' @describeIn matern_anisotropic3D Derivatives of anisotropic Matern covariance
+// [[Rcpp::export]]
+arma::cube d_matern_anisotropic3D_alt(arma::vec covparms, arma::mat locs ){
+
+    // covparms(0) = sigmasq
+    // covparms(1) = L00
+    // covparms(2) = L10
+    // covparms(3) = L11
+    // covparms(4) = L20
+    // covparms(5) = L21
+    // covparms(6) = L22
+    // covparms(7) = smoothness
+    // covparms(8) = tausq
+    // nugget = sigmasq*tausq
+    // overall variance = sigmasq*(1 + tausq) = sigmasq + nugget
+
+    int n = locs.n_rows;
+    //double nugget = covparms( 0 )*covparms( 8 );
+    double smooth = covparms( 7 );
+    double normcon = covparms(0)/(pow(2.0,smooth-1.0)*boost::math::tgamma(smooth));
+    double eps = 1e-8;
+    double normconeps = 
+        covparms(0)/(pow(2.0,smooth+eps-1.0)*boost::math::tgamma(smooth+eps));
+    
+    // calculate derivatives
+    arma::cube dcovmat = arma::cube(n,n,covparms.n_elem, fill::zeros);
+    for(int i2=0; i2<n; i2++){ for(int i1=0; i1<=i2; i1++){
+        
+        // calculate rescaled distance
+        double h0 = locs(i1,0) - locs(i2,0);
+        double h1 = locs(i1,1) - locs(i2,1);
+        double h2 = locs(i1,2) - locs(i2,2);
+        double r0 = covparms(1)*( h0 + covparms(2)*h1 + covparms(3)*h2 );
+        double r1 = covparms(4)*( h1 + covparms(5)*h2 );
+        double r2 = covparms(6)*( h2 );
+     
+        // 3 is hard coded here
+        double d = 0.0;
+        d += pow( r0, 2 );
+        d += pow( r1, 2 );
+        d += pow( r2, 2 );
+        d =  pow( d, 0.5 );
+            
+        double cov;        
+        if( d == 0.0 ){
+
+            cov = covparms(0);
+            dcovmat(i1,i2,0) += 1.0;
+
+        } else {
+
+	    // derivatives of r0, r1, r2 with respect to covparms
+	    double dr0_dc1 = r0/covparms(1);
+	    double dr0_dc2 = covparms(1)*h1;
+	    double dr0_dc3 = covparms(1)*h2;
+
+	    double dr1_dc4 = r1/covparms(4);
+	    double dr1_dc5 = covparms(4)*h2;
+
+	    double dr2_dc6 = h2;
+
+	    // derivative of scaled distance with respect to covparms
+	    double dd_dc1 = r0*dr0_dc1/d;
+	    double dd_dc2 = r0*dr0_dc2/d;
+	    double dd_dc3 = r0*dr0_dc3/d;
+	    double dd_dc4 = r1*dr1_dc4/d;
+	    double dd_dc5 = r1*dr1_dc5/d;
+	    double dd_dc6 = r2*dr2_dc6/d;
+	    
+	    // derivatives of (d)^nu K_nu(d) with respect to covparms
+            double cov_nu_m1 = normcon*pow( d, smooth - 1.0 )*
+                boost::math::cyl_bessel_k(smooth - 1.0, d);  
+	    dcovmat(i1,i2,1) = d*cov_nu_m1*dd_dc1; 
+	    dcovmat(i1,i2,2) = d*cov_nu_m1*dd_dc2; 
+	    dcovmat(i1,i2,3) = d*cov_nu_m1*dd_dc3; 
+	    dcovmat(i1,i2,4) = d*cov_nu_m1*dd_dc4; 
+	    dcovmat(i1,i2,5) = d*cov_nu_m1*dd_dc5; 
+	    dcovmat(i1,i2,6) = d*cov_nu_m1*dd_dc6; 
+
+            // variance parameter
+            cov = normcon*pow( d, smooth )*boost::math::cyl_bessel_k(smooth, d);  
+            dcovmat(i1,i2,0) += cov/covparms(0);
+    
+            // smoothness parameter (finite differencing)
+            dcovmat(i1,i2,7) += 
+                ( normconeps*pow(d,smooth+eps)*boost::math::cyl_bessel_k(smooth + eps, d) -
+                  cov )/eps;
+        }
+        if( i1 == i2 ){ // update diagonal entry
+            dcovmat(i1,i2,0) += covparms(8);
+            dcovmat(i1,i2,8) += covparms(0); 
+        } else { // fill in opposite entry
+            for(int j=0; j<covparms.n_elem; j++){
+                dcovmat(i2,i1,j) = dcovmat(i1,i2,j);
+            }
+        }
+    }}
+
+    return dcovmat;
+}
+
+
+
+
+
 //' Geometrically anisotropic exponential covariance function (two dimensions)
 //'
 //' From a matrix of locations and covariance parameters of the form

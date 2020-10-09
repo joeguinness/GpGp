@@ -82,6 +82,11 @@ covfun_t get_covfun(std::string covfun_name_string)
         covstruct.p_covfun = &matern_anisotropic3D; 
         covstruct.p_d_covfun = &d_matern_anisotropic3D;
     } 
+    else if( covfun_name_string.compare("matern_anisotropic3D_alt") == 0 )
+    { 
+        covstruct.p_covfun = &matern_anisotropic3D_alt; 
+        covstruct.p_d_covfun = &d_matern_anisotropic3D_alt;
+    } 
     else if( covfun_name_string.compare("matern_nonstat_var") == 0 )
     { 
         covstruct.p_covfun = &matern_nonstat_var; 
