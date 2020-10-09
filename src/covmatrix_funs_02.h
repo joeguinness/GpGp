@@ -310,18 +310,18 @@ arma::cube d_matern_anisotropic3D(arma::vec covparms, arma::mat locs ){
 //' Geometrically anisotropic Matern covariance function (three dimensions, alternate parameterization)
 //'
 //' From a matrix of locations and covariance parameters of the form
-//' (variance, B11, B21, B22, B31, B32, B33, smoothness, nugget), return the square matrix of
+//' (variance, B11, B12, B13, B22, B23, B33, smoothness, nugget), return the square matrix of
 //' all pairwise covariances.
 //' @param locs A matrix with \code{n} rows and \code{3} columns.
 //' Each row of locs is a point in R^3.
 //' @param covparms A vector with covariance parameters
-//' in the form (variance, B11, B21, B22, B31, B32, B33, smoothness, nugget)
+//' in the form (variance, B11, B12, B13, B22, B23, B33, smoothness, nugget)
 //' @return A matrix with \code{n} rows and \code{n} columns, with the i,j entry
 //' containing the covariance between observations at \code{locs[i,]} and
 //' \code{locs[j,]}.
 //' @section Parameterization:
-//' The covariance parameter vector is (variance, B11, B21, B22, B31, B32, B33, smoothness, nugget)
-//' where B11, B21, B22, B31, B32, B33 transform the three coordinates as
+//' The covariance parameter vector is (variance, B11, B12, B13, B22, B23, B33, smoothness, nugget)
+//' where B11, B12, B13, B22, B23, B33, transform the three coordinates as
 //' \deqn{ u_1 = B11[ x_1 + B12 x_2 + B13 x_3] }
 //' \deqn{ u_2 = B22[ x_2 + B23 x_3] }
 //' \deqn{ u_3 = B33[ x_3 ] }
