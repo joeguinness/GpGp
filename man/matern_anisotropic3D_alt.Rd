@@ -25,7 +25,7 @@ all pairwise covariances.
 }
 \section{Parameterization}{
 
-The covariance parameter vector is (variance, L11, L21, L22, L31, L32, L33, smoothness, nugget)
+The covariance parameter vector is (variance, B11, B21, B22, B31, B32, B33, smoothness, nugget)
 where B11, B21, B22, B31, B32, B33 transform the three coordinates as
 \deqn{ u_1 = B11[ x_1 + B12 x_2 + B13 x_3] }
 \deqn{ u_2 = B22[ x_2 + B23 x_3] }
