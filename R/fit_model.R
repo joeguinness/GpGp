@@ -129,6 +129,7 @@ fit_model <- function(y, locs, X = NULL, covfun_name = "matern_isotropic",
               "exponential_anisotropic2D",
               "exponential_anisotropic3D",
               "matern_anisotropic3D",
+              "matern_anisotropic3D_alt",
               "matern_nonstat_var",
               "exponential_nonstat_var",
               "matern_sphere",
@@ -401,7 +402,7 @@ get_start_parms <- function(y,X,locs,covfun_name){
         start_parms <- c(start_var, 1/start_range1, 0, 1/start_range2,
             0, 0, 1/start_range3, start_nug )
     }
-    if(covfun_name == "matern_anisotropic3D"){
+    if(covfun_name == "matern_anisotropic3D" ){
         dmat <- fields::rdist(locs[randinds,1,drop=FALSE])
         start_range1 <- mean( dmat )/4
         dmat <- fields::rdist(locs[randinds,2,drop=FALSE])
@@ -410,6 +411,16 @@ get_start_parms <- function(y,X,locs,covfun_name){
         start_range3 <- mean( dmat )/4
         start_parms <- c(start_var, 1/start_range1, 0, 1/start_range2,
             0, 0, 1/start_range3, start_smooth, start_nug )
+    }
+    if(covfun_name == "matern_anisotropic3D_alt" ){
+        dmat <- fields::rdist(locs[randinds,1,drop=FALSE])
+        start_range1 <- mean( dmat )/4
+        dmat <- fields::rdist(locs[randinds,2,drop=FALSE])
+        start_range2 <- mean( dmat )/4
+        dmat <- fields::rdist(locs[randinds,3,drop=FALSE])
+        start_range3 <- mean( dmat )/4
+        start_parms <- c(start_var, 1/start_range1, 0, 0, 1/start_range2,
+            0, 1/start_range3, start_smooth, start_nug )
     }
     if(covfun_name == "matern_sphere"){
         start_range <- 0.2
@@ -547,13 +558,21 @@ get_linkfun <- function(covfun_name){
         invlink <- function(x)
         { c( log(x[1:2]), x[3], log(x[4]), x[5:6], log(x[7:8]) ) }
     }
-    if(covfun_name == "matern_anisotropic3D"){
+    if(covfun_name == "matern_anisotropic3D" ){
         link <- function(x)
         { c( exp(x[1:2]), x[3], exp(x[4]), x[5:6], exp(x[7:9]) ) }
         dlink <- function(x)
         { c( exp(x[1:2]), 1.0, exp(x[4]), 1.0,1.0, exp(x[7:9]) ) }
         invlink <- function(x)
         { c( log(x[1:2]), x[3], log(x[4]), x[5:6], log(x[7:9]) ) }
+    }
+    if(covfun_name == "matern_anisotropic3D_alt" ){
+        link <- function(x)
+        { c( exp(x[1:2]), x[3:4],  exp(x[5]), x[6], exp(x[7:9]) ) }
+        dlink <- function(x)
+        { c( exp(x[1:2]), 1.0, 1.0, exp(x[5]), 1.0, exp(x[7:9]) ) }
+        invlink <- function(x)
+        { c( log(x[1:2]), x[3:4],  log(x[5]), x[6], log(x[7:9]) ) }
     }
     if(covfun_name == "matern_nonstat_var"){
         link <- function(x){    c( exp(x[1:3]), exp(x[4]), x[5:length(x)]     )}
@@ -694,7 +713,7 @@ get_penalty <- function(y,X,locs,covfun_name){
          dpen <- function(x){  dpen_nug(x,8)  +  dpen_var(x,1)  }
         ddpen <- function(x){  ddpen_nug(x,8)  + ddpen_var(x,1) }
     }
-    if(covfun_name == "matern_anisotropic3D"){
+    if(covfun_name %in% c("matern_anisotropic3D", "matern_anisotropic3D_alt") ){
           pen <- function(x){  pen_nug(x,9) +   pen_sm(x,8) +   pen_var(x,1)   }
          dpen <- function(x){  dpen_nug(x,9) +  dpen_sm(x,8) +  dpen_var(x,1)  }
         ddpen <- function(x){  ddpen_nug(x,9) + ddpen_sm(x,8) + ddpen_var(x,1) }

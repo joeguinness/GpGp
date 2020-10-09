@@ -456,14 +456,15 @@ arma::cube d_matern_anisotropic3D_alt(arma::vec covparms, arma::mat locs ){
 	    double dd_dc6 = r2*dr2_dc6/d;
 	    
 	    // derivatives of (d)^nu K_nu(d) with respect to covparms
+	    // deriv of (d)^n K_nu(d) with respect to d is negative!
             double cov_nu_m1 = normcon*pow( d, smooth - 1.0 )*
                 boost::math::cyl_bessel_k(smooth - 1.0, d);  
-	    dcovmat(i1,i2,1) = d*cov_nu_m1*dd_dc1; 
-	    dcovmat(i1,i2,2) = d*cov_nu_m1*dd_dc2; 
-	    dcovmat(i1,i2,3) = d*cov_nu_m1*dd_dc3; 
-	    dcovmat(i1,i2,4) = d*cov_nu_m1*dd_dc4; 
-	    dcovmat(i1,i2,5) = d*cov_nu_m1*dd_dc5; 
-	    dcovmat(i1,i2,6) = d*cov_nu_m1*dd_dc6; 
+	    dcovmat(i1,i2,1) = -d*cov_nu_m1*dd_dc1; 
+	    dcovmat(i1,i2,2) = -d*cov_nu_m1*dd_dc2; 
+	    dcovmat(i1,i2,3) = -d*cov_nu_m1*dd_dc3; 
+	    dcovmat(i1,i2,4) = -d*cov_nu_m1*dd_dc4; 
+	    dcovmat(i1,i2,5) = -d*cov_nu_m1*dd_dc5; 
+	    dcovmat(i1,i2,6) = -d*cov_nu_m1*dd_dc6; 
 
             // variance parameter
             cov = normcon*pow( d, smooth )*boost::math::cyl_bessel_k(smooth, d);  

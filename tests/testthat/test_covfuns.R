@@ -19,6 +19,7 @@ covfun_names <- c(
     "matern_anisotropic2D",
     "exponential_anisotropic2D",
     "matern_anisotropic3D",
+    "matern_anisotropic3D_alt",
     "exponential_anisotropic3D",
     "matern_nonstat_var",
     "exponential_nonstat_var",
@@ -72,7 +73,7 @@ get_test_locs <- function(covfun_name,n){
         locs <- matrix(runif(2*n),n,2)
     } else if(covfun_name=="exponential_anisotropic3D"){
         locs <- matrix(runif(3*n),n,3)           
-    } else if(covfun_name=="matern_anisotropic3D"){
+    } else if(covfun_name %in% c("matern_anisotropic3D","matern_anisotropic3D_alt") ){
         locs <- matrix(runif(3*n),n,3)           
     } else if(covfun_name=="matern_nonstat_var"){
         locs <- matrix(runif(6*n),n,6)           
@@ -121,7 +122,9 @@ test_that("covariance functions return positive definite matrix", {
 test_that("covariance function derivatives match finite differencing", {
         
     n <- 100    
+
     for(j in 1:length(covfun_names)){
+
         locs <- get_test_locs(covfun_names[j],n)
         covparms <- get_start_parms(rnorm(n),rep(1,n),locs,covfun_names[j])
         covparms <- covparms$start_parms
@@ -140,5 +143,6 @@ test_that("covariance function derivatives match finite differencing", {
         }
         denom <- covmat[1,1]
         expect_equal( dcovmat/denom, ddcov/denom, tolerance = 1e-4 )
+
     }
 })
