@@ -138,6 +138,30 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// matern_anisotropic3D_alt
+arma::mat matern_anisotropic3D_alt(arma::vec covparms, arma::mat locs);
+RcppExport SEXP _GpGp_matern_anisotropic3D_alt(SEXP covparmsSEXP, SEXP locsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec >::type covparms(covparmsSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type locs(locsSEXP);
+    rcpp_result_gen = Rcpp::wrap(matern_anisotropic3D_alt(covparms, locs));
+    return rcpp_result_gen;
+END_RCPP
+}
+// d_matern_anisotropic3D_alt
+arma::cube d_matern_anisotropic3D_alt(arma::vec covparms, arma::mat locs);
+RcppExport SEXP _GpGp_d_matern_anisotropic3D_alt(SEXP covparmsSEXP, SEXP locsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec >::type covparms(covparmsSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type locs(locsSEXP);
+    rcpp_result_gen = Rcpp::wrap(d_matern_anisotropic3D_alt(covparms, locs));
+    return rcpp_result_gen;
+END_RCPP
+}
 // exponential_anisotropic2D
 arma::mat exponential_anisotropic2D(arma::vec covparms, arma::mat locs);
 RcppExport SEXP _GpGp_exponential_anisotropic2D(SEXP covparmsSEXP, SEXP locsSEXP) {
@@ -864,6 +888,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_GpGp_d_matern_anisotropic2D", (DL_FUNC) &_GpGp_d_matern_anisotropic2D, 2},
     {"_GpGp_matern_anisotropic3D", (DL_FUNC) &_GpGp_matern_anisotropic3D, 2},
     {"_GpGp_d_matern_anisotropic3D", (DL_FUNC) &_GpGp_d_matern_anisotropic3D, 2},
+    {"_GpGp_matern_anisotropic3D_alt", (DL_FUNC) &_GpGp_matern_anisotropic3D_alt, 2},
+    {"_GpGp_d_matern_anisotropic3D_alt", (DL_FUNC) &_GpGp_d_matern_anisotropic3D_alt, 2},
     {"_GpGp_exponential_anisotropic2D", (DL_FUNC) &_GpGp_exponential_anisotropic2D, 2},
     {"_GpGp_d_exponential_anisotropic2D", (DL_FUNC) &_GpGp_d_exponential_anisotropic2D, 2},
     {"_GpGp_exponential_anisotropic3D", (DL_FUNC) &_GpGp_exponential_anisotropic3D, 2},
