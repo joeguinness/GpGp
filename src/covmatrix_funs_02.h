@@ -6,7 +6,7 @@
 #include <iostream>
 #include <vector>
 #include "basis.h"
-#include "covmatrix_funs_01.h"
+#include <boost/math/special_functions.hpp>
 
 using namespace Rcpp;
 using namespace arma;

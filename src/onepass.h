@@ -2,7 +2,7 @@
 #define ONEPASS_H
 
 #ifdef _OPENMP
-#include <omp.h>
+  #include <omp.h>
 #endif
 
 #include <RcppArmadillo.h>
