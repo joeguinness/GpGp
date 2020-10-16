@@ -46,5 +46,5 @@ covparms <- c(2, 0.2, 0.75, 0)
 y <- fast_Gp_sim(covparms, "matern_isotropic", locs, 50 )
 ord <- order_maxmin(locs)
 NNarray <- find_ordered_nn(locs,20)
-loglik <- vecchia_meanzero_loglik( covparms, "matern_isotropic", y, locs, NNarray )
+#loglik <- vecchia_meanzero_loglik( covparms, "matern_isotropic", y, locs, NNarray )
 }

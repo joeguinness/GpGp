@@ -64,6 +64,6 @@ y <- fast_Gp_sim(covparms, "matern_isotropic", locs, 50 )
 ord <- order_maxmin(locs)
 NNarray <- find_ordered_nn(locs,20)
 NNlist <- group_obs(NNarray)
-loglik <- vecchia_grouped_profbeta_loglik_grad_info( 
-    covparms, "matern_isotropic", y, X, locs, NNlist )
+#loglik <- vecchia_grouped_profbeta_loglik_grad_info( 
+#    covparms, "matern_isotropic", y, X, locs, NNlist )
 }

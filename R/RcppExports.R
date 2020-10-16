@@ -1037,8 +1037,8 @@ vecchia_Linv <- function(covparms, covfun_name, locs, NNarray, start_ind = 1L) {
 #' y <- X %*% c(1,2) + fast_Gp_sim(covparms, "matern_isotropic", locs, 50 )
 #' ord <- order_maxmin(locs)
 #' NNarray <- find_ordered_nn(locs,20)
-#' loglik <- vecchia_profbeta_loglik_grad_info( covparms, "matern_isotropic", 
-#'     y, X, locs, NNarray )
+#' #loglik <- vecchia_profbeta_loglik_grad_info( covparms, "matern_isotropic", 
+#' #    y, X, locs, NNarray )
 #' @export
 vecchia_profbeta_loglik_grad_info <- function(covparms, covfun_name, y, X, locs, NNarray) {
     .Call('_GpGp_vecchia_profbeta_loglik_grad_info', PACKAGE = 'GpGp', covparms, covfun_name, y, X, locs, NNarray)
@@ -1074,7 +1074,7 @@ vecchia_profbeta_loglik_grad_info <- function(covparms, covfun_name, y, X, locs,
 #' y <- X %*% c(1,2) + fast_Gp_sim(covparms, "matern_isotropic", locs, 50 )
 #' ord <- order_maxmin(locs)
 #' NNarray <- find_ordered_nn(locs,20)
-#' loglik <- vecchia_profbeta_loglik( covparms, "matern_isotropic", y, X, locs, NNarray )
+#' #loglik <- vecchia_profbeta_loglik( covparms, "matern_isotropic", y, X, locs, NNarray )
 #' @export
 vecchia_profbeta_loglik <- function(covparms, covfun_name, y, X, locs, NNarray) {
     .Call('_GpGp_vecchia_profbeta_loglik', PACKAGE = 'GpGp', covparms, covfun_name, y, X, locs, NNarray)
@@ -1112,7 +1112,7 @@ vecchia_profbeta_loglik <- function(covparms, covfun_name, y, X, locs, NNarray) 
 #' y <- fast_Gp_sim(covparms, "matern_isotropic", locs, 50 )
 #' ord <- order_maxmin(locs)
 #' NNarray <- find_ordered_nn(locs,20)
-#' loglik <- vecchia_meanzero_loglik( covparms, "matern_isotropic", y, locs, NNarray )
+#' #loglik <- vecchia_meanzero_loglik( covparms, "matern_isotropic", y, locs, NNarray )
 #' @export
 vecchia_meanzero_loglik <- function(covparms, covfun_name, y, locs, NNarray) {
     .Call('_GpGp_vecchia_meanzero_loglik', PACKAGE = 'GpGp', covparms, covfun_name, y, locs, NNarray)
@@ -1152,8 +1152,8 @@ vecchia_meanzero_loglik <- function(covparms, covfun_name, y, locs, NNarray) {
 #' ord <- order_maxmin(locs)
 #' NNarray <- find_ordered_nn(locs,20)
 #' NNlist <- group_obs(NNarray)
-#' loglik <- vecchia_grouped_profbeta_loglik_grad_info( 
-#'     covparms, "matern_isotropic", y, X, locs, NNlist )
+#' #loglik <- vecchia_grouped_profbeta_loglik_grad_info( 
+#' #    covparms, "matern_isotropic", y, X, locs, NNlist )
 #' @export
 vecchia_grouped_profbeta_loglik_grad_info <- function(covparms, covfun_name, y, X, locs, NNlist) {
     .Call('_GpGp_vecchia_grouped_profbeta_loglik_grad_info', PACKAGE = 'GpGp', covparms, covfun_name, y, X, locs, NNlist)
@@ -1190,8 +1190,8 @@ vecchia_grouped_profbeta_loglik_grad_info <- function(covparms, covfun_name, y, 
 #' ord <- order_maxmin(locs)
 #' NNarray <- find_ordered_nn(locs,20)
 #' NNlist <- group_obs(NNarray)
-#' loglik <- vecchia_grouped_profbeta_loglik( 
-#'     covparms, "matern_isotropic", y, X, locs, NNlist )
+#' #loglik <- vecchia_grouped_profbeta_loglik( 
+#' #    covparms, "matern_isotropic", y, X, locs, NNlist )
 #' @export
 vecchia_grouped_profbeta_loglik <- function(covparms, covfun_name, y, X, locs, NNlist) {
     .Call('_GpGp_vecchia_grouped_profbeta_loglik', PACKAGE = 'GpGp', covparms, covfun_name, y, X, locs, NNlist)
@@ -1228,7 +1228,7 @@ vecchia_grouped_profbeta_loglik <- function(covparms, covfun_name, y, X, locs, N
 #' ord <- order_maxmin(locs)
 #' NNarray <- find_ordered_nn(locs,20)
 #' NNlist <- group_obs(NNarray)
-#' loglik <- vecchia_grouped_meanzero_loglik( covparms, "matern_isotropic", y, locs, NNlist )
+#' #loglik <- vecchia_grouped_meanzero_loglik( covparms, "matern_isotropic", y, locs, NNlist )
 #' @export
 vecchia_grouped_meanzero_loglik <- function(covparms, covfun_name, y, locs, NNlist) {
     .Call('_GpGp_vecchia_grouped_meanzero_loglik', PACKAGE = 'GpGp', covparms, covfun_name, y, locs, NNlist)

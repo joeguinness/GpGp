@@ -66,6 +66,8 @@ void compute_pieces(
 #pragma omp for
     for(int i=0; i<n; i++){
     
+        arma::vec l_covparms(nparms);
+	    for(int j=0; j<nparms; j++){ l_covparms(j) = covparms(j); }
         int bsize = std::min(i+1,m);
 
         // first, fill in ysub, locsub, and X0 in reverse order
@@ -82,10 +84,12 @@ void compute_pieces(
         
         // compute covariance matrix and derivatives and take cholesky
         arma::mat covmat = (*p_covfun)( covparms, locsub );
+		
         arma::cube dcovmat;
         if(grad_info){ 
             dcovmat = (*p_d_covfun)( covparms, locsub ); 
         }
+		
         arma::mat cholmat = eye( size(covmat) );
         chol( cholmat, covmat, "lower" );
         
@@ -216,7 +220,6 @@ void compute_pieces_grouped(
     bool profbeta,
     bool grad_info
 ){
-    
 
     // data dimensions
     //int n = y.length();
@@ -225,6 +228,7 @@ void compute_pieces_grouped(
     int nparms = covparms.n_elem;
     int dim = locs.n_cols;
     
+
     // convert StringVector to std::string to use .compare() below
     std::string covfun_name_string;
     covfun_name_string = covfun_name[0];
@@ -247,7 +251,7 @@ void compute_pieces_grouped(
 
     int nb = last_ind_of_block.n_elem;  // number of blocks
 
-#pragma omp parallel
+	#pragma omp parallel
 {
     arma::mat l_XSX=arma::mat(p, p, fill::zeros);
     arma::vec l_ySX=arma::vec(p, fill::zeros);
@@ -259,10 +263,9 @@ void compute_pieces_grouped(
     arma::vec l_dlogdet=arma::vec(nparms, fill::zeros);
     arma::mat l_ainfo =arma::mat(nparms, nparms, fill::zeros);
     
-#pragma omp for
+    #pragma omp for
     // loop over every block
     for(int i=0; i<nb; i++){
-
 
         // first ind and last ind are the positions in all_inds
         // of the observations for block i.
@@ -287,7 +290,7 @@ void compute_pieces_grouped(
         // fill in ysub, locsub, and X0 in forward order
         arma::mat locsub(bsize, dim);
         arma::vec ysub(bsize);
-        arma::mat X0( bsize, p );
+        arma::mat X0(bsize,p);
         for(int j=0; j<bsize; j++){
             int jglobal = all_inds[first_ind + j] - 1;
             ysub(j) = y( jglobal );
@@ -298,11 +301,13 @@ void compute_pieces_grouped(
         }
 
         // compute covariance matrix and derivatives and take cholesky
-        arma::mat covmat = (*p_covfun)( covparms, locsub );
-        arma::cube dcovmat;
+        arma::mat covmat(bsize,bsize);
+		covmat = (*p_covfun)( covparms, locsub );
+        arma::cube dcovmat(bsize,bsize,nparms);
         if(grad_info){
             dcovmat = (*p_d_covfun)( covparms, locsub );
         }
+
         arma::mat cholmat = eye( size(covmat) );
         chol( cholmat, covmat, "lower" );
 
@@ -311,18 +316,21 @@ void compute_pieces_grouped(
         for(int j=0; j<rsize; j++){ 
             onemat(whichresp(j),j) = 1.0;
         }
-        arma::mat choli2;
+
+        arma::mat choli2(bsize,bsize);
         if(grad_info){
             choli2 = solve( trimatu(cholmat.t()), onemat );
         }
+
         bool cond = bsize > rsize;
         //double fac = 1.0;
         
         // do solves with X and y
-        arma::mat LiX0;
+        arma::mat LiX0( bsize, p );
         if(profbeta){
             LiX0 = solve( trimatl(cholmat), X0 );
         }
+
         arma::vec Liy0 = solve( trimatl(cholmat), ysub );
         // loglik objects
         for(int j=0; j<rsize; j++){
@@ -368,6 +376,7 @@ void compute_pieces_grouped(
                     LidSLi2.subcube(i1, span(k,k), span(j,j)) = LidSLi3;
                 }
             }
+
             // fisher information object
             // bottom right corner gets double counted, so subtract it off
             for(int i=0; i<nparms; i++){ for(int j=0; j<i+1; j++){
@@ -396,7 +405,7 @@ void compute_pieces_grouped(
         }
         }
     }
-#pragma omp critical
+	#pragma omp critical
 {
     *XSX += l_XSX;
     *ySX += l_ySX;
@@ -548,7 +557,6 @@ void synthesize_grouped(
     // fisher information
     arma::mat ainfo = arma::mat(nparms, nparms, fill::zeros);
     
-    
     // this is where the big computation happens
     
     // convert Numeric- to arma
@@ -563,8 +571,6 @@ void synthesize_grouped(
         &XSX, &ySX, &ySy, &logdet, &dXSX, &dySX, &dySy, &dlogdet, &ainfo,
         profbeta, grad_info
     );
-    
-        
         
     // synthesize everything and update loglik, grad, beta, betainfo, info
     
@@ -579,6 +585,7 @@ void synthesize_grouped(
         dbeta.col(j) = solve( XSX, dySX.col(j) - dXSX.slice(j) * abeta );
     }
     }
+
     // get sigmahatsq
     double sig2 = ( ySy - 2.0*as_scalar( ySX.t() * abeta ) + 
         as_scalar( abeta.t() * XSX * abeta ) )/n;

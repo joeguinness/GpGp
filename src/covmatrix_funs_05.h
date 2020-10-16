@@ -5,8 +5,7 @@
 #include <RcppArmadillo.h>
 #include <iostream>
 #include <vector>
-#include "basis.h"
-#include "covmatrix_funs_01.h"
+#include "covmatrix_funs_03.h"
 
 using namespace Rcpp;
 using namespace arma;

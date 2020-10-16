@@ -7,7 +7,6 @@
 #include <RcppArmadillo.h>
 #include <iostream>
 #include <vector>
-#include "basis.h"
 
 using namespace Rcpp;
 using namespace arma;

@@ -7,8 +7,8 @@
 #include <RcppArmadillo.h>
 #include <iostream>
 #include <vector>
-#include "basis.h"
-#include <boost/math/special_functions.hpp>
+#include <boost/math/special_functions/bessel.hpp>
+#include <boost/math/special_functions/gamma.hpp>
 
 using namespace Rcpp;
 using namespace arma;
@@ -137,8 +137,8 @@ arma::mat matern_isotropic(arma::vec covparms, arma::mat locs ){
     int dim = locs.n_cols;
     int n = locs.n_rows;
     double nugget = covparms( 0 )*covparms( 3 );
-    double normcon = covparms(0)/(pow(2.0,covparms(2)-1.0)*boost::math::tgamma(covparms(2) ));
-    
+	double normcon = covparms(0)/(pow(2.0,covparms(2)-1.0)*boost::math::tgamma(covparms(2) ));
+	
     // create scaled locations
     mat locs_scaled(n,dim);
     for(int j=0; j<dim; j++){ 

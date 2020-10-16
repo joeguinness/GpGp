@@ -2,12 +2,10 @@
 #define COVMATRIX_FUNS_10_H
 
 
-
 // covariance functions
 #include <RcppArmadillo.h>
 #include <iostream>
 #include <vector>
-#include "basis.h"
 
 using namespace Rcpp;
 using namespace arma;

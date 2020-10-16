@@ -56,5 +56,5 @@ covparms <- c(2, 0.2, 0.75, 0)
 y <- X \%*\% c(1,2) + fast_Gp_sim(covparms, "matern_isotropic", locs, 50 )
 ord <- order_maxmin(locs)
 NNarray <- find_ordered_nn(locs,20)
-loglik <- vecchia_profbeta_loglik( covparms, "matern_isotropic", y, X, locs, NNarray )
+#loglik <- vecchia_profbeta_loglik( covparms, "matern_isotropic", y, X, locs, NNarray )
 }

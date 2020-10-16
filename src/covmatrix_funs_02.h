@@ -5,12 +5,13 @@
 #include <RcppArmadillo.h>
 #include <iostream>
 #include <vector>
-#include "basis.h"
-#include <boost/math/special_functions.hpp>
+#include <boost/math/special_functions/bessel.hpp>
+#include <boost/math/special_functions/gamma.hpp>
 
 using namespace Rcpp;
 using namespace arma;
 //[[Rcpp::depends(RcppArmadillo)]]
+//[[Rcpp::depends(BH)]]
 
 
 //' Geometrically anisotropic Matern covariance function (two dimensions)

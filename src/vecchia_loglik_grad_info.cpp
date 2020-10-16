@@ -7,6 +7,7 @@
 #include <vector>
 #include "onepass.h"
 //[[Rcpp::depends(RcppArmadillo)]]
+//[[Rcpp::depends(BH)]]
 
 using namespace std;
 using namespace Rcpp;
@@ -43,8 +44,8 @@ using namespace Rcpp;
 //' y <- X %*% c(1,2) + fast_Gp_sim(covparms, "matern_isotropic", locs, 50 )
 //' ord <- order_maxmin(locs)
 //' NNarray <- find_ordered_nn(locs,20)
-//' loglik <- vecchia_profbeta_loglik_grad_info( covparms, "matern_isotropic", 
-//'     y, X, locs, NNarray )
+//' #loglik <- vecchia_profbeta_loglik_grad_info( covparms, "matern_isotropic", 
+//' #    y, X, locs, NNarray )
 //' @export
 // [[Rcpp::export]]
 List vecchia_profbeta_loglik_grad_info( 
@@ -103,7 +104,7 @@ List vecchia_profbeta_loglik_grad_info(
 //' y <- X %*% c(1,2) + fast_Gp_sim(covparms, "matern_isotropic", locs, 50 )
 //' ord <- order_maxmin(locs)
 //' NNarray <- find_ordered_nn(locs,20)
-//' loglik <- vecchia_profbeta_loglik( covparms, "matern_isotropic", y, X, locs, NNarray )
+//' #loglik <- vecchia_profbeta_loglik( covparms, "matern_isotropic", y, X, locs, NNarray )
 //' @export
 // [[Rcpp::export]]
 List vecchia_profbeta_loglik( 
@@ -165,7 +166,7 @@ List vecchia_profbeta_loglik(
 //' y <- fast_Gp_sim(covparms, "matern_isotropic", locs, 50 )
 //' ord <- order_maxmin(locs)
 //' NNarray <- find_ordered_nn(locs,20)
-//' loglik <- vecchia_meanzero_loglik( covparms, "matern_isotropic", y, locs, NNarray )
+//' #loglik <- vecchia_meanzero_loglik( covparms, "matern_isotropic", y, locs, NNarray )
 //' @export
 // [[Rcpp::export]]
 List vecchia_meanzero_loglik( 
@@ -231,8 +232,8 @@ List vecchia_meanzero_loglik(
 //' ord <- order_maxmin(locs)
 //' NNarray <- find_ordered_nn(locs,20)
 //' NNlist <- group_obs(NNarray)
-//' loglik <- vecchia_grouped_profbeta_loglik_grad_info( 
-//'     covparms, "matern_isotropic", y, X, locs, NNlist )
+//' #loglik <- vecchia_grouped_profbeta_loglik_grad_info( 
+//' #    covparms, "matern_isotropic", y, X, locs, NNlist )
 //' @export
 // [[Rcpp::export]]
 List vecchia_grouped_profbeta_loglik_grad_info( 
@@ -296,8 +297,8 @@ List vecchia_grouped_profbeta_loglik_grad_info(
 //' ord <- order_maxmin(locs)
 //' NNarray <- find_ordered_nn(locs,20)
 //' NNlist <- group_obs(NNarray)
-//' loglik <- vecchia_grouped_profbeta_loglik( 
-//'     covparms, "matern_isotropic", y, X, locs, NNlist )
+//' #loglik <- vecchia_grouped_profbeta_loglik( 
+//' #    covparms, "matern_isotropic", y, X, locs, NNlist )
 //' @export
 // [[Rcpp::export]]
 List vecchia_grouped_profbeta_loglik( 
@@ -321,7 +322,6 @@ List vecchia_grouped_profbeta_loglik(
     synthesize_grouped(covparms, covfun_name, locs, NNlist, y, X,
         &ll, &betahat, &grad, &info, &betainfo, true, false 
     );
-    
     
     List ret = List::create( Named("loglik") = ll, Named("betahat") = betahat,
         Named("betainfo") = betainfo );
@@ -360,7 +360,7 @@ List vecchia_grouped_profbeta_loglik(
 //' ord <- order_maxmin(locs)
 //' NNarray <- find_ordered_nn(locs,20)
 //' NNlist <- group_obs(NNarray)
-//' loglik <- vecchia_grouped_meanzero_loglik( covparms, "matern_isotropic", y, locs, NNlist )
+//' #loglik <- vecchia_grouped_meanzero_loglik( covparms, "matern_isotropic", y, locs, NNlist )
 //' @export
 // [[Rcpp::export]]
 List vecchia_grouped_meanzero_loglik( 
