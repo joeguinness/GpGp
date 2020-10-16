@@ -1,4 +1,9 @@
 
+# GpGp 0.3.1
+
+Added matern_anisotropic3D_alt covariance
+Fixed some problems with #includes in src files
+
 # GpGp 0.3.0
 
 Now uses OpenMP for parallel computations of the likelihood.
