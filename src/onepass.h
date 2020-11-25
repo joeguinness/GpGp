@@ -66,10 +66,19 @@ void compute_pieces(
 #pragma omp for
     for(int i=0; i<n; i++){
     
+		// create the vector of time points
+		std::vector<std::chrono::steady_clock::time_point> tt;
+		std::vector<std::string> mess;
+		
         arma::vec l_covparms(nparms);
 	    for(int j=0; j<nparms; j++){ l_covparms(j) = covparms(j); }
         int bsize = std::min(i+1,m);
 
+		// add a checkpoint like this:
+		tt.push_back( std::chrono::steady_clock::now() );
+		// push back an empty string for first element
+		mess.push_back("");
+		
         // first, fill in ysub, locsub, and X0 in reverse order
         arma::mat locsub(bsize, dim);
         arma::vec ysub(bsize);
@@ -82,17 +91,34 @@ void compute_pieces(
             }
         }
         
+		// checkpoint:
+		tt.push_back( std::chrono::steady_clock::now() );
+		// add a message for what was computed before the checkpoint
+		mess.push_back("fill subvectors and submatrices");
+		
         // compute covariance matrix and derivatives and take cholesky
         arma::mat covmat = (*p_covfun)( covparms, locsub );
+		
+		//checkpoint
+		tt.push_back( std::chrono::steady_clock::now() );
+		mess.push_back("compute covariances");
 		
         arma::cube dcovmat;
         if(grad_info){ 
             dcovmat = (*p_d_covfun)( covparms, locsub ); 
         }
 		
+		//checkpoint
+		tt.push_back( std::chrono::steady_clock::now() );
+		mess.push_back("compute covariance derivatives" );
+		
         arma::mat cholmat = eye( size(covmat) );
         chol( cholmat, covmat, "lower" );
         
+		//checkpoint
+		tt.push_back( std::chrono::steady_clock::now() );
+		mess.push_back("take cholesky" );
+		
         // i1 is conditioning set, i2 is response        
         //arma::span i1 = span(0,bsize-2);
         arma::span i2 = span(bsize-1,bsize-1);
@@ -105,6 +131,10 @@ void compute_pieces(
             choli2 = solve( trimatu(cholmat.t()), onevec );
         }
         
+		//checkpoint
+		tt.push_back( std::chrono::steady_clock::now() );
+		mess.push_back("solve with onevec" );
+		
         bool cond = bsize > 1;
         //double fac = 1.0;
         
@@ -115,6 +145,10 @@ void compute_pieces(
         }
         arma::vec Liy0 = solve( trimatl(cholmat), ysub );
         
+		//checkpoint
+		tt.push_back( std::chrono::steady_clock::now() );
+		mess.push_back("solves with X and y" );
+		
         // loglik objects
         l_logdet += 2.0*std::log( as_scalar(cholmat(i2,i2)) ); 
         l_ySy +=    pow( as_scalar(Liy0(i2)), 2 );
@@ -123,62 +157,81 @@ void compute_pieces(
             l_ySX += ( Liy0(i2) * LiX0.rows(i2) ).t();
         }
         
+		//checkpoint
+		tt.push_back( std::chrono::steady_clock::now() );
+		mess.push_back("update loglik objects" );
+		
         if( grad_info ){
-        // gradient objects
-        // LidSLi3 is last column of Li * (dS_j) * Lit for 1 parameter i
-        // LidSLi2 stores these columns in a matrix for all parameters
-        arma::mat LidSLi2(bsize,nparms);
-        
-        if(cond){ // if we condition on anything
+            // gradient objects
+            // LidSLi3 is last column of Li * (dS_j) * Lit for 1 parameter i
+            // LidSLi2 stores these columns in a matrix for all parameters
+            arma::mat LidSLi2(bsize,nparms);
             
-            for(int j=0; j<nparms; j++){
-                // compute last column of Li * (dS_j) * Lit
-                arma::vec LidSLi3 = solve( trimatl(cholmat), dcovmat.slice(j) * choli2 );
-                // store LiX0.t() * LidSLi3 and Liy0.t() * LidSLi3
-                arma::vec v1 = LiX0.t() * LidSLi3;
-                double s1 = as_scalar( Liy0.t() * LidSLi3 ); 
-                // update all quantities
-                // bottom-right corner gets double counted, so need to subtract it off
-                (l_dXSX).slice(j) += v1 * LiX0.rows(i2) + ( v1 * LiX0.rows(i2) ).t() - 
-                    as_scalar(LidSLi3(i2)) * ( LiX0.rows(i2).t() * LiX0.rows(i2) );
-                (l_dySy)(j) += as_scalar( 2.0 * s1 * Liy0(i2)  - 
-                    LidSLi3(i2) * Liy0(i2) * Liy0(i2) );
-                (l_dySX).col(j) += (  s1 * LiX0.rows(i2) + ( v1 * Liy0(i2) ).t() -  
-                    as_scalar( LidSLi3(i2) ) * LiX0.rows(i2) * as_scalar( Liy0(i2))).t();
-                (l_dlogdet)(j) += as_scalar( LidSLi3(i2) );
-                // store last column of Li * (dS_j) * Lit
-                LidSLi2.col(j) = LidSLi3;
+            if(cond){ // if we condition on anything
+                
+                for(int j=0; j<nparms; j++){
+                    // compute last column of Li * (dS_j) * Lit
+                    arma::vec LidSLi3 =
+						solve( trimatl(cholmat), dcovmat.slice(j) * choli2 );
+                    // store LiX0.t() * LidSLi3 and Liy0.t() * LidSLi3
+                    arma::vec v1 = LiX0.t() * LidSLi3;
+                    double s1 = as_scalar( Liy0.t() * LidSLi3 ); 
+                    // update all quantities
+                    // bottom-right corner gets double counted, so need to subtract it off
+                    (l_dXSX).slice(j) +=
+						v1 * LiX0.rows(i2) + ( v1 * LiX0.rows(i2) ).t() - 
+                        as_scalar(LidSLi3(i2)) * ( LiX0.rows(i2).t() * LiX0.rows(i2) );
+                    (l_dySy)(j) += as_scalar( 2.0 * s1 * Liy0(i2)  - 
+                        LidSLi3(i2) * Liy0(i2) * Liy0(i2) );
+                    (l_dySX).col(j) +=
+						(  s1 * LiX0.rows(i2) + ( v1 * Liy0(i2) ).t() -  
+                        as_scalar( LidSLi3(i2) ) * LiX0.rows(i2) *
+						as_scalar( Liy0(i2))).t();
+                    (l_dlogdet)(j) += as_scalar( LidSLi3(i2) );
+                    // store last column of Li * (dS_j) * Lit
+                    LidSLi2.col(j) = LidSLi3;
+                }
+
+                // fisher information object
+                // bottom right corner gets double counted, so subtract it off
+                for(int i=0; i<nparms; i++){ for(int j=0; j<i+1; j++){
+                    (l_ainfo)(i,j) += 
+                        1.0*accu( LidSLi2.col(i) % LidSLi2.col(j) ) - 
+                        0.5*accu( LidSLi2.rows(i2).col(j) %
+                                  LidSLi2.rows(i2).col(i) );
+                }}
+                
+            } else { // similar calculations, but for when there is no conditioning set
+                for(int j=0; j<nparms; j++){
+                    arma::mat LidSLi = solve( trimatl(cholmat), dcovmat.slice(j) );
+                    LidSLi = solve( trimatl(cholmat), LidSLi.t() );
+                    (l_dXSX).slice(j) += LiX0.t() *  LidSLi * LiX0; 
+                    (l_dySy)(j) += as_scalar( Liy0.t() * LidSLi * Liy0 );
+                    (l_dySX).col(j) += ( ( Liy0.t() * LidSLi ) * LiX0 ).t();
+                    (l_dlogdet)(j) += trace( LidSLi );
+                    LidSLi2.col(j) = LidSLi;
+                }
+                
+                // fisher information object
+                for(int i=0; i<nparms; i++){ for(int j=0; j<i+1; j++){
+                    (l_ainfo)(i,j) += 0.5*accu( LidSLi2.col(i) % LidSLi2.col(j) ); 
+                }}
+
             }
-
-            // fisher information object
-            // bottom right corner gets double counted, so subtract it off
-            for(int i=0; i<nparms; i++){ for(int j=0; j<i+1; j++){
-                (l_ainfo)(i,j) += 
-                    1.0*accu( LidSLi2.col(i) % LidSLi2.col(j) ) - 
-                    0.5*accu( LidSLi2.rows(i2).col(j) %
-                              LidSLi2.rows(i2).col(i) );
-            }}
-            
-        } else { // similar calculations, but for when there is no conditioning set
-            for(int j=0; j<nparms; j++){
-                arma::mat LidSLi = solve( trimatl(cholmat), dcovmat.slice(j) );
-                LidSLi = solve( trimatl(cholmat), LidSLi.t() );
-                (l_dXSX).slice(j) += LiX0.t() *  LidSLi * LiX0; 
-                (l_dySy)(j) += as_scalar( Liy0.t() * LidSLi * Liy0 );
-                (l_dySX).col(j) += ( ( Liy0.t() * LidSLi ) * LiX0 ).t();
-                (l_dlogdet)(j) += trace( LidSLi );
-                LidSLi2.col(j) = LidSLi;
-            }
-            
-            // fisher information object
-            for(int i=0; i<nparms; i++){ for(int j=0; j<i+1; j++){
-                (l_ainfo)(i,j) += 0.5*accu( LidSLi2.col(i) % LidSLi2.col(j) ); 
-            }}
-
-        }
         
         }
 
+		//checkpoint
+		tt.push_back( std::chrono::steady_clock::now() );
+		mess.push_back("gradient and fisher" );
+		
+		// print out timing
+		if( i == 1000 ){
+			for( int j=1; j<mess.size(); j++){
+		        cout <<	std::chrono::duration_cast<std::chrono::microseconds>(tt[j]-tt[j-1]).count();	
+				cout << " " << mess[j] << endl;
+			}
+		}
     }
 #pragma omp critical
 {
