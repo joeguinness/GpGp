@@ -134,6 +134,9 @@ arma::cube d_exponential_isotropic(arma::vec covparms, arma::mat locs ){
 // [[Rcpp::export]]
 arma::mat matern_isotropic(arma::vec covparms, arma::mat locs ){
 
+	// fail-safe to prevent large smoothness values
+	covparms(2) = std::min( covparms(2), 8.0 );
+	
     int dim = locs.n_cols;
     int n = locs.n_rows;
     double nugget = covparms( 0 )*covparms( 3 );
@@ -181,6 +184,9 @@ arma::mat matern_isotropic(arma::vec covparms, arma::mat locs ){
 // [[Rcpp::export]]
 arma::cube d_matern_isotropic(arma::vec covparms, arma::mat locs ){
 
+	// fail-safe to prevent large smoothness values
+	covparms(2) = std::min( covparms(2), 8.0 );
+	
     int dim = locs.n_cols;
     int n = locs.n_rows;
     //double nugget = covparms( 0 )*covparms( 3 );

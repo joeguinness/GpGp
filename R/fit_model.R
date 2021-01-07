@@ -682,6 +682,33 @@ get_penalty <- function(y,X,locs,covfun_name){
         return(ddpen)
     }
 
+    # penalty on large smoothness parameters
+    pen_sm_hi <- function(x,j){sm <-8.0; bb<-0.5; tt<-3.0; pen_hi(x[j]/bb,tt,sm) }
+    dpen_sm_hi <- function(x,j){
+        sm <- 8.0
+        bb <- 0.5
+        tt <- 3.0
+        dpen <- rep(0,length(x))
+        dpen[j] <- 1/bb*dpen_hi(x[j]/bb,tt,sm)
+        return(dpen)
+    }
+    ddpen_sm_hi <- function(x,j){
+        sm <- 8.0
+        bb <- 0.5
+        tt <- 3.0
+        ddpen <- matrix(0,length(x),length(x))
+        ddpen[j,j] <- 1/bb^2*ddpen_hi(x[j]/bb,tt,sm)
+        return(ddpen)
+    }
+
+    #for(k in 1:length(xvec)){
+    #    penvec[k] <- pen_sm_hi(xvec[k],1)
+    #    dpenvec[k] <- dpen_sm_hi(xvec[k],1)[1]
+    #    ddpenvec[k] <- ddpen_sm_hi(xvec[k],1)[1,1]
+    #}
+    #plot(xvec,ddpenvec)
+    #lines(xvec[3:length(xvec)],diff(diff(penvec))/0.1^2)
+    
     if(covfun_name %in% c("exponential_isotropic","exponential_isotropic_fast")){
           pen <- function(x){  pen_nug(x,3) +   pen_var(x,1)   }
          dpen <- function(x){  dpen_nug(x,3) +  dpen_var(x,1)  }
@@ -694,9 +721,14 @@ get_penalty <- function(y,X,locs,covfun_name){
         ddpen <- function(x){  ddpen_nug(x,3) + ddpen_var(x,1) }
     }
     if(covfun_name == "matern_isotropic"){
-          pen <- function(x){  pen_nug(x,4) +   pen_sm(x,3) +   pen_var(x,1)   }
-         dpen <- function(x){  dpen_nug(x,4) +  dpen_sm(x,3) +  dpen_var(x,1)  }
-        ddpen <- function(x){  ddpen_nug(x,4) + ddpen_sm(x,3) + ddpen_var(x,1) }
+          pen <- function(x){
+              pen_nug(x,4) +   pen_sm(x,3) +   pen_var(x,1) + pen_sm_hi(x,3)
+          }
+         dpen <- function(x){
+             dpen_nug(x,4) +  dpen_sm(x,3) +  dpen_var(x,1) + dpen_sm_hi(x,3)
+         }
+        ddpen <- function(x){
+            ddpen_nug(x,4) + ddpen_sm(x,3) + ddpen_var(x,1) + ddpen_sm_hi(x,3) }
     }
     if(covfun_name == "matern_anisotropic2D"){
           pen <- function(x){  pen_nug(x,6) +   pen_sm(x,5) +   pen_var(x,1)   }
