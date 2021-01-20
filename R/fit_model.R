@@ -746,9 +746,9 @@ get_penalty <- function(y,X,locs,covfun_name){
         ddpen <- function(x){  ddpen_nug(x,8)  + ddpen_var(x,1) }
     }
     if(covfun_name %in% c("matern_anisotropic3D", "matern_anisotropic3D_alt") ){
-          pen <- function(x){  pen_nug(x,9) +   pen_sm(x,8) +   pen_var(x,1)   }
-         dpen <- function(x){  dpen_nug(x,9) +  dpen_sm(x,8) +  dpen_var(x,1)  }
-        ddpen <- function(x){  ddpen_nug(x,9) + ddpen_sm(x,8) + ddpen_var(x,1) }
+          pen <- function(x){  pen_nug(x,9) +   pen_sm(x,8) +   pen_var(x,1) + pen_sm_hi(x,8)  }
+         dpen <- function(x){  dpen_nug(x,9) +  dpen_sm(x,8) +  dpen_var(x,1) + dpen_sm_hi(x,8) }
+        ddpen <- function(x){  ddpen_nug(x,9) + ddpen_sm(x,8) + ddpen_var(x,1) + ddpen_sm_hi(x,8) }
     }
     if(covfun_name == "matern_sphere"){
           pen <- function(x){  pen_nug(x,4) +   pen_sm(x,3) +   pen_var(x,1)   }
