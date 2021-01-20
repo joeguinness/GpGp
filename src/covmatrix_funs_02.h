@@ -345,6 +345,9 @@ arma::mat matern_anisotropic3D_alt(arma::vec covparms, arma::mat locs ){
     // nugget = sigmasq*tausq
     // overall variance = sigmasq*(1 + tausq) = sigmasq + nugget
     
+	// fail-safe to prevent large smoothness values
+	covparms(7) = std::min( covparms(7), 8.0 );
+	
     //int dim = locs.n_cols;
     int n = locs.n_rows;
     double nugget = covparms( 0 )*covparms( 8 );
@@ -403,6 +406,9 @@ arma::cube d_matern_anisotropic3D_alt(arma::vec covparms, arma::mat locs ){
     // nugget = sigmasq*tausq
     // overall variance = sigmasq*(1 + tausq) = sigmasq + nugget
 
+	// fail-safe to prevent large smoothness values
+	covparms(7) = std::min( covparms(7), 8.0 );
+	
     int n = locs.n_rows;
     //double nugget = covparms( 0 )*covparms( 8 );
     double smooth = covparms( 7 );
