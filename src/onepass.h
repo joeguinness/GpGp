@@ -47,7 +47,7 @@ void compute_pieces(
     // assign covariance fun and derivative based on covfun_name_string
 
     /* p_covfun is an array of length 1. Its entry is a pointer to a function which takes
-     in arma::vec and arma::mar and returns mat. p_d_covfun is analogous. This was a workaround for the solaris bug*/
+     in arma::vec and arma::mat and returns mat. p_d_covfun is analogous. This was a workaround for the solaris bug*/
 
     mat (*p_covfun[1])(arma::vec, arma::mat);
     cube (*p_d_covfun[1])(arma::vec, arma::mat);
@@ -653,7 +653,6 @@ NumericMatrix vecchia_Linv(
     int m = NNarray.n_cols;
     //int nparms = covparms.length();
     int dim = locs.n_cols;
-    NumericMatrix Linv(n,m);
     
     // convert StringVector to std::string to use .compare() below
     std::string covfun_name_string;
@@ -663,11 +662,16 @@ NumericMatrix vecchia_Linv(
     mat (*p_covfun[1])(arma::vec, arma::mat);
     cube (*p_d_covfun[1])(arma::vec, arma::mat);
     get_covfun(covfun_name_string, p_covfun, p_d_covfun);
-
+    
+    arma::mat Linv = arma::mat(n, m, fill::zeros);
     // loop over every observation    
+#pragma omp parallel 
+{
+    arma::mat l_Linv = arma::mat(n, m, fill::zeros);
+#pragma omp for
     for(int i=start_ind-1; i<n; i++){
     
-        Rcpp::checkUserInterrupt();
+        //Rcpp::checkUserInterrupt();
         int bsize = std::min(i+1,m);
 
         // first, fill in ysub, locsub, and X0 in reverse order
@@ -693,10 +697,14 @@ NumericMatrix vecchia_Linv(
             choli2 = solve( trimatu(cholmat.t()), onevec );
         }
         for(int j=bsize-1; j>=0; j--){
-            Linv(i,bsize-1-j) = choli2(j);
+            l_Linv(i,bsize-1-j) = choli2(j);
         }
-    }    
-    return Linv;    
+    }
+#pragma omp critical
+    Linv += l_Linv; 
+}
+    NumericMatrix Linv_r = wrap(Linv);
+    return Linv_r;    
 }
 
 
