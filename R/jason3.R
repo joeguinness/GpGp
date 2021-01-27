@@ -14,5 +14,5 @@
 #'   \item{lat}{latitude in degrees between -90 and 90}
 #'   \item{time}{time in seconds from midnight August 4}
 #' }
-#' @source \url{https://www.nodc.noaa.gov/SatelliteData/jason/}
+#' @source \url{https://www.ncei.noaa.gov/products/jason-satellite-products}
 "jason3"
