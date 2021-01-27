@@ -1,4 +1,15 @@
 
+# GpGp 0.3.2
+
+The major purpose of this release is to fix an error
+on CRAN checks for Oracle Developer Studio. We have also
+parallelized the computation of the inverse cholesky
+factor, and included safeguards against large smoothness
+parameters in matern_isotropic.
+
+Many thanks for Youssef Fahmy for finally cracking
+the solaris error.
+
 # GpGp 0.3.1
 
 Added matern_anisotropic3D_alt covariance
