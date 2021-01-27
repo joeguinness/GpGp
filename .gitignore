@@ -6,4 +6,3 @@ inst/doc
 .gitignore~
 src/*.so
 src/*.o
-cran-comments.md
