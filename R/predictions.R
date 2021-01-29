@@ -40,8 +40,19 @@ predictions <- function(fit = NULL, locs_pred, X_pred,
     
     # get orderings
     if(reorder){
-        ord1 <- order_maxmin(locs_obs)
-        ord2 <- order_maxmin(locs_pred)
+
+        if( n_obs < 1e5 ){
+            ord1 <- order_maxmin(locs_obs)
+        } else {
+            ord1 <- sample( 1:n_obs )
+        }
+        
+        if( n_pred < 1e5 ){
+            ord2 <- order_maxmin(locs_pred)
+        } else {
+            ord2 <- sample( 1:n_pred )
+        }
+
     } else {
         ord1 <- 1:n_obs
         ord2 <- 1:n_pred
