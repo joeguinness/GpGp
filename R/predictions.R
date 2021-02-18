@@ -82,12 +82,10 @@ predictions <- function(fit = NULL, locs_pred, X_pred,
         dd <- ncol(locs_all)
     }
     #NNarray_all <- find_ordered_nn(locs_all[,1:dd,drop=FALSE],m=m,lonlat = lonlat)
-    NNarray_all <- find_ordered_nn(locs_all,m=m,
-        lonlat = lonlat,st_scale=st_scale)
+    NNarray_all <- find_ordered_nn(locs_all,m=m, lonlat = lonlat,st_scale=st_scale)
     
     # get entries of Linv for obs locations and pred locations
-    Linv_all <- vecchia_Linv(covparms,covfun_name,locs_all,
-        NNarray_all, n_obs+1)
+    Linv_all <- vecchia_Linv(covparms,covfun_name,locs_all, NNarray_all, n_obs+1)
     
     y_withzeros <- c(yord_obs - c(Xord_obs %*% beta), rep(0,n_pred) )
     v1 <- Linv_mult(Linv_all, y_withzeros, NNarray_all )
