@@ -17,13 +17,23 @@
 #' \itemize{
 #'     \item \code{\link{matern_isotropic}}
 #'     \item \code{\link{exponential_isotropic}}
-#'     \item \code{\link{matern_spacetime}}
-#'     \item \code{\link{exponential_spacetime}}
-#'     \item \code{\link{matern_scaledim}}
-#'     \item \code{\link{exponential_scaledim}}
 #'     \item \code{\link{matern_anisotropic2D}}
 #'     \item \code{\link{exponential_anisotropic2D}}
+#'     \item \code{\link{matern_anisotropic3D}}
 #'     \item \code{\link{exponential_anisotropic3D}}
+#'     \item \code{\link{matern_anisotropic3D_alt}}
+#'     \item \code{\link{matern15_isotropic}}
+#'     \item \code{\link{matern25_isotropic}}
+#'     \item \code{\link{matern35_isotropic}}
+#'     \item \code{\link{matern45_isotropic}}
+#'     \item \code{\link{matern_scaledim}}
+#'     \item \code{\link{exponential_scaledim}}
+#'     \item \code{\link{matern15_scaledim}}
+#'     \item \code{\link{matern25_scaledim}}
+#'     \item \code{\link{matern35_scaledim}}
+#'     \item \code{\link{matern45_scaledim}}
+#'     \item \code{\link{matern_spacetime}}
+#'     \item \code{\link{exponential_spacetime}}
 #'     \item \code{\link{matern_nonstat_var}}
 #'     \item \code{\link{exponential_nonstat_var}}
 #'     \item \code{\link{matern_sphere}}
