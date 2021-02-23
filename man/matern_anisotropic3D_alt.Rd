@@ -27,9 +27,11 @@ all pairwise covariances.
 
 The covariance parameter vector is (variance, B11, B12, B13, B22, B23, B33, smoothness, nugget)
 where B11, B12, B13, B22, B23, B33, transform the three coordinates as
-\deqn{ u_1 = B11[ x_1 + B12 x_2 + B13 x_3] }
+\deqn{ u_1 = B11[ x_1 + B12 x_2 + (B13 + B12 B23) x_3] }
 \deqn{ u_2 = B22[ x_2 + B23 x_3] }
 \deqn{ u_3 = B33[ x_3 ] }
+NOTE: the u_1 transformation is different from previous versions of this function.
+NOTE: now (B13,B23) can be interpreted as a drift vector in space over time.
 Assuming x is transformed to u and y transformed to v, the covariances are 
 \deqn{ M(x,y) = \sigma^2 2^{1-\nu}/\Gamma(\nu) (|| u - v || )^\nu K_\nu(|| u - v ||) }
 The nugget value \eqn{ \sigma^2 \tau^2 } is added to the diagonal of the covariance matrix.
