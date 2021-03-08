@@ -2,9 +2,12 @@
 % Please edit documentation in R/RcppExports.R
 \name{exponential_anisotropic3D_alt}
 \alias{exponential_anisotropic3D_alt}
+\alias{d_exponential_anisotropic3D_alt}
 \title{Geometrically anisotropic exponential covariance function (three dimensions, alternate parameterization)}
 \usage{
 exponential_anisotropic3D_alt(covparms, locs)
+
+d_exponential_anisotropic3D_alt(covparms, locs)
 }
 \arguments{
 \item{covparms}{A vector with covariance parameters
@@ -23,6 +26,11 @@ From a matrix of locations and covariance parameters of the form
 (variance, B11, B12, B13, B22, B23, B33, smoothness, nugget), return the square matrix of
 all pairwise covariances.
 }
+\section{Functions}{
+\itemize{
+\item \code{d_exponential_anisotropic3D_alt}: Derivatives of anisotropic Matern covariance
+}}
+
 \section{}{
 NA
 }

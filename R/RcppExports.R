@@ -276,7 +276,7 @@ exponential_anisotropic3D_alt <- function(covparms, locs) {
     .Call('_GpGp_exponential_anisotropic3D_alt', PACKAGE = 'GpGp', covparms, locs)
 }
 
-#' @describeIn matern_anisotropic3D Derivatives of anisotropic Matern covariance
+#' @describeIn exponential_anisotropic3D_alt Derivatives of anisotropic Matern covariance
 d_exponential_anisotropic3D_alt <- function(covparms, locs) {
     .Call('_GpGp_d_exponential_anisotropic3D_alt', PACKAGE = 'GpGp', covparms, locs)
 }

@@ -854,16 +854,16 @@ arma::mat exponential_anisotropic3D_alt(arma::vec covparms, arma::mat locs ){
     return covmat;
 }
 
-//' @describeIn matern_anisotropic3D Derivatives of anisotropic Matern covariance
+//' @describeIn exponential_anisotropic3D_alt Derivatives of anisotropic Matern covariance
 // [[Rcpp::export]]
 arma::cube d_exponential_anisotropic3D_alt(arma::vec covparms, arma::mat locs ){
 
     // covparms(0) = sigmasq
     // covparms(1) = B00
-    // covparms(2) = B10
-    // covparms(3) = B11
-    // covparms(4) = B20
-    // covparms(5) = B21
+    // covparms(2) = B01
+    // covparms(3) = B02
+    // covparms(4) = B11
+    // covparms(5) = B12
     // covparms(6) = B22
     // covparms(7) = tausq
     // nugget = sigmasq*tausq

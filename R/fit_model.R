@@ -561,13 +561,21 @@ get_linkfun <- function(covfun_name){
         ddlink <- function(x){  c( exp(x[1:2]), 0.0,  exp(x[4:5]) ) }
         invlink <- function(x){ c( log(x[1:2]), x[3], log(x[4:5]) ) }
     }
-    if(covfun_name %in% c("exponential_anisotropic3D","exponential_anisotropic3D_alt")){
+    if(covfun_name %in% c("exponential_anisotropic3D")){
         link <- function(x)
         { c( exp(x[1:2]), x[3], exp(x[4]), x[5:6], exp(x[7:8]) ) }
         dlink <- function(x)
         { c( exp(x[1:2]), 1.0, exp(x[4]), 1.0,1.0, exp(x[7:8]) ) }
         invlink <- function(x)
         { c( log(x[1:2]), x[3], log(x[4]), x[5:6], log(x[7:8]) ) }
+    }
+    if(covfun_name %in% c("exponential_anisotropic3D_alt")){
+        link <- function(x)
+        { c( exp(x[1:2]), x[3:4], exp(x[5]), x[6], exp(x[7:8]) ) }
+        dlink <- function(x)
+        { c( exp(x[1:2]), 1.0,1.0, exp(x[5]), 1.0, exp(x[7:8]) ) }
+        invlink <- function(x)
+        { c( log(x[1:2]), x[3:4], log(x[5]), x[6], log(x[7:8]) ) }
     }
     if(covfun_name == "matern_anisotropic3D" ){
         link <- function(x)
