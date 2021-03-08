@@ -52,6 +52,11 @@ void get_covfun(std::string covfun_name_string,  mat (*p_covfun[1])(arma::vec, a
         p_covfun[0] = exponential_anisotropic3D; 
         p_d_covfun[0] = d_exponential_anisotropic3D;
     } 
+    else if( covfun_name_string.compare("exponential_anisotropic3D_alt") == 0 )
+    { 
+        p_covfun[0] = exponential_anisotropic3D_alt; 
+        p_d_covfun[0] = d_exponential_anisotropic3D_alt;
+    } 
     else if( covfun_name_string.compare("matern_anisotropic3D") == 0 )
     { 
         p_covfun[0] = matern_anisotropic3D; 

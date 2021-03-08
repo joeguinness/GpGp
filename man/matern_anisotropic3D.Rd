@@ -4,6 +4,7 @@
 \alias{matern_anisotropic3D}
 \alias{d_matern_anisotropic3D}
 \alias{d_matern_anisotropic3D_alt}
+\alias{d_exponential_anisotropic3D_alt}
 \title{Geometrically anisotropic Matern covariance function (three dimensions)}
 \usage{
 matern_anisotropic3D(covparms, locs)
@@ -11,6 +12,8 @@ matern_anisotropic3D(covparms, locs)
 d_matern_anisotropic3D(covparms, locs)
 
 d_matern_anisotropic3D_alt(covparms, locs)
+
+d_exponential_anisotropic3D_alt(covparms, locs)
 }
 \arguments{
 \item{covparms}{A vector with covariance parameters
@@ -34,6 +37,8 @@ all pairwise covariances.
 \item \code{d_matern_anisotropic3D}: Derivatives of anisotropic Matern covariance
 
 \item \code{d_matern_anisotropic3D_alt}: Derivatives of anisotropic Matern covariance
+
+\item \code{d_exponential_anisotropic3D_alt}: Derivatives of anisotropic Matern covariance
 }}
 
 \section{Parameterization}{

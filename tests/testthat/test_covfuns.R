@@ -21,6 +21,7 @@ covfun_names <- c(
     "matern_anisotropic3D",
     "matern_anisotropic3D_alt",
     "exponential_anisotropic3D",
+    "exponential_anisotropic3D_alt",
     "matern_nonstat_var",
     "exponential_nonstat_var",
     "matern_sphere",
@@ -71,7 +72,7 @@ get_test_locs <- function(covfun_name,n){
         locs <- matrix(runif(2*n),n,2)
     } else if(covfun_name=="exponential_anisotropic2D"){
         locs <- matrix(runif(2*n),n,2)
-    } else if(covfun_name=="exponential_anisotropic3D"){
+    } else if(covfun_name %in% c("exponential_anisotropic3D","exponential_anisotropic3D_alt")){
         locs <- matrix(runif(3*n),n,3)           
     } else if(covfun_name %in% c("matern_anisotropic3D","matern_anisotropic3D_alt") ){
         locs <- matrix(runif(3*n),n,3)           
