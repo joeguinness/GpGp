@@ -31,7 +31,9 @@ covfun_names <- c(
     "matern_sphere_warp",
     "exponential_sphere_warp",
     "matern_spheretime_warp",
-    "exponential_spheretime_warp"
+    "exponential_spheretime_warp",
+    "matern_categorical",
+    "matern_spacetime_categorical"
 )
 
 get_test_locs <- function(covfun_name,n){
@@ -96,6 +98,10 @@ get_test_locs <- function(covfun_name,n){
         locs <- cbind(lonlat,runif(n))
     } else if(covfun_name=="exponential_spheretime_warp"){
         locs <- cbind(lonlat,runif(n))
+    } else if(covfun_name=="matern_categorical"){
+        locs <- cbind(runif(n),runif(n), sample(1:3,n,replace=TRUE))
+    } else if(covfun_name=="matern_spacetime_categorical"){
+        locs <- cbind(runif(n),runif(n),runif(n), sample(1:3,n,replace=TRUE))
     } else {
         stop("unrecognized covariance in testing function")
     }
