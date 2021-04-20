@@ -917,17 +917,17 @@ d_matern45_scaledim <- function(covparms, locs) {
 #' Isotropic Matern covariance function with random effects for categories
 #'
 #' From a matrix of locations and covariance parameters of the form
-#' (variance, range, smoothness, category, nugget), return the square matrix of
+#' (variance, range, smoothness, category variance, nugget), return the square matrix of
 #' all pairwise covariances.
 #' @param locs A matrix with \code{n} rows and \code{d} columns.
 #' Each row of locs gives a point in R^d.
 #' @param covparms A vector with covariance parameters
-#' in the form (variance, range, smoothness, category, nugget)
+#' in the form (variance, range, smoothness, category variance, nugget)
 #' @return A matrix with \code{n} rows and \code{n} columns, with the i,j entry
 #' containing the covariance between observations at \code{locs[i,]} and
 #' \code{locs[j,]}.
 #' @section Parameterization:
-#' The covariance parameter vector is (variance, range, smoothness, category, nugget)
+#' The covariance parameter vector is (variance, range, smoothness, category variance, nugget)
 #' = \eqn{(\sigma^2,\alpha,\nu,c^2,\tau^2)}, and the covariance function is parameterized
 #' as
 #' \deqn{ M(x,y) = \sigma^2 2^{1-\nu}/\Gamma(\nu) (|| x - y ||/\alpha )^\nu K_\nu(|| x - y ||/\alpha ) }
@@ -972,6 +972,44 @@ matern_spacetime_categorical <- function(covparms, locs) {
 #' @describeIn matern_spacetime_categorical Derivatives of isotropic Matern covariance
 d_matern_spacetime_categorical <- function(covparms, locs) {
     .Call('_GpGp_d_matern_spacetime_categorical', PACKAGE = 'GpGp', covparms, locs)
+}
+
+#' Space-Time Matern covariance function with local random effects for categories
+#'
+#' From a matrix of locations and covariance parameters of the form
+#' (variance, spatial range, temporal range, smoothness, cat variance, cat spatial range, cat temporal range, cat smoothness, nugget),
+#' return the square matrix of
+#' all pairwise covariances.
+#' This is the covariance for the following model for data from cateogory k
+#' \deqn{ Y_k(x_i,t_i) = Z_0(x_i,t_i) + Z_k(x_i,t_i) + e_i }
+#' where Z_0 is Matern with parameters (variance,spatial range,temporal range,smoothness)
+#' and Z_1,...,Z_K are independent Materns with parameters
+#' (cat variance, cat spatial range, cat temporal range, cat smoothness),
+#' and e_1, ..., e_n are independent normals with variance (variance * nugget)
+#' @param locs A matrix with \code{n} rows and \code{d} columns.
+#' Each row of locs gives a point in R^d.
+#' @param covparms A vector with covariance parameters
+#' in the form (variance, spatial range, temporal range, smoothness, category, nugget)
+#' @return A matrix with \code{n} rows and \code{n} columns, with the i,j entry
+#' containing the covariance between observations at \code{locs[i,]} and
+#' \code{locs[j,]}.
+#' @section Parameterization:
+#' The covariance parameter vector is (variance, range, smoothness, category, nugget)
+#' = \eqn{(\sigma^2,\alpha_1,\alpha_2,\nu,c^2,\tau^2)}, and the covariance function is parameterized
+#' as
+#' \deqn{ d = ( || x - y ||^2/\alpha_1 + |s-t|^2/\alpha_2^2 )^{1/2} }
+#' \deqn{ M(x,y) = \sigma^2 2^{1-\nu}/\Gamma(\nu) (d)^\nu K_\nu(d) }
+#' (x,s) and (y,t) are the space-time locations of a pair of observations.
+#' The nugget value \eqn{ \sigma^2 \tau^2 } is added to the diagonal of the covariance matrix.
+#' The category variance \eqn{c^2} is added if two observation from same category
+#' NOTE: the nugget is \eqn{ \sigma^2 \tau^2 }, not \eqn{ \tau^2 }. 
+matern_spacetime_categorical_local <- function(covparms, locs) {
+    .Call('_GpGp_matern_spacetime_categorical_local', PACKAGE = 'GpGp', covparms, locs)
+}
+
+#' @describeIn matern_spacetime_categorical_local Derivatives of isotropic Matern covariance
+d_matern_spacetime_categorical_local <- function(covparms, locs) {
+    .Call('_GpGp_d_matern_spacetime_categorical_local', PACKAGE = 'GpGp', covparms, locs)
 }
 
 #' Multiply approximate inverse Cholesky by a vector

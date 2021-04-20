@@ -150,7 +150,9 @@ fit_model <- function(y, locs, X = NULL, covfun_name = "matern_isotropic",
               "matern45_scaledim",
               "exponential_scaledim",
               "matern_categorical",
-              "matern_spacetime_categorical" ))
+              "matern_spacetime_categorical",
+              "matern_spacetime_categorical_local"
+            ))
     {
         stop("unrecognized covariance function name `covfun_name'.")
     }
@@ -247,7 +249,7 @@ fit_model <- function(y, locs, X = NULL, covfun_name = "matern_isotropic",
         if(!silent) cat("Finding nearest neighbors...")
 
         # need to ignore category variable for categorical covfuns
-        if( covfun_name %in% c("matern_categorical","matern_spacetime_categorical") ){
+        if( covfun_name %in% c("matern_categorical","matern_spacetime_categorical","matern_spacetime_categorical_local") ){
             locs_for_NN <- locsord[ , 1:(ncol(locsord)-1) ]
         } else {
             locs_for_NN <- locsord
@@ -558,6 +560,17 @@ get_start_parms <- function(y,X,locs,covfun_name){
         start_parms <-
             c(start_var, start_range1, start_range2, start_smooth, start_var, start_nug)
     }
+    if(covfun_name == "matern_spacetime_categorical_local"){
+        d <- ncol(locs)-2
+        dmat1 <- fields::rdist(locs[randinds,1:d])
+        dmat2 <- fields::rdist(locs[randinds,d+1,drop=FALSE])
+        start_range1 <- mean( dmat1 )/4
+        start_range2 <- mean( dmat2 )/1
+        start_parms <-
+            c(start_var, start_range1, start_range2, start_smooth,
+              start_var, 1.5*start_range1, 1.5*start_range2, 1.0,
+              start_nug)
+    }
     return( list( start_parms = start_parms ) )
 }
 
@@ -660,6 +673,7 @@ get_linkfun <- function(covfun_name){
     if(covfun_name == "matern_spacetime"){ space_time <- TRUE }
     if(covfun_name == "exponential_spacetime"){ space_time <- TRUE }
     if(covfun_name == "matern_spacetime_categorical"){ space_time <- TRUE }
+    if(covfun_name == "matern_spacetime_categorical_local"){ space_time <- TRUE }
     if(covfun_name == "matern_spheretime"){
         lonlat <- TRUE
         space_time <- TRUE
@@ -793,6 +807,16 @@ get_penalty <- function(y,X,locs,covfun_name){
          }
         ddpen <- function(x){
             ddpen_nug(x,6) + ddpen_sm(x,4) + ddpen_var(x,1) + ddpen_sm_hi(x,4) }
+    }
+    if(covfun_name == "matern_spacetime_categorical_local"){
+          pen <- function(x){
+              pen_nug(x,9) +   pen_sm(x,4) +   pen_var(x,1) + pen_sm_hi(x,4) + pen_sm(x,8) + pen_var(x,5) + pen_sm_hi(x,8)
+          }
+         dpen <- function(x){
+             dpen_nug(x,9) +  dpen_sm(x,4) +  dpen_var(x,1) + dpen_sm_hi(x,4) + dpen_sm(x,8) + dpen_var(x,5) + dpen_sm_hi(x,8)
+         }
+        ddpen <- function(x){
+            ddpen_nug(x,9) + ddpen_sm(x,4) + ddpen_var(x,1) + ddpen_sm_hi(x,4)  + ddpen_sm(x,8) + ddpen_var(x,5) + ddpen_sm_hi(x,8) }
     }
     if(covfun_name == "matern_anisotropic2D"){
           pen <- function(x){  pen_nug(x,6) +   pen_sm(x,5) +   pen_var(x,1)   }

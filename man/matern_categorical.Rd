@@ -11,7 +11,7 @@ d_matern_categorical(covparms, locs)
 }
 \arguments{
 \item{covparms}{A vector with covariance parameters
-in the form (variance, range, smoothness, category, nugget)}
+in the form (variance, range, smoothness, category variance, nugget)}
 
 \item{locs}{A matrix with \code{n} rows and \code{d} columns.
 Each row of locs gives a point in R^d.}
@@ -23,7 +23,7 @@ containing the covariance between observations at \code{locs[i,]} and
 }
 \description{
 From a matrix of locations and covariance parameters of the form
-(variance, range, smoothness, category, nugget), return the square matrix of
+(variance, range, smoothness, category variance, nugget), return the square matrix of
 all pairwise covariances.
 }
 \section{Functions}{
@@ -33,7 +33,7 @@ all pairwise covariances.
 
 \section{Parameterization}{
 
-The covariance parameter vector is (variance, range, smoothness, category, nugget)
+The covariance parameter vector is (variance, range, smoothness, category variance, nugget)
 = \eqn{(\sigma^2,\alpha,\nu,c^2,\tau^2)}, and the covariance function is parameterized
 as
 \deqn{ M(x,y) = \sigma^2 2^{1-\nu}/\Gamma(\nu) (|| x - y ||/\alpha )^\nu K_\nu(|| x - y ||/\alpha ) }
