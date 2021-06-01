@@ -13,6 +13,62 @@
 using namespace Rcpp;
 using namespace arma;
 
+arma::vec forward_solve( arma::mat cholmat, arma::vec b ){
+
+    int n = cholmat.n_rows;
+    arma::vec x(n);
+    x(0) = b(0)/cholmat(0,0);
+
+    for(int i=1; i<n; i++){
+        double dd = 0.0;
+        for(int j=0; j<i; j++){
+            dd += cholmat(i,j)*x(j);
+        }
+        x(i) = (b(i)-dd)/cholmat(i,i);
+    }    
+    return x;
+
+} 
+
+arma::vec backward_solve( arma::mat lower, arma::vec b ){
+
+    int n = lower.n_rows;
+    arma::vec x(n);
+    x(n-1) = b(n-1)/lower(n-1,n-1);
+
+    for(int i=n-2; i>=0; i--){
+        double dd = 0.0;
+        for(int j=n-1; j>i; j--){
+            dd += lower(j,i)*x(j);
+        }
+        x(i) = (b(i)-dd)/lower(i,i);
+    }    
+    return x;
+
+} 
+
+arma::mat forward_solve_mat( arma::mat cholmat, arma::mat b ){
+
+    int n = cholmat.n_rows;
+    int p = b.n_cols;
+    arma::mat x(n,p);
+    for(int k=0; k<p; k++){ x(0,k) = b(0,k)/cholmat(0,0); }
+
+    for(int i=1; i<n; i++){
+	for(int k=0; k<p; k++){
+            double dd = 0.0;
+            for(int j=0; j<i; j++){
+                dd += cholmat(i,j)*x(j,k);
+            }
+            x(i,k) = (b(i,k)-dd)/cholmat(i,i);
+       	}
+    }    
+    return x;
+	
+} 
+
+
+
 void compute_pieces(
     arma::vec covparms, 
     StringVector covfun_name,
@@ -71,6 +127,10 @@ void compute_pieces(
     
         int bsize = std::min(i+1,m);
 
+	//std::vector<std::chrono::steady_clock::time_point> tt;
+
+	//tt.push_back( std::chrono::steady_clock::now() );
+
         // first, fill in ysub, locsub, and X0 in reverse order
         arma::mat locsub(bsize, dim);
         arma::vec ysub(bsize);
@@ -85,6 +145,9 @@ void compute_pieces(
         
         // compute covariance matrix and derivatives and take cholesky
         arma::mat covmat = p_covfun[0]( covparms, locsub );	
+	
+	//tt.push_back( std::chrono::steady_clock::now() );
+
         arma::cube dcovmat;
         if(grad_info){ 
             dcovmat = p_d_covfun[0]( covparms, locsub ); 
@@ -102,7 +165,8 @@ void compute_pieces(
         onevec(bsize-1) = 1.0;
         arma::vec choli2;
         if(grad_info){
-            choli2 = solve( trimatu(cholmat.t()), onevec );
+            //choli2 = solve( trimatu(cholmat.t()), onevec );
+            choli2 = backward_solve( cholmat, onevec );
         }
         
         bool cond = bsize > 1;
@@ -111,9 +175,11 @@ void compute_pieces(
         // do solves with X and y
         arma::mat LiX0;
         if(profbeta){
-            LiX0 = solve( trimatl(cholmat), X0 );
+            //LiX0 = solve( trimatl(cholmat), X0 );
+            LiX0 = forward_solve_mat( cholmat, X0 );
         }
-        arma::vec Liy0 = solve( trimatl(cholmat), ysub );
+        //arma::vec Liy0 = solve( trimatl(cholmat), ysub );
+        arma::vec Liy0 = forward_solve( cholmat, ysub );
         
         // loglik objects
         l_logdet += 2.0*std::log( as_scalar(cholmat(i2,i2)) ); 
@@ -133,7 +199,8 @@ void compute_pieces(
             
             for(int j=0; j<nparms; j++){
                 // compute last column of Li * (dS_j) * Lit
-                arma::vec LidSLi3 = solve( trimatl(cholmat), dcovmat.slice(j) * choli2 );
+                //arma::vec LidSLi3 = solve( trimatl(cholmat), dcovmat.slice(j) * choli2 );
+                arma::vec LidSLi3 = forward_solve( cholmat, dcovmat.slice(j) * choli2 );
                 // store LiX0.t() * LidSLi3 and Liy0.t() * LidSLi3
                 arma::vec v1 = LiX0.t() * LidSLi3;
                 double s1 = as_scalar( Liy0.t() * LidSLi3 ); 
@@ -161,8 +228,10 @@ void compute_pieces(
             
         } else { // similar calculations, but for when there is no conditioning set
             for(int j=0; j<nparms; j++){
-                arma::mat LidSLi = solve( trimatl(cholmat), dcovmat.slice(j) );
-                LidSLi = solve( trimatl(cholmat), LidSLi.t() );
+                //arma::mat LidSLi = solve( trimatl(cholmat), dcovmat.slice(j) );
+                arma::mat LidSLi = forward_solve_mat( cholmat, dcovmat.slice(j) );
+                //LidSLi = solve( trimatl(cholmat), LidSLi.t() );
+                LidSLi = forward_solve_mat( cholmat, LidSLi.t() );
                 (l_dXSX).slice(j) += LiX0.t() *  LidSLi * LiX0; 
                 (l_dySy)(j) += as_scalar( Liy0.t() * LidSLi * Liy0 );
                 (l_dySX).col(j) += ( ( Liy0.t() * LidSLi ) * LiX0 ).t();
@@ -178,6 +247,17 @@ void compute_pieces(
         }
         
         }
+
+	/*
+	if(i==500){
+	    for(int k=1; k<tt.size(); k++ ){
+	        cout << std::chrono::duration_cast<std::chrono::microseconds>(tt[k]-tt[k-1]).count();
+	        cout << "  ";
+	    }
+	    cout << endl;
+	}
+	*/
+
 
     }
 #pragma omp critical

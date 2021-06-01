@@ -41,6 +41,7 @@ arma::mat exponential_isotropic(arma::vec covparms, arma::mat locs ){
     int dim = locs.n_cols;
     int n = locs.n_rows;
     double nugget = covparms( 0 )*covparms( 2 );
+    
     // create scaled locations
     mat locs_scaled(n,dim);
     for(int j=0; j<dim; j++){ 
@@ -57,20 +58,23 @@ arma::mat exponential_isotropic(arma::vec covparms, arma::mat locs ){
             d += pow( locs_scaled(i1,j) - locs_scaled(i2,j), 2.0 );
         }
         d = std::sqrt( d );
-        if( d == 0.0 ){
-            covmat(i2,i1) = covparms(0);
-        } else {
-            // calculate covariance            
-            covmat(i2,i1) = covparms(0)*std::exp( -d );
-        }
-        // add nugget
-        if( i1 == i2 ){ covmat(i2,i2) += nugget; } 
-        // fill in opposite entry
-        else { covmat(i1,i2) = covmat(i2,i1); }
+
+        // calculate covariance            
+        covmat(i2,i1) = covparms(0)*std::exp( -d );
+        covmat(i1,i2) = covmat(i2,i1);
+
     }}
+
+    // add nugget
+    for(int i1=0; i1<n; i1++){
+	covmat(i1,i1) += nugget;
+    }
 
     return covmat;
 }
+
+
+
 
 //' @describeIn exponential_isotropic Derivatives of isotropic exponential covariance
 // [[Rcpp::export]]
