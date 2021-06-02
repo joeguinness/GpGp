@@ -2,6 +2,7 @@
 #define ONEPASS_H
 
 #include <RcppArmadillo.h>
+#include <string>
 //[[Rcpp::depends(RcppArmadillo)]]
 
 #include "covmatrix_funs.h"
@@ -85,6 +86,59 @@ arma::mat backward_solve_mat( arma::mat cholmat, arma::mat b ){
 } 
 
 
+arma::mat mychol( arma::mat A ){
+
+    arma::uword n = A.n_rows;
+    arma::mat L(n,n);
+    bool pd = true;
+    
+    // upper-left entry
+    if( A(0,0) < 0 ){
+	pd = false;
+	L(0,0) = 1.0;
+    } else {
+        L(0,0) = std::sqrt(A(0,0));
+    }
+    if( n > 1 ){
+	// second row
+	L(1,0) = A(1,0)/L(0,0);
+	double f = A(1,1) - L(1,0)*L(1,0);
+	if( f < 0 ){
+	    pd = false;
+	    L(1,1) = 1.0;
+	} else {
+	    L(1,1) = std::sqrt( f );
+	}
+	// rest of the rows
+	if( n > 2 ){
+            for(uword i=2; i<n; i++){
+    	        // leftmost entry in row i
+    	        L(i,0) = A(i,0)/L(0,0);
+    	        // middle entries in row i 
+    	        for(uword j=1; j<i; j++){
+    	            double d = A(i,j);
+    	            for(uword k=0; k<j; k++){
+    	        	d -= L(i,k)*L(j,k);
+    	            }
+    	            L(i,j) = d/L(j,j);
+    	        }
+		// diagonal entry in row i
+    	        double e = A(i,i);
+    	        for(uword k=0; k<i; k++){
+    	            e -= L(i,k)*L(i,k);
+    	        }
+		if( e < 0 ){
+		    pd = false;
+		    L(i,i) = 1.0;
+		} else {
+    	            L(i,i) = std::sqrt(e);
+		}
+	    }
+	}
+    }
+    return L;	
+}
+
 
 
 void compute_pieces(
@@ -164,8 +218,6 @@ void compute_pieces(
         // compute covariance matrix and derivatives and take cholesky
         arma::mat covmat = p_covfun[0]( covparms, locsub );	
 	
-	//tt.push_back( std::chrono::steady_clock::now() );
-
         arma::cube dcovmat;
         if(grad_info){ 
             dcovmat = p_d_covfun[0]( covparms, locsub ); 
@@ -196,6 +248,7 @@ void compute_pieces(
             //LiX0 = solve( trimatl(cholmat), X0 );
             LiX0 = forward_solve_mat( cholmat, X0 );
         }
+
         //arma::vec Liy0 = solve( trimatl(cholmat), ysub );
         arma::vec Liy0 = forward_solve( cholmat, ysub );
         
@@ -266,15 +319,13 @@ void compute_pieces(
         
         }
 
-	/*
-	if(i==500){
-	    for(int k=1; k<tt.size(); k++ ){
-	        cout << std::chrono::duration_cast<std::chrono::microseconds>(tt[k]-tt[k-1]).count();
-	        cout << "  ";
-	    }
-	    cout << endl;
-	}
-	*/
+	// if(i % 100 == 0 ){
+	//     for(int k=1; k<tt.size(); k++ ){
+	//         cout << std::chrono::duration_cast<std::chrono::microseconds>(tt[k]-tt[k-1]).count();
+	//         cout << "  ";
+	//     }
+	//     cout << endl;
+	// }
 
 
     }
@@ -399,14 +450,16 @@ void compute_pieces_grouped(
 
         // compute covariance matrix and derivatives and take cholesky
 	arma::mat covmat = p_covfun[0]( covparms, locsub );
+
         arma::cube dcovmat(bsize,bsize,nparms);
         if(grad_info){
             dcovmat = p_d_covfun[0]( covparms, locsub );
         }
 
-        arma::mat cholmat = eye( size(covmat) );
-        chol( cholmat, covmat, "lower" );
-
+        //arma::mat cholmat = eye( size(covmat) );
+        //chol( cholmat, covmat, "lower" );
+	arma::mat cholmat = mychol(covmat);
+	
         // get response rows of inverse cholmat, put in column vectors
         arma::mat onemat = zeros(bsize,rsize);
         for(int j=0; j<rsize; j++){ 
@@ -429,8 +482,8 @@ void compute_pieces_grouped(
             LiX0 = forward_solve_mat( cholmat, X0 );
         }
 
-        arma::vec Liy0 = solve( trimatl(cholmat), ysub );
-        //arma::vec Liy0 = forward_solve( cholmat, ysub );
+        //arma::vec Liy0 = solve( trimatl(cholmat), ysub );
+        arma::vec Liy0 = forward_solve( cholmat, ysub );
 
         // loglik objects
         for(int j=0; j<rsize; j++){
