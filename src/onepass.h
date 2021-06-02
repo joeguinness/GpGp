@@ -30,23 +30,6 @@ arma::vec forward_solve( arma::mat cholmat, arma::vec b ){
 
 } 
 
-arma::vec backward_solve( arma::mat lower, arma::vec b ){
-
-    int n = lower.n_rows;
-    arma::vec x(n);
-    x(n-1) = b(n-1)/lower(n-1,n-1);
-
-    for(int i=n-2; i>=0; i--){
-        double dd = 0.0;
-        for(int j=n-1; j>i; j--){
-            dd += lower(j,i)*x(j);
-        }
-        x(i) = (b(i)-dd)/lower(i,i);
-    }    
-    return x;
-
-} 
-
 arma::mat forward_solve_mat( arma::mat cholmat, arma::mat b ){
 
     int n = cholmat.n_rows;
@@ -64,8 +47,43 @@ arma::mat forward_solve_mat( arma::mat cholmat, arma::mat b ){
        	}
     }    
     return x;
-	
 } 
+
+arma::vec backward_solve( arma::mat lower, arma::vec b ){
+
+    int n = lower.n_rows;
+    arma::vec x(n);
+    x(n-1) = b(n-1)/lower(n-1,n-1);
+
+    for(int i=n-2; i>=0; i--){
+        double dd = 0.0;
+        for(int j=n-1; j>i; j--){
+            dd += lower(j,i)*x(j);
+        }
+        x(i) = (b(i)-dd)/lower(i,i);
+    }    
+    return x;
+} 
+
+arma::mat backward_solve_mat( arma::mat cholmat, arma::mat b ){
+
+    int n = cholmat.n_rows;
+    int p = b.n_cols;
+    arma::mat x(n,p);
+    for(int k=0; k<p; k++){ x(n-1,k) = b(n-1,k)/cholmat(n-1,n-1); }
+
+    for(int i=n-2; i>=0; i--){
+	for(int k=0; k<p; k++){
+            double dd = 0.0;
+            for(int j=n-1; j>i; j--){
+                dd += cholmat(j,i)*x(j,k);
+            }
+            x(i,k) = (b(i,k)-dd)/cholmat(i,i);
+       	}
+    }    
+    return x;
+} 
+
 
 
 
@@ -397,7 +415,8 @@ void compute_pieces_grouped(
 
         arma::mat choli2(bsize,bsize);
         if(grad_info){
-            choli2 = solve( trimatu(cholmat.t()), onemat );
+            //choli2 = solve( trimatu(cholmat.t()), onemat );
+            choli2 = backward_solve_mat( cholmat, onemat );
         }
 
         bool cond = bsize > rsize;
@@ -406,10 +425,13 @@ void compute_pieces_grouped(
         // do solves with X and y
         arma::mat LiX0( bsize, p );
         if(profbeta){
-            LiX0 = solve( trimatl(cholmat), X0 );
+            //LiX0 = solve( trimatl(cholmat), X0 );
+            LiX0 = forward_solve_mat( cholmat, X0 );
         }
 
         arma::vec Liy0 = solve( trimatl(cholmat), ysub );
+        //arma::vec Liy0 = forward_solve( cholmat, ysub );
+
         // loglik objects
         for(int j=0; j<rsize; j++){
             int ii = whichresp(j);
@@ -430,9 +452,8 @@ void compute_pieces_grouped(
             arma::cube LidSLi2 = arma::cube(bsize,rsize,nparms,fill::zeros);
             for(int j=0; j<nparms; j++){
                 // compute last column of Li * (dS_j) * Lit
-                arma::mat LidSLi4 = 
-                    solve( trimatl(cholmat), 
-                           dcovmat.slice(j) * choli2 );
+                //arma::mat LidSLi4 = solve( trimatl(cholmat), dcovmat.slice(j) * choli2 );
+                arma::mat LidSLi4 = forward_solve_mat( cholmat, dcovmat.slice(j) * choli2 );
                 
                 for(int k=0; k<rsize; k++){
                     int i2 = whichresp(k);
@@ -467,8 +488,10 @@ void compute_pieces_grouped(
         } else { // similar calculations, but for when there is no conditioning set
             arma::cube LidSLi2(bsize,bsize,nparms);
             for(int j=0; j<nparms; j++){
-                arma::mat LidSLi = solve( trimatl(cholmat), dcovmat.slice(j) );
-                LidSLi = solve( trimatl(cholmat), LidSLi.t() );
+                //arma::mat LidSLi = solve( trimatl(cholmat), dcovmat.slice(j) );
+                arma::mat LidSLi = forward_solve_mat( cholmat, dcovmat.slice(j) );
+                //LidSLi = solve( trimatl(cholmat), LidSLi.t() );
+                LidSLi = forward_solve_mat( cholmat, LidSLi.t() );
                 (l_dXSX).slice(j) += LiX0.t() *  LidSLi * LiX0; 
                 (l_dySy)(j) += as_scalar( Liy0.t() * LidSLi * Liy0 );
                 (l_dySX).col(j) += ( ( Liy0.t() * LidSLi ) * LiX0 ).t();
@@ -482,6 +505,7 @@ void compute_pieces_grouped(
             }}
         }
         }
+	
     }
 
 #pragma omp critical
