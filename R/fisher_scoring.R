@@ -95,7 +95,13 @@ fisher_scoring <- function( likfun, start_parms, link,
             if (!silent) cat("Cond # of info matrix > 1/tol \n")
             #info <- 1.0*max(likobj0$info)*diag(nrow(likobj0$info))
             # regularize
-            diag(info) <- diag(info) + tol*max(diag(info))
+            ee <- eigen(info)
+            ee_ratios <- ee$values/max(ee$values)
+            ee_ratios[ ee_ratios < 1e-5 ] <- 1e-5
+            ee$values <- max(ee$values)*ee_ratios
+            info <- ee$vectors %*% diag(ee$values) %*% t(ee$vectors)
+            
+            #diag(info) <- diag(info) + tol*max(diag(info))
         }
 
         # calculate fisher step 
@@ -119,6 +125,30 @@ fisher_scoring <- function( likfun, start_parms, link,
             newlogparms <- logparms + step
             likobj <- likfun(newlogparms)
             if (cnt == 10) { stop("could not avoid inf, na or nan\n") }
+        }
+
+        # check whether negative likelihood decreased
+        # take smaller stepsize
+        if( likobj$loglik > likobj0$loglik ){
+            step <- 0.25*step
+            newlogparms <- logparms + step
+            likobj <- likfun(newlogparms)
+        }
+            
+        # check again, move along gradient
+        if( likobj$loglik > likobj0$loglik ){
+            info0 <- diag( rep(mean(diag(info)),nrow(info)) )
+            step <- -solve(info0,grad)
+            newlogparms <- logparms + step
+            likobj <- likfun(newlogparms)
+        }
+            
+        # check once move, take smaller step along gradient
+        if( likobj$loglik > likobj0$loglik ){
+            info0 <- diag( rep(max(diag(info)),nrow(info)) )
+            step <- -solve(info0,grad)
+            newlogparms <- logparms + step
+            likobj <- likfun(newlogparms)
         }
         
         # Check the wolfe conditions
