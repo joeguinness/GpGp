@@ -1,24 +1,20 @@
 
-The major purpose of this release is to fix an error
-on CRAN checks for Oracle Developer Studio. We have also
-parallelized the computation of the inverse cholesky
-factor, and included safeguards against large smoothness
-parameters in matern_isotropic.
+Speedups in likelihood functions, stabilization
+of Fisher scoring algorithm.
 
 
 ## Test environments
 
-* local: ubuntu 18.10, R 4.0.3
-* r-hub: Windows Server 2008 R2 SP1, R-devel, 32/64 bit
+* local: ubuntu 18.04, R 4.1.0
+* r-hub: Windows Server 2008 R2 SP1, R-release, 32/64 bit
 * r-hub: macOS 10.13.6 High Sierra, R-release, CRAN's setup
-* r-hub: Oracle Solaris 10, x86, 32 bit, R-release, Oracle Developer Studio 12.6
 
 
 ## R CMD check results
 
 There were no ERRORs or WARNINGs
 
-There was 1 NOTEs:
+There was 1 NOTE (on local check):
 
     N  checking installed package size ...
          installed size is 10.8Mb

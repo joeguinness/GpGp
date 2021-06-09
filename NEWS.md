@@ -1,4 +1,9 @@
 
+# GpGp 0.4.0
+
+Speedups of evaluations of the likelihood function.  Modifications to
+the Fisher scoring algorithm to make it a little more stable.
+
 # GpGp 0.3.2
 
 The major purpose of this release is to fix an error
