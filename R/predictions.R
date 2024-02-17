@@ -35,6 +35,14 @@ predictions <- function(fit = NULL, locs_pred, X_pred,
     covparms = fit$covparms, covfun_name = fit$covfun_name, 
     m = 60, reorder = TRUE, st_scale = NULL){
     
+    # make sure things are matrices
+    locs_obs <- as.matrix( locs_obs )
+    X_obs <- as.matrix( X_obs )
+
+    locs_pred <- as.matrix(locs_pred)
+    X_pred <- as.matrix(X_pred)
+
+    # how many observations and predictions 
     n_obs <- nrow(locs_obs)
     n_pred <- nrow(locs_pred)
     
@@ -65,7 +73,6 @@ predictions <- function(fit = NULL, locs_pred, X_pred,
     Xord_pred <- X_pred[ord2,,drop=FALSE]
     yord_obs  <- y_obs[ord1]
     
-    
     # put all coordinates together
     locs_all <- rbind( locs_obs[ord1,,drop=FALSE], locs_pred[ord2,,drop=FALSE] )
     inds1 <- 1:n_obs
@@ -76,12 +83,6 @@ predictions <- function(fit = NULL, locs_pred, X_pred,
     space_time <- get_linkfun(covfun_name)$space_time
     
     # get nearest neighbor array (in space only)
-    if(space_time){
-        dd <- ncol(locs_all)-1
-    } else {
-        dd <- ncol(locs_all)
-    }
-    #NNarray_all <- find_ordered_nn(locs_all[,1:dd,drop=FALSE],m=m,lonlat = lonlat)
     NNarray_all <- find_ordered_nn(locs_all,m=m, lonlat = lonlat,st_scale=st_scale)
     
     # get entries of Linv for obs locations and pred locations
@@ -135,12 +136,36 @@ cond_sim <- function(fit = NULL, locs_pred, X_pred,
     covparms = fit$covparms, covfun_name = fit$covfun_name, 
     m = 60, reorder = TRUE, st_scale = NULL, nsims = 1 ){
 
+    # make sure things are matrices
+    locs_obs <- as.matrix( locs_obs )
+    X_obs <- as.matrix( X_obs )
+
+    locs_pred <- as.matrix(locs_pred)
+    X_pred <- as.matrix(X_pred)
+
+    # how many observations and predictions 
     n_obs <- nrow(locs_obs)
     n_pred <- nrow(locs_pred)
     
     # get orderings
-    ord1 <- order_maxmin(locs_obs)
-    ord2 <- order_maxmin(locs_pred)
+    if(reorder){
+
+        if( n_obs < 6e4 ){
+            ord1 <- order_maxmin(locs_obs)
+        } else {
+            ord1 <- sample( 1:n_obs )
+        }
+        
+        if( n_pred < 6e4 ){
+            ord2 <- order_maxmin(locs_pred)
+        } else {
+            ord2 <- sample( 1:n_pred )
+        }
+
+    } else {
+        ord1 <- 1:n_obs
+        ord2 <- 1:n_pred
+    }
 
     # reorder stuff
     X_obs <- as.matrix(X_obs)
@@ -150,15 +175,15 @@ cond_sim <- function(fit = NULL, locs_pred, X_pred,
     yord_obs  <- y_obs[ord1]
 
     # put all coordinates together
-    locs_all <- rbind( locs_obs[ord1,], locs_pred[ord2,] )
+    locs_all <- rbind( locs_obs[ord1,,drop=FALSE], locs_pred[ord2,,drop=FALSE] )
     inds1 <- 1:n_obs
     inds2 <- (n_obs+1):(n_obs+n_pred)
     
     # figure out if lonlat or not
     lonlat <- get_linkfun(covfun_name)$lonlat
+    space_time <- get_linkfun(covfun_name)$space_time
     
     # get nearest neighbor array (in space only)
-    #NNarray_all <- find_ordered_nn(locs_all,m=m,lonlat = lonlat)
     NNarray_all <- find_ordered_nn(locs_all,m=m,lonlat = lonlat,st_scale=st_scale)
 
     # get entries of Linv for obs locations and pred locations
