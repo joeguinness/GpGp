@@ -1,4 +1,11 @@
 
+# GpGp 0.5.0
+
+Bug fixes related to automatic coercion of matrices to vectors
+One-dimensional inputs and single-location predictions work now
+Workaround for change to roxygen that removed package-alias
+Removed maptools from Suggests field of DESCRIPTION
+
 # GpGp 0.4.0
 
 Speedups of evaluations of the likelihood function.  Modifications to
