@@ -15,7 +15,7 @@ in the form (variance, range_1, range_2, nugget). range_1 is the
 spatial range, and range_2 is the temporal range.}
 
 \item{locs}{A matrix with \code{n} rows and \code{d+1} columns.
-Each row of locs is a point in R^{d+1}. The first \code{d} columns
+Each row of locs is a point in R^(d+1). The first \code{d} columns
 should contain the spatial coordinates. The last column contains the times.}
 }
 \value{
