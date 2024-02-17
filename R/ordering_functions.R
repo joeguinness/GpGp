@@ -148,6 +148,9 @@ order_coordinate <- function( locs, coordinate ){
 order_maxmin <- function(locs, lonlat = FALSE, 
     space_time = FALSE, st_scale = NULL){
 
+    # make sure locs is a matrix (for 1D case, and data frame case)
+    locs <- as.matrix(locs)
+    
     # FNN::get.knnx has strange behavior for exact matches
     # so add a small amount of noise to each location
     n <- nrow(locs)
