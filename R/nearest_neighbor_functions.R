@@ -80,10 +80,8 @@ find_ordered_nn_brute <- function( locs, m ){
 #' @export
 find_ordered_nn <- function(locs,m, lonlat = FALSE, st_scale = NULL){
     
-    # if locs is a vector, convert to matrix
-    if( is.null(ncol(locs)) ){
-        locs <- as.matrix(locs)
-    }
+    # convert locs to matrix (works on vectors and data frames)
+    locs <- as.matrix(locs)
 
     # number of locations
     n <- nrow(locs)
