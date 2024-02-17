@@ -62,6 +62,7 @@
 #' functions, grouping (partitioning) functions, and approximate simulation functions.
 #'
 #' @docType package
+#' @aliases GpGp-package
 #' @name GpGp
 #' @useDynLib GpGp
 #' @importFrom Rcpp sourceCpp
