@@ -284,7 +284,7 @@ arma::cube d_exponential_scaledim(arma::vec covparms, arma::mat locs ){
 //' (variance, range_1, range_2, smoothness, nugget), return the square matrix of
 //' all pairwise covariances.
 //' @param locs A matrix with \code{n} rows and \code{d+1} columns.
-//' Each row of locs is a point in R^{d+1}. The first \code{d} columns
+//' Each row of locs is a point in R^(d+1). The first \code{d} columns
 //' should contain the spatial coordinates. The last column contains the times.
 //' @param covparms A vector with covariance parameters
 //' in the form (variance, range_1, range_2, smoothness, nugget). range_1 is the
@@ -409,7 +409,7 @@ arma::cube d_matern_spacetime(arma::vec covparms, arma::mat locs ){
 //' (variance, range_1, range_2, nugget), return the square matrix of
 //' all pairwise covariances.
 //' @param locs A matrix with \code{n} rows and \code{d+1} columns.
-//' Each row of locs is a point in R^{d+1}. The first \code{d} columns
+//' Each row of locs is a point in R^(d+1). The first \code{d} columns
 //' should contain the spatial coordinates. The last column contains the times.
 //' @param covparms A vector with covariance parameters
 //' in the form (variance, range_1, range_2, nugget). range_1 is the
