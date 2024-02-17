@@ -31,11 +31,10 @@ Suggests:
     knitr,
     rmarkdown,
     testthat,
-    maps,
-    maptools
+    maps
 LinkingTo:
     Rcpp,
     RcppArmadillo,
     BH
-RoxygenNote: 7.1.1
+RoxygenNote: 7.3.0
 LazyData: true
