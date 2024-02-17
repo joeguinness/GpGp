@@ -3,6 +3,7 @@
 \docType{package}
 \name{GpGp}
 \alias{GpGp}
+\alias{GpGp-package}
 \title{GpGp: Fast Gaussian Process Computing.}
 \description{
 Vecchia's (1988)
@@ -66,4 +67,14 @@ For Gaussian process researchers, the package also provides access to functions 
 computing the likelihood, gradient, and Fisher information with respect
 to covariance parameters; reordering functions, nearest neighbor-finding 
 functions, grouping (partitioning) functions, and approximate simulation functions.
+}
+\author{
+\strong{Maintainer}: Joseph Guinness \email{joeguinness@gmail.com}
+
+Authors:
+\itemize{
+  \item Matthias Katzfuss \email{katzfuss@gmail.com}
+  \item Youssef Fahmy \email{yf297@cornell.edu}
+}
+
 }
