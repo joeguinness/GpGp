@@ -30,9 +30,9 @@ all pairwise covariances.
 }
 \section{Functions}{
 \itemize{
-\item \code{d_matern_spacetime}: Derivatives with respect to parameters
-}}
+\item \code{d_matern_spacetime()}: Derivatives with respect to parameters
 
+}}
 \section{Parameterization}{
 
 The covariance parameter vector is (variance, range_1, range_2, smoothness, nugget).

@@ -31,13 +31,13 @@ all pairwise covariances.
 }
 \section{Functions}{
 \itemize{
-\item \code{d_matern35_isotropic}: Derivatives of isotropic
+\item \code{d_matern35_isotropic()}: Derivatives of isotropic
 matern covariance function with smoothness 3.5
 
-\item \code{d_matern45_isotropic}: Derivatives of isotropic
+\item \code{d_matern45_isotropic()}: Derivatives of isotropic
 matern covariance function with smoothness 3.5
+
 }}
-
 \section{Parameterization}{
 
 The covariance parameter vector is (variance, range, nugget)

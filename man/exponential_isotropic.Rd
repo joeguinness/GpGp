@@ -34,15 +34,15 @@ all pairwise covariances.
 }
 \section{Functions}{
 \itemize{
-\item \code{d_exponential_isotropic}: Derivatives of isotropic exponential covariance
+\item \code{d_exponential_isotropic()}: Derivatives of isotropic exponential covariance
 
-\item \code{d_matern15_isotropic}: Derivatives of isotropic 
+\item \code{d_matern15_isotropic()}: Derivatives of isotropic 
 matern covariance with smoothness 1.5
 
-\item \code{d_matern25_isotropic}: Derivatives of isotropic
+\item \code{d_matern25_isotropic()}: Derivatives of isotropic
 matern covariance function with smoothness 2.5
-}}
 
+}}
 \section{Parameterization}{
 
 The covariance parameter vector is (variance, range, nugget)

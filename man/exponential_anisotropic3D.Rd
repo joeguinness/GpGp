@@ -28,9 +28,9 @@ all pairwise covariances.
 }
 \section{Functions}{
 \itemize{
-\item \code{d_exponential_anisotropic3D}: Derivatives of anisotropic exponential covariance
-}}
+\item \code{d_exponential_anisotropic3D()}: Derivatives of anisotropic exponential covariance
 
+}}
 \section{Parameterization}{
 
 The covariance parameter vector is (variance, L11, L21, L22, L31, L32, L33, nugget)

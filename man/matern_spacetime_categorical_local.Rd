@@ -35,9 +35,9 @@ and e_1, ..., e_n are independent normals with variance (variance * nugget)
 }
 \section{Functions}{
 \itemize{
-\item \code{d_matern_spacetime_categorical_local}: Derivatives of isotropic Matern covariance
-}}
+\item \code{d_matern_spacetime_categorical_local()}: Derivatives of isotropic Matern covariance
 
+}}
 \section{Parameterization}{
 
 The covariance parameter vector is (variance, range, smoothness, category, nugget)

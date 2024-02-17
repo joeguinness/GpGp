@@ -30,9 +30,9 @@ all pairwise covariances.
 }
 \section{Functions}{
 \itemize{
-\item \code{d_exponential_spheretime}: Derivatives with respect to parameters.
-}}
+\item \code{d_exponential_spheretime()}: Derivatives with respect to parameters.
 
+}}
 \section{Covariances on spheres}{
 
 The function first calculates the (x,y,z) 3D coordinates, and then inputs

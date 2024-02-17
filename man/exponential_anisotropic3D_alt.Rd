@@ -28,9 +28,9 @@ all pairwise covariances.
 }
 \section{Functions}{
 \itemize{
-\item \code{d_exponential_anisotropic3D_alt}: Derivatives of anisotropic Matern covariance
-}}
+\item \code{d_exponential_anisotropic3D_alt()}: Derivatives of anisotropic Matern covariance
 
+}}
 \section{}{
 NA
 }

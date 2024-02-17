@@ -30,9 +30,9 @@ all pairwise covariances.
 }
 \section{Functions}{
 \itemize{
-\item \code{d_matern_sphere}: Derivatives with respect to parameters
-}}
+\item \code{d_matern_sphere()}: Derivatives with respect to parameters
 
+}}
 \section{Matern on Sphere Domain}{
 
 The function first calculates the (x,y,z) 3D coordinates, and then inputs

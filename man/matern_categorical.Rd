@@ -28,9 +28,9 @@ all pairwise covariances.
 }
 \section{Functions}{
 \itemize{
-\item \code{d_matern_categorical}: Derivatives of isotropic Matern covariance
-}}
+\item \code{d_matern_categorical()}: Derivatives of isotropic Matern covariance
 
+}}
 \section{Parameterization}{
 
 The covariance parameter vector is (variance, range, smoothness, category variance, nugget)

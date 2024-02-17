@@ -31,9 +31,9 @@ return the square matrix of all pairwise covariances.
 }
 \section{Functions}{
 \itemize{
-\item \code{d_exponential_nonstat_var}: Derivatives with respect to parameters
-}}
+\item \code{d_exponential_nonstat_var()}: Derivatives with respect to parameters
 
+}}
 \section{Parameterization}{
 
 This covariance function multiplies the isotropic exponential covariance

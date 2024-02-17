@@ -31,9 +31,9 @@ all pairwise covariances.
 }
 \section{Functions}{
 \itemize{
-\item \code{d_matern_spheretime_warp}: Derivatives with respect to parameters
-}}
+\item \code{d_matern_spheretime_warp()}: Derivatives with respect to parameters
 
+}}
 \section{Warpings}{
 
 The function first calculates the (x,y,z) 3D coordinates, and then "warps"

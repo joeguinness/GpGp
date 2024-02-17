@@ -28,9 +28,9 @@ all pairwise covariances.
 }
 \section{Functions}{
 \itemize{
-\item \code{d_matern_anisotropic2D}: Derivatives of anisotropic Matern covariance
-}}
+\item \code{d_matern_anisotropic2D()}: Derivatives of anisotropic Matern covariance
 
+}}
 \section{Parameterization}{
 
 The covariance parameter vector is (variance, L11, L21, L22, smoothness, nugget)
