@@ -1,11 +1,11 @@
 
-Speedups in likelihood functions, stabilization
-of Fisher scoring algorithm.
-
+Bug fixes related to automatic coercion of matrices to vectors
+Workaround for change to roxygen that removed package-alias
+Removed maptools from Suggests field of DESCRIPTION
 
 ## Test environments
 
-* local: ubuntu 18.04, R 4.1.0
+* local: ubuntu 20.04, R 4.3.2
 * r-hub: Windows Server 2008 R2 SP1, R-release, 32/64 bit
 * r-hub: macOS 10.13.6 High Sierra, R-release, CRAN's setup
 
@@ -16,17 +16,11 @@ There were no ERRORs or WARNINGs
 
 There was 1 NOTE (on local check):
 
-    N  checking installed package size ...
-         installed size is 10.8Mb
-         sub-directories of 1Mb or more:
-           data   1.4Mb
-           libs   9.1Mb
+    installed size is 13.7Mb
+    sub-directories of 1Mb or more:
+      data   1.4Mb
+      libs  11.9Mb
 
+## Downstream Dependencies
 
-## Downstream dependencies
-
-There is one downstream dependency (GPvecchia), but it
-uses only 1 function that is not affected by this
-package update.
-
-
+There are no known negative impacts on downstream dependencies
