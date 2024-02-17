@@ -15,6 +15,9 @@
 #' @export
 fast_Gp_sim <- function( covparms, covfun_name = "matern_isotropic", locs, m = 30 ){
     
+    # make sure locs is a matrix
+    locs <- as.matrix(locs)
+    
     # figure out if lonlat or not
     lonlat <- get_linkfun(covfun_name)$lonlat
     space_time <- get_linkfun(covfun_name)$space_time
@@ -27,7 +30,7 @@ fast_Gp_sim <- function( covparms, covfun_name = "matern_isotropic", locs, m = 3
     n <- nrow(locs)
     m <- min(m,n-1)
     ord <- order_maxmin(locs,lonlat=lonlat,space_time=space_time)
-    locsord <- locs[ord,]
+    locsord <- locs[ord,,drop=FALSE]
     NNarray <- find_ordered_nn(locsord,m,lonlat=lonlat,st_scale=st_scale)
     Linv <- vecchia_Linv( covparms, covfun_name, locsord, NNarray )
     y <- fast_Gp_sim_Linv( Linv, NNarray )
