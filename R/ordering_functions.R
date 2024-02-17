@@ -154,6 +154,8 @@ order_maxmin <- function(locs, lonlat = FALSE,
     # FNN::get.knnx has strange behavior for exact matches
     # so add a small amount of noise to each location
     n <- nrow(locs)
+    # no need to reorder if only 1 location
+    if( n == 1 ){return(1)}
     ee <- min(apply( locs, 2, stats::sd ))
     locs <- locs + matrix( ee*1e-4*stats::rnorm(n*ncol(locs)), n, ncol(locs) )    
 
