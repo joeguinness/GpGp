@@ -6,21 +6,33 @@ Removed maptools from Suggests field of DESCRIPTION
 ## Test environments
 
 * local: ubuntu 20.04, R 4.3.2
-* r-hub: Windows Server 2008 R2 SP1, R-release, 32/64 bit
-* r-hub: macOS 10.13.6 High Sierra, R-release, CRAN's setup
+* Win-builder
+* r-hub: Ubuntu Linux 20.04.1 LTS, R-release, GCC
+* r-hub: Fedora Linux, R-devel, clang, gfortran
 
 
 ## R CMD check results
 
 There were no ERRORs or WARNINGs
 
-There was 1 NOTE (on local check):
+There were 3 NOTEs:
 
-    installed size is 13.7Mb
-    sub-directories of 1Mb or more:
+installed size is 13.7Mb
+   sub-directories of 1Mb or more:
       data   1.4Mb
       libs  11.9Mb
 
-## Downstream Dependencies
+Found the following (possibly) invalid URLs:
+   URL: http://www.jstor.org/stable/2345768
+      From: DESCRIPTION
+      Status: 403
+      Message: Forbidden
 
-There are no known negative impacts on downstream dependencies
+Found the following (possibly) invalid URLs:
+   URL: https://www.ncei.noaa.gov/products/jason-satellite-products
+      From: man/jason3.Rd
+      Status: Error
+      Message: Empty reply from server
+
+Both urls are valid. Possibly jstor rejects requests that are not from browsers.
+
