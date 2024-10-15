@@ -1,8 +1,8 @@
 Package: GpGp
 Type: Package
 Title: Fast Gaussian Process Computation Using Vecchia's Approximation
-Version: 0.5.0
-Date: 2024-02-17
+Version: 0.5.1
+Date: 2024-10-15
 Authors@R: c(
     person("Joseph", "Guinness", email = "joeguinness@gmail.com", role = c("aut", "cre")),
     person("Matthias", "Katzfuss", email = "katzfuss@gmail.com", role = "aut" ),
@@ -20,7 +20,7 @@ Description: Functions for fitting and doing predictions with
     grouping methods are from Guinness (2018) 
     <doi:10.1080/00401706.2018.1437476>.
     Model fitting employs a Fisher scoring algorithm described
-    in Guinness (2019) <arXiv:1905.08374>.
+    in Guinness (2019) <doi:10.48550/arXiv.1905.08374>.
 Depends: R (>= 2.10)
 License: MIT + file LICENSE
 Imports:
@@ -36,5 +36,5 @@ LinkingTo:
     Rcpp,
     RcppArmadillo,
     BH
-RoxygenNote: 7.3.0
+RoxygenNote: 7.3.2
 LazyData: true

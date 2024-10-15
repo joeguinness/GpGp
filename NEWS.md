@@ -1,4 +1,8 @@
 
+# GpGp 0.5.1
+
+Fixed minor issue in documentation.
+
 # GpGp 0.5.0
 
 Bug fixes related to automatic coercion of matrices to vectors
