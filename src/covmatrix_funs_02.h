@@ -38,6 +38,9 @@ using namespace arma;
 // [[Rcpp::export]]
 arma::mat matern_anisotropic2D(arma::vec covparms, arma::mat locs ){
     
+	// fail-safe to prevent large smoothness values
+    covparms(4) = std::min( covparms(4), 8.0 );
+	
     // covparms(0) = sigmasq
     // covparms(1) = L00
     // covparms(2) = L10
@@ -87,6 +90,9 @@ arma::mat matern_anisotropic2D(arma::vec covparms, arma::mat locs ){
 // [[Rcpp::export]]
 arma::cube d_matern_anisotropic2D(arma::vec covparms, arma::mat locs ){
 
+	// fail-safe to prevent large smoothness values
+    covparms(4) = std::min( covparms(4), 8.0 );
+	
     // covparms(0) = sigmasq
     // covparms(1) = L00
     // covparms(2) = L10
@@ -798,7 +804,7 @@ arma::cube d_exponential_anisotropic3D(arma::vec covparms, arma::mat locs ){
 //' (B13,B23) can be interpreted as a drift vector in space over time
 //' if first two dimensions are space and third is time.
 //' Assuming x is transformed to u and y transformed to v, the covariances are 
-//' \deqn{ M(x,y) = \sigma^2 exp( - || u - v || )
+//' \deqn{ M(x,y) = \sigma^2 exp( - || u - v || ) }
 //' The nugget value \eqn{ \sigma^2 \tau^2 } is added to the diagonal of the covariance matrix.
 //' NOTE: the nugget is \eqn{ \sigma^2 \tau^2 }, not \eqn{ \tau^2 }. 
 // [[Rcpp::export]]

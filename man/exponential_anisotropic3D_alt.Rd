@@ -31,7 +31,18 @@ all pairwise covariances.
 \item \code{d_exponential_anisotropic3D_alt()}: Derivatives of anisotropic Matern covariance
 
 }}
-\section{}{
-NA
+\section{Parameterization}{
+
+The covariance parameter vector is (variance, B11, B12, B13, B22, B23, B33, smoothness, nugget)
+where B11, B12, B13, B22, B23, B33, transform the three coordinates as
+\deqn{ u_1 = B11[ x_1 + B12 x_2 + (B13 + B12 B23) x_3] }
+\deqn{ u_2 = B22[ x_2 + B23 x_3] }
+\deqn{ u_3 = B33[ x_3 ] }
+(B13,B23) can be interpreted as a drift vector in space over time
+if first two dimensions are space and third is time.
+Assuming x is transformed to u and y transformed to v, the covariances are 
+\deqn{ M(x,y) = \sigma^2 exp( - || u - v || ) }
+The nugget value \eqn{ \sigma^2 \tau^2 } is added to the diagonal of the covariance matrix.
+NOTE: the nugget is \eqn{ \sigma^2 \tau^2 }, not \eqn{ \tau^2 }.
 }
 

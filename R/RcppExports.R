@@ -269,7 +269,7 @@ d_exponential_anisotropic3D <- function(covparms, locs) {
 #' (B13,B23) can be interpreted as a drift vector in space over time
 #' if first two dimensions are space and third is time.
 #' Assuming x is transformed to u and y transformed to v, the covariances are 
-#' \deqn{ M(x,y) = \sigma^2 exp( - || u - v || )
+#' \deqn{ M(x,y) = \sigma^2 exp( - || u - v || ) }
 #' The nugget value \eqn{ \sigma^2 \tau^2 } is added to the diagonal of the covariance matrix.
 #' NOTE: the nugget is \eqn{ \sigma^2 \tau^2 }, not \eqn{ \tau^2 }. 
 exponential_anisotropic3D_alt <- function(covparms, locs) {
