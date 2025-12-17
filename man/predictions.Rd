@@ -7,7 +7,7 @@
 predictions(
   fit = NULL,
   locs_pred,
-  X_pred,
+  X_pred = NULL,
   y_obs = fit$y,
   locs_obs = fit$locs,
   X_obs = fit$X,
@@ -24,7 +24,7 @@ predictions(
 
 \item{locs_pred}{prediction locations}
 
-\item{X_pred}{Design matrix for predictions}
+\item{X_pred}{Design matrix for predictions. Can be omitted when X_obs is intercept-only}
 
 \item{y_obs}{Observations associated with locs_obs}
 

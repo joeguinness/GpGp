@@ -15,7 +15,7 @@
 #' @param locs_obs observation locations
 #' @param locs_pred prediction locations
 #' @param X_obs Design matrix for observations
-#' @param X_pred Design matrix for predictions
+#' @param X_pred Design matrix for predictions. Can be omitted when X_obs is intercept-only
 #' @param beta Linear mean parameters
 #' @param m Number of nearest neighbors to use
 #' @param reorder TRUE/FALSE for whether reordering should be done. This should
@@ -30,7 +30,7 @@
 #' parameters, the observations, observation locations, and design matrix. We 
 #' must specify the prediction locations and the prediction design matrix.
 #' @export
-predictions <- function(fit = NULL, locs_pred, X_pred, 
+predictions <- function(fit = NULL, locs_pred, X_pred = NULL, 
     y_obs = fit$y, locs_obs = fit$locs, X_obs = fit$X, beta = fit$betahat,    
     covparms = fit$covparms, covfun_name = fit$covfun_name, 
     m = 60, reorder = TRUE, st_scale = NULL){
@@ -40,7 +40,16 @@ predictions <- function(fit = NULL, locs_pred, X_pred,
     X_obs <- as.matrix( X_obs )
 
     locs_pred <- as.matrix(locs_pred)
-    X_pred <- as.matrix(X_pred)
+
+    # if X_pred is null, set it to intercept only, warn if X_obs is not
+    if( is.null(X_pred) ){
+        if( !all(X_obs == 1 ) ){
+            stop("X_pred must be specified when X_obs is not intercept-only")
+        }
+        X_pred <- matrix(1, nrow(locs_pred), 1 )
+    } else {
+        X_pred <- as.matrix(X_pred)
+    }
 
     # how many observations and predictions 
     n_obs <- nrow(locs_obs)

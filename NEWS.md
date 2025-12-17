@@ -1,4 +1,8 @@
 
+# GpGp 1.0.0
+
+Allow X_pred to be unspecified in 'predictions' when X_obs is intercept-only
+
 # GpGp 0.5.1
 
 Fixed minor issue in documentation.

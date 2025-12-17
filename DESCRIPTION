@@ -1,8 +1,8 @@
 Package: GpGp
 Type: Package
 Title: Fast Gaussian Process Computation Using Vecchia's Approximation
-Version: 0.5.1
-Date: 2024-10-15
+Version: 1.0.0
+Date: 2025-12-17
 Authors@R: c(
     person("Joseph", "Guinness", email = "joeguinness@gmail.com", role = c("aut", "cre")),
     person("Matthias", "Katzfuss", email = "katzfuss@gmail.com", role = "aut" ),
@@ -36,5 +36,5 @@ LinkingTo:
     Rcpp,
     RcppArmadillo,
     BH
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 LazyData: true
